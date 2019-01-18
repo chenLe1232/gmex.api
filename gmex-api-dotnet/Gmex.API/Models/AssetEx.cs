@@ -105,5 +105,10 @@ namespace Gmex.API.Models
         /// 重置间隔
         /// </summary>
         public UInt64 SumInterval { get; set; }
+
+        /// <summary>
+        /// 下次重制
+        /// </summary>
+        public UInt64 SumResetNext { get; set; }
     }
 }

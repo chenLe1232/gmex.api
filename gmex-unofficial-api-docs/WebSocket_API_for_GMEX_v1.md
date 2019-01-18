@@ -606,6 +606,8 @@ type AssetEx struct {
     SumAt uint64 `son:"SumAt,omitempty"`
     // 重置间隔
     SumInterval uint64 `json:"SumInterval,omitempty"`
+    // 下次重制
+    SumResetNext uint64 `json:"SumResetNext,omitempty"`
 }
 
 ```

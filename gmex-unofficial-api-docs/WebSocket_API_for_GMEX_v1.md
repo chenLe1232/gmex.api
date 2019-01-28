@@ -90,6 +90,7 @@ GMEX官方的生产环境：
 注意返回的结果是数组，只有配置了的交易对才会有，没配置的则没有数据，以交易对Sym为主键。
 
 交易对相关对应的结构定义如下：
+
 ```golang
 
 // **交易对/合约的结构定义**
@@ -120,6 +121,8 @@ type AssetD struct {
     FromC               string  // 从什么货币
     ToC                 string  // 兑换为什么货币
     TrdCls              int32   // 交易类型, 1-现货交易, 2-期货交易, 3-永续
+    MkSt                int32   // 合约、交易对的状态: 1-正常运行, 2-自动减仓, 3-暂停, 4-交易对已经关闭
+    Flag                int32   // 合约标志, 位操作: 1-反向报价or正向报价, 2-TODO, 4-自动结算, 8-禁止开仓, 16-停止交易
     SettleCoin          string  // 结算货币
     QuoteCoin           string  // 报价货币
     SettleR             float64 // 结算费率

@@ -138,6 +138,16 @@ namespace Gmex.API.Models
         public Int32 TrdCls { get; set; }
 
         /// <summary>
+        /// 合约、交易对的状态: 1-正常运行, 2-自动减仓, 3-暂停, 4-交易对已经关闭
+        /// </summary>
+        public Int32 MkSt { get; set; }
+
+        /// <summary>
+        /// 合约标志, 位操作: 1-反向报价or正向报价, 2-TODO, 4-自动结算, 8-禁止开仓, 16-停止交易
+        /// </summary>
+        public Int32 Flag { get; set; }
+
+        /// <summary>
         /// 结算货币
         /// </summary>
         public string SettleCoin { get; set; }

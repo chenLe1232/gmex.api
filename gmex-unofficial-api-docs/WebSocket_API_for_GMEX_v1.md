@@ -176,46 +176,71 @@ const (
 )
 
 // **交易对的扩展配置数据**
-type AssetEx struct {
-    // 合约符合/交易对符号
-    Sym  string  `json:"Sym"`
-    // 手续费计费方法
-    FM FeeMethod `json:"FM,omitempty"`
-    // 手续费，货币符号，如果未指定，则现货：按照收入额进行收取。期货：按照SettleCoin进行。
-    // 如果指定了FeeCoin则从该币种钱包内进行扣除。注意到，如果该钱包余额不足，则依旧使用SettleCoin进行
-    FeeCoin string `json:"FeeCoin,omitempty"`
-    // 折扣率
-    FeeDiscR float64 `json:"FeeDiscR"`
-    // 开放交易时间 (日内,毫秒)
-    OnAt uint64 `json:"OnAt,omitempty"`
-    // 关闭交易时间 (日内,毫秒)
-    OffAt uint64 `json:"OffAt,omitempty"`
-    // 价格涨价幅度 万分比 * 10000
-    RiseR int64 `json:"RiseR,omitempty"`
-    // 价格跌价幅度 万分比 * 10000
-    FallR int64 `json:"FallR,omitempty"`
-    // 最小价格
-    PrzMin float64 `json:"PrzMin,omitempty"`
-    // 买入量
-    LmtBid float64 `json:"LmtBid,omitempty"`
-    // 卖出量
-    LmtAsk float64 `json:"LmtAsk,omitempty"`
-    // 买入卖出总量
-    LmtBidAsk float64 `json:"LmtBidAsk,omitempty"`
-    // 买入次数
-    LmtNumBid uint64 `json:"LmtNumBid,omitempty"`
-    // 卖出次数
-    LmtNumAsk uint64 `json:"LmtNumAsk,omitempty"`
-    // 买入卖出总次数
-    LmtNumBidAsk uint64 `json:"LmtNumBidAsk,omitempty"`
-    // 委托的买价偏离盘口比例(小数)
-    BidPrzR float64 `json:"BidPrzR,omitempty"`
-    // 委托的卖价偏离盘口比例(小数)
-    AskPrzR float64 `json:"AskPrzR,omitempty"`
-    // 从0点开始，在每天的什么时间，开始重置统计值(绝对时间,毫秒)
-    SumAt uint64 `son:"SumAt,omitempty"`
-    // 重置间隔
-    SumInterval uint64 `json:"SumInterval,omitempty"`
+type V2AssetCfg struct {
+	// 交易对(合约对)
+	Sym string `protobuf:"bytes,1,opt,name=Sym,proto3" json:"Sym,omitempty"`
+	// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 手续费计费方法
+	FM FeeMethod `protobuf:"varint,5,opt,name=FM,proto3,enum=Protocol.FeeMethod" json:"FM,omitempty"`
+	// 尚未支持
+	// 手续费，货币符号，如果未指定，则现货：按照收入额进行收取。期货：按照SettleCoin进行。
+	// 如果指定了FeeCoin则从该币种钱包内进行扣除。注意到，如果该钱包余额不足，则依旧使用SettleCoin进行
+	FeeCoin string `protobuf:"bytes,6,opt,name=FeeCoin,proto3" json:"FeeCoin,omitempty"`
+	// 折扣率
+	FeeDiscR gaea_Num.Flt `protobuf:"bytes,7,opt,name=FeeDiscR,proto3,customtype=gaea/Num.Flt" json:"FeeDiscR" xorm:"char(64)"`
+	// 开放交易时间 (日内,毫秒)
+	OnAt uint64 `protobuf:"varint,10,opt,name=OnAt,proto3" json:"OnAt,omitempty"`
+	// 关闭交易时间 (日内,毫秒)
+	OffAt uint64 `protobuf:"varint,11,opt,name=OffAt,proto3" json:"OffAt,omitempty"`
+	// 价格涨价幅度 万分比 * 10000
+	RiseR int64 `protobuf:"varint,15,opt,name=RiseR,proto3" json:"RiseR,omitempty"`
+	// 价格跌价幅度 万分比 * 10000
+	FallR int64 `protobuf:"varint,16,opt,name=FallR,proto3" json:"FallR,omitempty"`
+	// 最小价格
+	PrzMin float64 `protobuf:"fixed64,17,opt,name=PrzMin,proto3" json:"PrzMin,omitempty"`
+	// 买入量
+	LmtBid float64 `protobuf:"fixed64,20,opt,name=LmtBid,proto3" json:"LmtBid,omitempty"`
+	// 卖出量
+	LmtAsk float64 `protobuf:"fixed64,21,opt,name=LmtAsk,proto3" json:"LmtAsk,omitempty"`
+	// 买入卖出总量
+	LmtBidAsk float64 `protobuf:"fixed64,22,opt,name=LmtBidAsk,proto3" json:"LmtBidAsk,omitempty"`
+	// 买入次数
+	LmtNumBid uint64 `protobuf:"varint,23,opt,name=LmtNumBid,proto3" json:"LmtNumBid,omitempty"`
+	// 卖出次数
+	LmtNumAsk uint64 `protobuf:"varint,24,opt,name=LmtNumAsk,proto3" json:"LmtNumAsk,omitempty"`
+	// 买入卖出总次数
+	LmtNumBidAsk uint64 `protobuf:"varint,25,opt,name=LmtNumBidAsk,proto3" json:"LmtNumBidAsk,omitempty"`
+	// 委托的买价偏离盘口比例(小数)
+	BidPrzR float64 `protobuf:"fixed64,26,opt,name=BidPrzR,proto3" json:"BidPrzR,omitempty"`
+	// 委托的买价偏离盘口比例(小数)
+	AskPrzR float64 `protobuf:"fixed64,27,opt,name=AskPrzR,proto3" json:"AskPrzR,omitempty"`
+	// 每统计周期 净卖量。如果为0，则表示不进行检查
+	LmtNetAsk float64 `protobuf:"fixed64,28,opt,name=LmtNetAsk,proto3" json:"LmtNetAsk,omitempty"`
+	// 每统计周期 卖/买比率. 如果为0，则表示不进行检查
+	LmtAskQBid float64 `protobuf:"fixed64,29,opt,name=LmtAskQBid,proto3" json:"LmtAskQBid,omitempty"`
+	// 从0点开始，在每天的什么时间，开始重置统计值(绝对时间,毫秒)
+	SumAt uint64 `protobuf:"varint,30,opt,name=SumAt,proto3" json:"SumAt,omitempty"`
+	// 重置间隔
+	SumInterval uint64 `protobuf:"varint,31,opt,name=SumInterval,proto3" json:"SumInterval,omitempty"`
+	// 下次重制
+	SumResetNext uint64 `protobuf:"varint,32,opt,name=SumResetNext,proto3" json:"SumResetNext,omitempty"`
+	// 求用户的最近的买入价格的量
+	SzForAvg float64 `protobuf:"fixed64,33,opt,name=SzForAvg,proto3" json:"SzForAvg,omitempty"`
+	// Maker最低手续费
+	FeeMkrMin gaea_Num.Flt `protobuf:"bytes,40,opt,name=FeeMkrMin,proto3,customtype=gaea/Num.Flt" json:"FeeMkrMin" xorm:"char(64)"`
+	// Taker最低手续费
+	FeeTkrMin gaea_Num.Flt `protobuf:"bytes,41,opt,name=FeeTkrMin,proto3,customtype=gaea/Num.Flt" json:"FeeTkrMin" xorm:"char(64)"`
+	// 下面是挖矿相关设定
+	// 每日有挖矿算力的交易量
+	SzMaxFM float64 `protobuf:"fixed64,50,opt,name=SzMaxFM,proto3" json:"SzMaxFM,omitempty"`
+	// 每日有挖矿算力的交易次数
+	NumMaxFM float64 `protobuf:"fixed64,51,opt,name=NumMaxFM,proto3" json:"NumMaxFM,omitempty"`
+	// 涨经验的交易量完成率.当交易量达到 SzMaxFM * ExpRatio Exp ++
+	ExpRatio float64 `protobuf:"fixed64,52,opt,name=ExpRatio,proto3" json:"ExpRatio,omitempty"`
+	// 最大Exp
+	ExpMax int64 `protobuf:"varint,53,opt,name=ExpMax,proto3" json:"ExpMax,omitempty"`
+	// 标志位
+	Flag AssetFlag `protobuf:"varint,98,opt,name=Flag,proto3,enum=Protocol.AssetFlag" json:"Flag,omitempty"`
 }
 
 ```
@@ -1171,76 +1196,18 @@ args: {
     }
 ```
 
+
 14. 更多的查询功能(内测中)
 
-更多查询功能当前内测的有：GetAssetExCfg，GetExchangeRate，GetMktSum，GetTrdSum；查询的参数args需要
-AId和Sym，对应的数据结构如下：
+更多查询功能当前内测的有：
+    - GetAssetExCfg, 返回结果对应结构 V2AssetCfg;
+    - GetExchangeRate，返回结果对应结构 V2ExchangeRate;
+    - GetMktSum，返回结果对应结构 V2MktSum;
+    - GetTrdSum；返回结果对应结构 V2TrdSum;
+
+以上查询操作的参数args需要AId和Sym。
 
 ```golang
-
-// GetAssetExCfg 的返回结构，交易对扩展定义字段
-type V2AssetCfg struct {
-	// 交易对(合约对)
-	Sym string `protobuf:"bytes,1,opt,name=Sym,proto3" json:"Sym,omitempty"`
-	// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 手续费计费方法
-	FM FeeMethod `protobuf:"varint,5,opt,name=FM,proto3,enum=Protocol.FeeMethod" json:"FM,omitempty"`
-	// 尚未支持
-	// 手续费，货币符号，如果未指定，则现货：按照收入额进行收取。期货：按照SettleCoin进行。
-	// 如果指定了FeeCoin则从该币种钱包内进行扣除。注意到，如果该钱包余额不足，则依旧使用SettleCoin进行
-	FeeCoin string `protobuf:"bytes,6,opt,name=FeeCoin,proto3" json:"FeeCoin,omitempty"`
-	// 折扣率
-	FeeDiscR gaea_Num.Flt `protobuf:"bytes,7,opt,name=FeeDiscR,proto3,customtype=gaea/Num.Flt" json:"FeeDiscR" xorm:"char(64)"`
-	// 开放交易时间 (日内,毫秒)
-	OnAt uint64 `protobuf:"varint,10,opt,name=OnAt,proto3" json:"OnAt,omitempty"`
-	// 关闭交易时间 (日内,毫秒)
-	OffAt uint64 `protobuf:"varint,11,opt,name=OffAt,proto3" json:"OffAt,omitempty"`
-	// 价格涨价幅度 万分比 * 10000
-	RiseR int64 `protobuf:"varint,15,opt,name=RiseR,proto3" json:"RiseR,omitempty"`
-	// 价格跌价幅度 万分比 * 10000
-	FallR int64 `protobuf:"varint,16,opt,name=FallR,proto3" json:"FallR,omitempty"`
-	// 最小价格
-	PrzMin float64 `protobuf:"fixed64,17,opt,name=PrzMin,proto3" json:"PrzMin,omitempty"`
-	// 买入量
-	LmtBid float64 `protobuf:"fixed64,20,opt,name=LmtBid,proto3" json:"LmtBid,omitempty"`
-	// 卖出量
-	LmtAsk float64 `protobuf:"fixed64,21,opt,name=LmtAsk,proto3" json:"LmtAsk,omitempty"`
-	// 买入卖出总量
-	LmtBidAsk float64 `protobuf:"fixed64,22,opt,name=LmtBidAsk,proto3" json:"LmtBidAsk,omitempty"`
-	// 买入次数
-	LmtNumBid uint64 `protobuf:"varint,23,opt,name=LmtNumBid,proto3" json:"LmtNumBid,omitempty"`
-	// 卖出次数
-	LmtNumAsk uint64 `protobuf:"varint,24,opt,name=LmtNumAsk,proto3" json:"LmtNumAsk,omitempty"`
-	// 买入卖出总次数
-	LmtNumBidAsk uint64 `protobuf:"varint,25,opt,name=LmtNumBidAsk,proto3" json:"LmtNumBidAsk,omitempty"`
-	// 委托的买价偏离盘口比例(小数)
-	BidPrzR float64 `protobuf:"fixed64,26,opt,name=BidPrzR,proto3" json:"BidPrzR,omitempty"`
-	// 委托的买价偏离盘口比例(小数)
-	AskPrzR float64 `protobuf:"fixed64,27,opt,name=AskPrzR,proto3" json:"AskPrzR,omitempty"`
-	// 每统计周期 净卖量。如果为0，则表示不进行检查
-	LmtNetAsk float64 `protobuf:"fixed64,28,opt,name=LmtNetAsk,proto3" json:"LmtNetAsk,omitempty"`
-	// 每统计周期 卖/买比率. 如果为0，则表示不进行检查
-	LmtAskQBid float64 `protobuf:"fixed64,29,opt,name=LmtAskQBid,proto3" json:"LmtAskQBid,omitempty"`
-	// 从0点开始，在每天的什么时间，开始重置统计值(绝对时间,毫秒)
-	SumAt uint64 `protobuf:"varint,30,opt,name=SumAt,proto3" json:"SumAt,omitempty"`
-	// 重置间隔
-	SumInterval uint64 `protobuf:"varint,31,opt,name=SumInterval,proto3" json:"SumInterval,omitempty"`
-	// 下次重制
-	SumResetNext uint64 `protobuf:"varint,32,opt,name=SumResetNext,proto3" json:"SumResetNext,omitempty"`
-	// 求用户的最近的买入价格的量
-	SzForAvg float64 `protobuf:"fixed64,33,opt,name=SzForAvg,proto3" json:"SzForAvg,omitempty"`
-	// Maker最低手续费
-	FeeMkrMin gaea_Num.Flt `protobuf:"bytes,40,opt,name=FeeMkrMin,proto3,customtype=gaea/Num.Flt" json:"FeeMkrMin" xorm:"char(64)"`
-	// Taker最低手续费
-	FeeTkrMin gaea_Num.Flt `protobuf:"bytes,41,opt,name=FeeTkrMin,proto3,customtype=gaea/Num.Flt" json:"FeeTkrMin" xorm:"char(64)"`
-	// 下面是挖矿相关设定
-	// 每日有挖矿算力的交易量
-	SzMaxForMining float64 `protobuf:"fixed64,50,opt,name=SzMaxForMining,proto3" json:"SzMaxForMining,omitempty"`
-	// 日收益率
-	ROEPerDay float64 `protobuf:"fixed64,51,opt,name=ROEPerDay,proto3" json:"ROEPerDay,omitempty"`
-	// 标志位
-	Flag AssetFlag `protobuf:"varint,98,opt,name=Flag,proto3,enum=Protocol.AssetFlag" json:"Flag,omitempty"`
-}
 
 // GetExchangeRate 返回的结构定义：
 type V2ExchangeRate struct {
@@ -1321,8 +1288,6 @@ type V2TrdSum struct {
 	MPL int64 `protobuf:"varint,40,opt,name=MPL,proto3" json:"MPL,omitempty"`
 	// 挖矿Exp
 	MPExp int64 `protobuf:"varint,41,opt,name=MPExp,proto3" json:"MPExp,omitempty"`
-	// 脏标志
-	DirtyFlag Dirty `protobuf:"varint,99,opt,name=DirtyFlag,proto3,enum=Protocol.Dirty" json:"DirtyFlag,omitempty"`
 }
 ```
 

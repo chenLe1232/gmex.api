@@ -95,7 +95,6 @@
                 "OrderMaxQty": 10000000.0,              // 最大委托量
                 "OrderMinQty": 1.0,                     // 最小委托量
                 "PosLmtStart": 1000000000,
-                "PosOpenRatio": 1,
                 "PrzMFairBasis": 27,
                 "PrzMFairBasisCalc": 100,
                 "PrzMFairBasisRate": 5,
@@ -1068,6 +1067,9 @@ type AssetEx struct {
     }
 }
 ```
+
+* 其它的一些查询操作 GetAssetExCfg，GetExchangeRate，GetMktSum，GetTrdSum；查询的参数args需要
+AId和Sym，对应的数据结构请参考WebSocket_API的文档.
 
 ## 错误码定义
 错误码在REST和WS两种API中定义是一致的，请参考 WebSocket_API_for_GMEX_v1.md 里的定义和说明。

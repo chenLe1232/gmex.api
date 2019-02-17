@@ -50,7 +50,6 @@ GMEX官方的生产环境：
             "OpenInterest":2181200,
             "PrzIndex":244.8863,
             "PosLmtStart":10000000,
-            "PosOpenRatio":0.05,
             "FeeMkrR":-0.0003,
             "FeeTkrR":0.0007,
             "Mult":1,
@@ -71,9 +70,9 @@ GMEX官方的生产环境：
             "FundingTolerance": 59,       // 偏移宽容度
             "FundingFeeR": 60             // Funding结算佣金
         },
-        {"Sym":"BTC1812","Beg":1,"Expire":1545984000000,"PrzMaxChg":1000,"PrzMinInc":0.5,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":6731.3100000000004001776687800884246826171875,"MIR":0.07,"MMR":0.05,"PrzLatest":6731.0,"OpenInterest":3431840,"PrzIndex":6737.3525,"PosLmtStart":10000000,"PosOpenRatio":0.05,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"BTC","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"BTC","QuoteCoin":"BTC","SettleR":0.0005,"DenyOpenAfter":1545980400000},
-        {"Sym":"ETH1809","Beg":1,"Expire":1538121600000,"PrzMaxChg":1000,"PrzMinInc":0.05,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":244.19999999999998863131622783839702606201171875,"MIR":0.07,"MMR":0.05,"PrzLatest":244.20,"OpenInterest":4500733,"PrzIndex":244.8863,"PosLmtStart":10000000,"PosOpenRatio":0.05,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"ETH","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"ETH","QuoteCoin":"ETH","SettleR":0.0005,"DenyOpenAfter":1538118000000},
-        {"Sym":"BTC1809","Beg":1,"Expire":1538121600000,"PrzMaxChg":1000,"PrzMinInc":0.5,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":6727.5500000000001818989403545856475830078125,"MIR":0.07,"MMR":0.05,"PrzLatest":6728.0,"OpenInterest":1451134,"PrzIndex":6737.3525,"PosLmtStart":10000000,"PosOpenRatio":0.05,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"BTC","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"BTC","QuoteCoin":"BTC","SettleR":0.0005,"DenyOpenAfter":1538118000000}
+        {"Sym":"BTC1812","Beg":1,"Expire":1545984000000,"PrzMaxChg":1000,"PrzMinInc":0.5,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":6731.3100000000004001776687800884246826171875,"MIR":0.07,"MMR":0.05,"PrzLatest":6731.0,"OpenInterest":3431840,"PrzIndex":6737.3525,"PosLmtStart":10000000,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"BTC","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"BTC","QuoteCoin":"BTC","SettleR":0.0005,"DenyOpenAfter":1545980400000},
+        {"Sym":"ETH1809","Beg":1,"Expire":1538121600000,"PrzMaxChg":1000,"PrzMinInc":0.05,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":244.19999999999998863131622783839702606201171875,"MIR":0.07,"MMR":0.05,"PrzLatest":244.20,"OpenInterest":4500733,"PrzIndex":244.8863,"PosLmtStart":10000000,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"ETH","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"ETH","QuoteCoin":"ETH","SettleR":0.0005,"DenyOpenAfter":1538118000000},
+        {"Sym":"BTC1809","Beg":1,"Expire":1538121600000,"PrzMaxChg":1000,"PrzMinInc":0.5,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":6727.5500000000001818989403545856475830078125,"MIR":0.07,"MMR":0.05,"PrzLatest":6728.0,"OpenInterest":1451134,"PrzIndex":6737.3525,"PosLmtStart":10000000,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"BTC","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"BTC","QuoteCoin":"BTC","SettleR":0.0005,"DenyOpenAfter":1538118000000}
     ]
 }
 ```
@@ -92,6 +91,33 @@ GMEX官方的生产环境：
 交易对相关对应的结构定义如下：
 
 ```golang
+
+//
+// 合约标志
+type AssetFlag int32
+
+const (
+	// 占位、无任何标志
+	AssetFlag_CF_INVALID AssetFlag = 0
+	// 例:盈亏 = 合约数量 * 乘数 * ( ( - 1/平仓价格) - ( - 1/开仓价格 ) ).如果是正向合约: 盈亏 = 合约数量 * 乘数 * ( ( 1 * 平仓价格 ) - ( 1 * 开仓价格 ) )
+	AssetFlag_PRZ_INVERSE AssetFlag = 1
+	// 在必要的情况下，进行自动减仓操作。未使用
+	AssetFlag_DO_ADL AssetFlag = 2
+	// 自动结算
+	AssetFlag_AUTO_SETTLE AssetFlag = 4
+	// 禁止开仓
+	AssetFlag_DENY_OPEN AssetFlag = 8
+	// 停止交易
+	AssetFlag_TRADE_STOPPED AssetFlag = 16
+	// 手续费率设定方法
+	AssetFlag_FEE_R_FOR_BUYSELL AssetFlag = 32
+	// 激活挖矿系统
+	AssetFlag_ENABLE_MINING AssetFlag = 64
+	// KNodelist更新时，更新价格区段
+	AssetFlag_UPDATE_PRZ_LIMIT AssetFlag = 256
+	// 数据失效
+	AssetFlag_DATA_INVALID AssetFlag = 512
+)
 
 // **交易对/合约的结构定义**
 type AssetD struct {
@@ -122,7 +148,7 @@ type AssetD struct {
     ToC                 string  // 兑换为什么货币
     TrdCls              int32   // 交易类型, 1-现货交易, 2-期货交易, 3-永续
     MkSt                int32   // 合约、交易对的状态: 1-正常运行, 2-自动减仓, 3-暂停, 4-交易对已经关闭
-    Flag                int32   // 合约标志, 位操作: 1-反向报价or正向报价, 2-TODO, 4-自动结算, 8-禁止开仓, 16-停止交易
+    Flag                AssetFlag   // 合约标志, 位操作
     SettleCoin          string  // 结算货币
     QuoteCoin           string  // 报价货币
     SettleR             float64 // 结算费率
@@ -489,7 +515,6 @@ type AssetEx struct {
             "OpenInterest":2181137,
             "PrzIndex":244.9823,
             "PosLmtStart":10000000,
-            "PosOpenRatio":0.05,
             "FeeMkrR":-0.0003,
             "FeeTkrR":0.0007,
             "Mult":1,
@@ -503,9 +528,9 @@ type AssetEx struct {
             "SettleR":0.0005,
             "DenyOpenAfter":1545980400000
         },
-        {"Sym":"BTC1812","Beg":1,"Expire":1545984000000,"PrzMaxChg":1000,"PrzMinInc":0.5,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":6725.75,"MIR":0.07,"MMR":0.05,"PrzLatest":6724.5,"OpenInterest":3431245,"PrzIndex":6729.2552,"PosLmtStart":10000000,"PosOpenRatio":0.05,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"BTC","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"BTC","QuoteCoin":"BTC","SettleR":0.0005,"DenyOpenAfter":1545980400000},
-        {"Sym":"ETH1809","Beg":1,"Expire":1538121600000,"PrzMaxChg":1000,"PrzMinInc":0.05,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":244.650000000000005684341886080801486968994140625,"MIR":0.07,"MMR":0.05,"PrzLatest":244.65,"OpenInterest":4501232,"PrzIndex":244.9823,"PosLmtStart":10000000,"PosOpenRatio":0.05,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"ETH","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"ETH","QuoteCoin":"ETH","SettleR":0.0005,"DenyOpenAfter":1538118000000},
-        {"Sym":"BTC1809","Beg":1,"Expire":1538121600000,"PrzMaxChg":1000,"PrzMinInc":0.5,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":6726.8000000000001818989403545856475830078125,"MIR":0.07,"MMR":0.05,"PrzLatest":6724.0,"OpenInterest":1449455,"PrzIndex":6729.2552,"PosLmtStart":10000000,"PosOpenRatio":0.05,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"BTC","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"BTC","QuoteCoin":"BTC","SettleR":0.0005,"DenyOpenAfter":1538118000000}
+        {"Sym":"BTC1812","Beg":1,"Expire":1545984000000,"PrzMaxChg":1000,"PrzMinInc":0.5,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":6725.75,"MIR":0.07,"MMR":0.05,"PrzLatest":6724.5,"OpenInterest":3431245,"PrzIndex":6729.2552,"PosLmtStart":10000000,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"BTC","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"BTC","QuoteCoin":"BTC","SettleR":0.0005,"DenyOpenAfter":1545980400000},
+        {"Sym":"ETH1809","Beg":1,"Expire":1538121600000,"PrzMaxChg":1000,"PrzMinInc":0.05,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":244.650000000000005684341886080801486968994140625,"MIR":0.07,"MMR":0.05,"PrzLatest":244.65,"OpenInterest":4501232,"PrzIndex":244.9823,"PosLmtStart":10000000,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"ETH","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"ETH","QuoteCoin":"ETH","SettleR":0.0005,"DenyOpenAfter":1538118000000},
+        {"Sym":"BTC1809","Beg":1,"Expire":1538121600000,"PrzMaxChg":1000,"PrzMinInc":0.5,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":6726.8000000000001818989403545856475830078125,"MIR":0.07,"MMR":0.05,"PrzLatest":6724.0,"OpenInterest":1449455,"PrzIndex":6729.2552,"PosLmtStart":10000000,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"BTC","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"BTC","QuoteCoin":"BTC","SettleR":0.0005,"DenyOpenAfter":1538118000000}
     ]
 }
 ```
@@ -1123,13 +1148,14 @@ args: {
     * }
     */
     // 请求发送参数
-    {"req":"GetRiskLimit","rid":"15","expires":1537712072667,"args":{"AId":"123456701",Sym:"BTC1812"},"signature": "1234567890abcdef1234567890abcdef"}
+    {"req":"GetRiskLimit","rid":"15","expires":1537712072667,"args":{"AId":"123456701","Sym":"BTC1812"},"signature": "1234567890abcdef1234567890abcdef"}
     // 接收到的返回消息
     {"rid":"15","code":0,"data":{....}}
 
 ```
 
 风险限额的定义如下
+
 ```golang
     // RiskLimit的数据结构
     type RiskLimitDef struct {
@@ -1143,6 +1169,161 @@ args: {
         StepIR      float64     // 每次递增的时候，MIR 的增量
         MaxOrdVal   float64     // 单笔委托的最大价值
     }
+```
+
+14. 更多的查询功能(内测中)
+
+更多查询功能当前内测的有：GetAssetExCfg，GetExchangeRate，GetMktSum，GetTrdSum；查询的参数args需要
+AId和Sym，对应的数据结构如下：
+
+```golang
+
+// GetAssetExCfg 的返回结构，交易对扩展定义字段
+type V2AssetCfg struct {
+	// 交易对(合约对)
+	Sym string `protobuf:"bytes,1,opt,name=Sym,proto3" json:"Sym,omitempty"`
+	// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 手续费计费方法
+	FM FeeMethod `protobuf:"varint,5,opt,name=FM,proto3,enum=Protocol.FeeMethod" json:"FM,omitempty"`
+	// 尚未支持
+	// 手续费，货币符号，如果未指定，则现货：按照收入额进行收取。期货：按照SettleCoin进行。
+	// 如果指定了FeeCoin则从该币种钱包内进行扣除。注意到，如果该钱包余额不足，则依旧使用SettleCoin进行
+	FeeCoin string `protobuf:"bytes,6,opt,name=FeeCoin,proto3" json:"FeeCoin,omitempty"`
+	// 折扣率
+	FeeDiscR gaea_Num.Flt `protobuf:"bytes,7,opt,name=FeeDiscR,proto3,customtype=gaea/Num.Flt" json:"FeeDiscR" xorm:"char(64)"`
+	// 开放交易时间 (日内,毫秒)
+	OnAt uint64 `protobuf:"varint,10,opt,name=OnAt,proto3" json:"OnAt,omitempty"`
+	// 关闭交易时间 (日内,毫秒)
+	OffAt uint64 `protobuf:"varint,11,opt,name=OffAt,proto3" json:"OffAt,omitempty"`
+	// 价格涨价幅度 万分比 * 10000
+	RiseR int64 `protobuf:"varint,15,opt,name=RiseR,proto3" json:"RiseR,omitempty"`
+	// 价格跌价幅度 万分比 * 10000
+	FallR int64 `protobuf:"varint,16,opt,name=FallR,proto3" json:"FallR,omitempty"`
+	// 最小价格
+	PrzMin float64 `protobuf:"fixed64,17,opt,name=PrzMin,proto3" json:"PrzMin,omitempty"`
+	// 买入量
+	LmtBid float64 `protobuf:"fixed64,20,opt,name=LmtBid,proto3" json:"LmtBid,omitempty"`
+	// 卖出量
+	LmtAsk float64 `protobuf:"fixed64,21,opt,name=LmtAsk,proto3" json:"LmtAsk,omitempty"`
+	// 买入卖出总量
+	LmtBidAsk float64 `protobuf:"fixed64,22,opt,name=LmtBidAsk,proto3" json:"LmtBidAsk,omitempty"`
+	// 买入次数
+	LmtNumBid uint64 `protobuf:"varint,23,opt,name=LmtNumBid,proto3" json:"LmtNumBid,omitempty"`
+	// 卖出次数
+	LmtNumAsk uint64 `protobuf:"varint,24,opt,name=LmtNumAsk,proto3" json:"LmtNumAsk,omitempty"`
+	// 买入卖出总次数
+	LmtNumBidAsk uint64 `protobuf:"varint,25,opt,name=LmtNumBidAsk,proto3" json:"LmtNumBidAsk,omitempty"`
+	// 委托的买价偏离盘口比例(小数)
+	BidPrzR float64 `protobuf:"fixed64,26,opt,name=BidPrzR,proto3" json:"BidPrzR,omitempty"`
+	// 委托的买价偏离盘口比例(小数)
+	AskPrzR float64 `protobuf:"fixed64,27,opt,name=AskPrzR,proto3" json:"AskPrzR,omitempty"`
+	// 每统计周期 净卖量。如果为0，则表示不进行检查
+	LmtNetAsk float64 `protobuf:"fixed64,28,opt,name=LmtNetAsk,proto3" json:"LmtNetAsk,omitempty"`
+	// 每统计周期 卖/买比率. 如果为0，则表示不进行检查
+	LmtAskQBid float64 `protobuf:"fixed64,29,opt,name=LmtAskQBid,proto3" json:"LmtAskQBid,omitempty"`
+	// 从0点开始，在每天的什么时间，开始重置统计值(绝对时间,毫秒)
+	SumAt uint64 `protobuf:"varint,30,opt,name=SumAt,proto3" json:"SumAt,omitempty"`
+	// 重置间隔
+	SumInterval uint64 `protobuf:"varint,31,opt,name=SumInterval,proto3" json:"SumInterval,omitempty"`
+	// 下次重制
+	SumResetNext uint64 `protobuf:"varint,32,opt,name=SumResetNext,proto3" json:"SumResetNext,omitempty"`
+	// 求用户的最近的买入价格的量
+	SzForAvg float64 `protobuf:"fixed64,33,opt,name=SzForAvg,proto3" json:"SzForAvg,omitempty"`
+	// Maker最低手续费
+	FeeMkrMin gaea_Num.Flt `protobuf:"bytes,40,opt,name=FeeMkrMin,proto3,customtype=gaea/Num.Flt" json:"FeeMkrMin" xorm:"char(64)"`
+	// Taker最低手续费
+	FeeTkrMin gaea_Num.Flt `protobuf:"bytes,41,opt,name=FeeTkrMin,proto3,customtype=gaea/Num.Flt" json:"FeeTkrMin" xorm:"char(64)"`
+	// 下面是挖矿相关设定
+	// 每日有挖矿算力的交易量
+	SzMaxForMining float64 `protobuf:"fixed64,50,opt,name=SzMaxForMining,proto3" json:"SzMaxForMining,omitempty"`
+	// 日收益率
+	ROEPerDay float64 `protobuf:"fixed64,51,opt,name=ROEPerDay,proto3" json:"ROEPerDay,omitempty"`
+	// 标志位
+	Flag AssetFlag `protobuf:"varint,98,opt,name=Flag,proto3,enum=Protocol.AssetFlag" json:"Flag,omitempty"`
+}
+
+// GetExchangeRate 返回的结构定义：
+type V2ExchangeRate struct {
+	// 交易对(合约对) Key
+	CoinPair string `protobuf:"bytes,1,opt,name=CoinPair,proto3" json:"CoinPair,omitempty"`
+	// 消耗
+	FromC string `protobuf:"bytes,2,opt,name=FromC,proto3" json:"FromC,omitempty"`
+	// 收入
+	ToC string `protobuf:"bytes,3,opt,name=ToC,proto3" json:"ToC,omitempty"`
+	// 买入价
+	Buy gaea_Num.Flt `protobuf:"bytes,10,opt,name=Buy,proto3,customtype=gaea/Num.Flt" json:"Buy" xorm:"char(64)"`
+	// 卖出价
+	Sell gaea_Num.Flt `protobuf:"bytes,11,opt,name=Sell,proto3,customtype=gaea/Num.Flt" json:"Sell" xorm:"char(64)"`
+	// 更新时间戳(毫秒)
+	Upd int64 `protobuf:"varint,20,opt,name=Upd,proto3" json:"Upd,omitempty"`
+	// 标志位
+	Flag AssetFlag `protobuf:"varint,98,opt,name=Flag,proto3,enum=Protocol.AssetFlag" json:"Flag,omitempty"`
+}
+
+// GetMktSum 返回的结构定义：
+type V2MktSum struct {
+	// 合约ID
+	Sym string `protobuf:"bytes,1,opt,name=Sym,proto3" json:"Sym,omitempty"`
+	// 开多仓量
+	PosL int64 `protobuf:"varint,2,opt,name=PosL,proto3" json:"PosL,omitempty"`
+	// 开多价值
+	ValL float64 `protobuf:"fixed64,3,opt,name=ValL,proto3" json:"ValL,omitempty"`
+	// 开空仓量
+	PosS int64 `protobuf:"varint,4,opt,name=PosS,proto3" json:"PosS,omitempty"`
+	// 开空价值
+	ValS float64 `protobuf:"fixed64,5,opt,name=ValS,proto3" json:"ValS,omitempty"`
+	// UPNL
+	UPNL float64 `protobuf:"fixed64,6,opt,name=UPNL,proto3" json:"UPNL,omitempty"`
+	// PNL
+	PNL float64 `protobuf:"fixed64,7,opt,name=PNL,proto3" json:"PNL,omitempty"`
+	// 用户数
+	Usrs int64 `protobuf:"varint,10,opt,name=Usrs,proto3" json:"Usrs,omitempty"`
+}
+
+
+// GetTrdSum 返回的结构定义：
+type V2TrdSum struct {
+	// 账号ID
+	AId string `protobuf:"bytes,1,opt,name=AId,proto3" json:"AId,omitempty"`
+	// 交易对
+	Sym string `protobuf:"bytes,2,opt,name=Sym,proto3" json:"Sym,omitempty"`
+	// 买入量
+	Bid float64 `protobuf:"fixed64,3,opt,name=Bid,proto3" json:"Bid,omitempty"`
+	// 卖出量
+	Ask float64 `protobuf:"fixed64,4,opt,name=Ask,proto3" json:"Ask,omitempty"`
+	// 买入次数
+	NumBid uint64 `protobuf:"varint,5,opt,name=NumBid,proto3" json:"NumBid,omitempty"`
+	// 卖出次数
+	NumAsk uint64 `protobuf:"varint,6,opt,name=NumAsk,proto3" json:"NumAsk,omitempty"`
+	// 本周期结束的时间戳(毫秒)
+	Next uint64 `protobuf:"varint,11,opt,name=Next,proto3" json:"Next,omitempty"`
+	// 最近一次买交易
+	LstPB float64 `protobuf:"fixed64,20,opt,name=LstPB,proto3" json:"LstPB,omitempty"`
+	// 最近一次买数量
+	LstQB float64 `protobuf:"fixed64,21,opt,name=LstQB,proto3" json:"LstQB,omitempty"`
+	// 最近一次买交易的时间(毫秒)
+	LstTB uint64 `protobuf:"varint,22,opt,name=LstTB,proto3" json:"LstTB,omitempty"`
+	// 最近一次卖交易价格
+	LstPA float64 `protobuf:"fixed64,25,opt,name=LstPA,proto3" json:"LstPA,omitempty"`
+	// 最近一次卖交易数量
+	LstQA float64 `protobuf:"fixed64,26,opt,name=LstQA,proto3" json:"LstQA,omitempty"`
+	// 最近一次卖交易的时间(毫秒)
+	LstTA uint64 `protobuf:"varint,27,opt,name=LstTA,proto3" json:"LstTA,omitempty"`
+	// 平均买入价
+	BAvg float64 `protobuf:"fixed64,30,opt,name=BAvg,proto3" json:"BAvg,omitempty"`
+	// 买入量
+	NBid float64 `protobuf:"fixed64,31,opt,name=NBid,proto3" json:"NBid,omitempty"`
+	// 平均卖出价
+	AAvg float64 `protobuf:"fixed64,32,opt,name=AAvg,proto3" json:"AAvg,omitempty"`
+	// 卖出量
+	NAsk float64 `protobuf:"fixed64,33,opt,name=NAsk,proto3" json:"NAsk,omitempty"`
+	// 挖矿算力等级
+	MPL int64 `protobuf:"varint,40,opt,name=MPL,proto3" json:"MPL,omitempty"`
+	// 挖矿Exp
+	MPExp int64 `protobuf:"varint,41,opt,name=MPExp,proto3" json:"MPExp,omitempty"`
+	// 脏标志
+	DirtyFlag Dirty `protobuf:"varint,99,opt,name=DirtyFlag,proto3,enum=Protocol.Dirty" json:"DirtyFlag,omitempty"`
+}
 ```
 
 

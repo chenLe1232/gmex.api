@@ -566,46 +566,138 @@ type V2AssetCfg struct {
 
 // **交易对/合约的结构定义**
 type AssetD struct {
-    Sym                 string  // 合约符合/交易对符号
-    Beg                 int64   // 开始时间,毫秒
-    Expire              int64   // 到期时间,毫秒
-    PrzMaxChg           int32   // 市价委托的撮合的最多次数。比如5
-    PrzMinInc           float64 // 最小的价格变化
-    PrzMax              float64 // 最大委托价格
-    OrderMaxQty         float64 // 最大委托数量
-    OrderMinQty         float64 // 最小委托数量
-    LotSz               float64 // 最小合约数量,每次买卖的合约数量必须是LotSz的倍数,当前只支持为1;
-    PrzM                float64 // 标记价格
-    MIR                 float64 // 起始保证金率
-    MMR                 float64 // 维持保证金率
-    PrzLatest           float64 // 最新成交价格
-    TotalVol            float64 // 总交易量
-    OpenInterest        int64   // 持仓量
-    Turnover            float64 // 总成交额
-    PrzIndex            float64 // 指数价格
-    PosLmtStart         int64   // 个人持仓比例激活条件
-    PrzRFMin            float64 // 当前涨跌价格范围 Prz Rise Fall Range
-    PrzRFMax            float64 // 当前涨跌价格范围最大值
-    FeeMkrR             float64 // 提供流动性的费率
-    FeeTkrR             float64 // 消耗流动性的费率
-    Mult                float64 // 乘数
-    FromC               string  // 从什么货币
-    ToC                 string  // 兑换为什么货币
-    TrdCls              int32   // 交易类型, 1-现货交易, 2-期货交易, 3-永续
-    SettleCoin          string  // 结算货币
-    QuoteCoin           string  // 报价货币
-    SettleR             float64 // 结算费率
-    DenyOpenAfter       int64   // 到期前禁止开仓时间,毫秒
-    FundingLongR        float64 // 当前周期内的资金费率
-    FundingPredictedR   float64 // 下个周期预测的资金费率
-    FundingShortR       float64 // 当前未使用字段
-    FundingInterval     uint32  // 结算间隔(毫秒)
-    FundingNext         int64   // 下次结算时间戳
-    FundingTolerance    float64 // 偏移宽容度
-    FundingFeeR         float64 // Funding结算佣金
-    FeeCoin             string  // 如果允许使用第三种货币支付手续费，则配置本项目
-    FeeDiscR            float64 // 如果允许使用第三种货币支付手续费，这里配置折扣率
-    Grp                 int64   // 交易对所属的分组ID，仅仅是一个逻辑分组概念.
+    // 符号 XBTUSD , XBTM18
+    Sym string `protobuf:"bytes,1,opt,name=Sym,proto3" json:"Sym,omitempty" xorm:"char(16)"`
+    // 开始时间
+    Beg int64 `protobuf:"varint,2,opt,name=Beg,proto3" json:"Beg,omitempty"`
+    // 到期日期 永续
+    Expire int64 `protobuf:"varint,3,opt,name=Expire,proto3" json:"Expire,omitempty"`
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 市价委托的撮合的最多次数。比如5
+    PrzMaxChg int32 `protobuf:"varint,4,opt,name=PrzMaxChg,proto3" json:"PrzMaxChg,omitempty"`
+    // 最小的价格变化	0.5 USD
+    PrzMinInc gaea_Num.Flt `protobuf:"bytes,5,opt,name=PrzMinInc,proto3,customtype=gaea/Num.Flt" json:"PrzMinInc" xorm:"char(64)"`
+    // 最大委托价格	1,000,000
+    PrzMax gaea_Num.Flt `protobuf:"bytes,6,opt,name=PrzMax,proto3,customtype=gaea/Num.Flt" json:"PrzMax" xorm:"char(64)"`
+    // 最大委托数量	10,000,000
+    OrderMaxQty gaea_Num.Flt `protobuf:"bytes,7,opt,name=OrderMaxQty,proto3,customtype=gaea/Num.Flt" json:"OrderMaxQty" xorm:"char(64)"`
+    // 最小合约数量	这个就是每次买卖的合约数量必须是LotSz的倍数。
+    LotSz gaea_Num.Flt `protobuf:"bytes,8,opt,name=LotSz,proto3,customtype=gaea/Num.Flt" json:"LotSz" xorm:"char(64)"`
+    // 保证金计算相关参数 开始
+    // 	标记价格	8103.14
+    PrzM gaea_Num.Flt `protobuf:"bytes,9,opt,name=PrzM,proto3,customtype=gaea/Num.Flt" json:"PrzM" xorm:"char(64)"`
+    // double LiqR = 10;	//Unused 已废弃。  从 PrzLiq 向 PrzBr偏离的百分比， 0 表示，= PrzLiq, 1 表示 到达PrzBr
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 起始保证金	 1.00% + 开仓佣金 + 平仓佣金 Mgn Initial Ratio
+    MIR gaea_Num.Flt `protobuf:"bytes,11,opt,name=MIR,proto3,customtype=gaea/Num.Flt" json:"MIR" xorm:"char(64)"`
+    // 维持保证金	0.50% + 平仓佣金 + 资金费率 Mgn Maintaince Ratio
+    MMR gaea_Num.Flt `protobuf:"bytes,12,opt,name=MMR,proto3,customtype=gaea/Num.Flt" json:"MMR" xorm:"char(64)"`
+    // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 风险限额	200 XBT
+    // Unused int64 RiskLimit = 13;
+    // 风险限额递增值	100 XBT
+    // Unused int64 RiskStep = 14;
+    // 标记方法	Prz Mark Method
+    PrzMMethod string `protobuf:"bytes,15,opt,name=PrzMMethod,proto3" json:"PrzMMethod,omitempty" xorm:"char(16)"`
+    // 合理基差	-12.36
+    PrzMFairBasis int64 `protobuf:"varint,16,opt,name=PrzMFairBasis,proto3" json:"PrzMFairBasis,omitempty"`
+    // 合理基差率	-410%
+    PrzMFairBasisRate int64 `protobuf:"varint,17,opt,name=PrzMFairBasisRate,proto3" json:"PrzMFairBasisRate,omitempty"`
+    // 合理基差计算公式	此合约的合理基差取决于年化资金费率。
+    PrzMFairBasisCalc int32 `protobuf:"varint,18,opt,name=PrzMFairBasisCalc,proto3" json:"PrzMFairBasisCalc,omitempty"`
+    // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 委托的最小价值. 废弃字段。
+    OrderMinVal gaea_Num.Flt `protobuf:"bytes,19,opt,name=OrderMinVal,proto3,customtype=gaea/Num.Flt" json:"OrderMinVal" xorm:"char(64)"`
+    // 保证金计算相关参数 结束
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 统计信息：
+    // 最新成交价格
+    PrzLatest gaea_Num.Flt `protobuf:"bytes,20,opt,name=PrzLatest,proto3,customtype=gaea/Num.Flt" json:"PrzLatest" xorm:"char(64)"`
+    // 保证金计算相关参数 结束
+    // 最新的成交方向
+    DirLatest OrderDir `protobuf:"varint,21,opt,name=DirLatest,proto3,enum=Protocol.OrderDir" json:"DirLatest,omitempty"`
+    // 总交易量	30,585,913,058
+    TotalVol float64 `protobuf:"fixed64,22,opt,name=TotalVol,proto3" json:"TotalVol,omitempty"`
+    // 持仓量	99,192,762
+    OpenInterest int64 `protobuf:"varint,23,opt,name=OpenInterest,proto3" json:"OpenInterest,omitempty"`
+    // 总成交额	26,293.1141 XBT
+    Turnover float64 `protobuf:"fixed64,24,opt,name=Turnover,proto3" json:"Turnover,omitempty"`
+    // 增加指数价格
+    PrzIndex gaea_Num.Flt `protobuf:"bytes,25,opt,name=PrzIndex,proto3,customtype=gaea/Num.Flt" json:"PrzIndex" xorm:"char(64)"`
+    // 类型	结算货币为 XBT，计价货币为 USD
+    // 	int32 SettleUnit = 25; 未使用。
+    // 合约大小	1 USD (目前每张合约价值 0.00012341 XBT)，注意到，是以计价货币来表示的
+    AssetSz int64 `protobuf:"varint,26,opt,name=AssetSz,proto3" json:"AssetSz,omitempty"`
+    // 结算	此合约为永续无结算合约。
+    // 或者 此合约在 6月29日 下午8:00 (UTC 下午12:00:00) 按照 .BXBT30M 指数 价格结算。
+    // 结算日期
+    // int64 SettleTime = 27;  与 Expire同义
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PosLmtStart int64 `protobuf:"varint,27,opt,name=PosLmtStart,proto3" json:"PosLmtStart,omitempty"`
+    // 个人占用开仓
+    // 当前涨跌价格范围 Prz Rise Fall Range
+    PrzRFMin float64 `protobuf:"fixed64,28,opt,name=PrzRFMin,proto3" json:"PrzRFMin,omitempty"`
+    // 当前涨跌价格范围最大值
+    PrzRFMax float64 `protobuf:"fixed64,29,opt,name=PrzRFMax,proto3" json:"PrzRFMax,omitempty"`
+    // 佣金费率
+    // 提供流动性的费率	FeeMkrR
+    FeeMkrR gaea_Num.Flt `protobuf:"bytes,30,opt,name=FeeMkrR,proto3,customtype=gaea/Num.Flt" json:"FeeMkrR" xorm:"char(64)"`
+    // 消耗流动性的费率
+    FeeTkrR gaea_Num.Flt `protobuf:"bytes,31,opt,name=FeeTkrR,proto3,customtype=gaea/Num.Flt" json:"FeeTkrR" xorm:"char(64)"`
+    // Order中，Qty必须是Mult的倍数
+    Mult gaea_Num.Flt `protobuf:"bytes,32,opt,name=Mult,proto3,customtype=gaea/Num.Flt" json:"Mult" xorm:"char(64)"`
+    // 从什么货币 购买行为消耗的货币符号
+    FromC string `protobuf:"bytes,33,opt,name=FromC,proto3" json:"FromC,omitempty" xorm:"char(16)"`
+    // 兑换为 什么货币  购买行为得到的货币符号
+    ToC string `protobuf:"bytes,34,opt,name=ToC,proto3" json:"ToC,omitempty" xorm:"char(16)"`
+    // 交易类型
+    TrdCls TradeClass `protobuf:"varint,40,opt,name=TrdCls,proto3,enum=Protocol.TradeClass" json:"TrdCls,omitempty"`
+    // 市场状态
+    MkSt MkStatus `protobuf:"varint,41,opt,name=MkSt,proto3,enum=Protocol.MkStatus" json:"MkSt,omitempty"`
+    // 标志, 正向报价，反向报价
+    Flag AssetFlag `protobuf:"varint,42,opt,name=Flag,proto3,enum=Protocol.AssetFlag" json:"Flag,omitempty"`
+    // 结算货币
+    SettleCoin string `protobuf:"bytes,43,opt,name=SettleCoin,proto3" json:"SettleCoin,omitempty" xorm:"char(16)"`
+    // 报价货币
+    QuoteCoin string `protobuf:"bytes,44,opt,name=QuoteCoin,proto3" json:"QuoteCoin,omitempty" xorm:"char(16)"`
+    // 结算费率
+    SettleR gaea_Num.Flt `protobuf:"bytes,45,opt,name=SettleR,proto3,customtype=gaea/Num.Flt" json:"SettleR" xorm:"char(64)"`
+    // 时间节点：当越过了DenyOpenAfter后，不允许开新仓
+    DenyOpenAfter int64 `protobuf:"varint,46,opt,name=DenyOpenAfter,proto3" json:"DenyOpenAfter,omitempty"`
+    // 如果允许使用第三种货币支付手续费，则配置本项目
+    FeeCoin string `protobuf:"bytes,47,opt,name=FeeCoin,proto3" json:"FeeCoin,omitempty"`
+    // 如果允许使用第三种货币支付手续费，这里配置折扣率
+    FeeDiscR gaea_Num.Flt `protobuf:"bytes,48,opt,name=FeeDiscR,proto3,customtype=gaea/Num.Flt" json:"FeeDiscR" xorm:"char(64)"`
+    // 最大委托数量	10,000,000
+    OrderMinQty gaea_Num.Flt `protobuf:"bytes,49,opt,name=OrderMinQty,proto3,customtype=gaea/Num.Flt" json:"OrderMinQty" xorm:"char(64)"`
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 永续合约专属数据
+    // 基础货币利率符号	.XBTBON8H
+    InterestBaseSym string `protobuf:"bytes,50,opt,name=InterestBaseSym,proto3" json:"InterestBaseSym,omitempty" xorm:"char(16)"`
+    // 计价货币利率符号	.USDBON8H
+    InterestQuoteSym string `protobuf:"bytes,51,opt,name=InterestQuoteSym,proto3" json:"InterestQuoteSym,omitempty" xorm:"char(16)"`
+    // 资金费用溢价符号	.XBTUSDPI8H
+    FundingPremiumSym string `protobuf:"bytes,52,opt,name=FundingPremiumSym,proto3" json:"FundingPremiumSym,omitempty" xorm:"char(16)"`
+    // 资金费率	-0.3750%
+    // 多仓资金费率
+    FundingLongR float64 `protobuf:"fixed64,53,opt,name=FundingLongR,proto3" json:"FundingLongR,omitempty"`
+    // 空仓资金费率
+    FundingShortR float64 `protobuf:"fixed64,54,opt,name=FundingShortR,proto3" json:"FundingShortR,omitempty"`
+    // 资金费用收取间隔 秒。	每 8 小时 //秒，8小时 = 8 * 3600 秒 = 28800 秒 = 28800000 毫秒
+    FundingInterval uint32 `protobuf:"varint,55,opt,name=FundingInterval,proto3" json:"FundingInterval,omitempty"`
+    // 下一个资金费率结算的时间。2018年4月16日 下午8:00:00. 时间戳 毫秒
+    FundingNext int64 `protobuf:"varint,56,opt,name=FundingNext,proto3" json:"FundingNext,omitempty"`
+    // 预测费率	-0.3586%
+    FundingPredictedR float64 `protobuf:"fixed64,57,opt,name=FundingPredictedR,proto3" json:"FundingPredictedR,omitempty"`
+    // 每日0点后的 FundingOffset 毫秒后 为第一个结算时间点
+    FundingOffset int64 `protobuf:"varint,58,opt,name=FundingOffset,proto3" json:"FundingOffset,omitempty"`
+    // 资金费率计算参数: 公差
+    FundingTolerance float64 `protobuf:"fixed64,59,opt,name=FundingTolerance,proto3" json:"FundingTolerance,omitempty"`
+    // Funding结算佣金
+    FundingFeeR gaea_Num.Flt `protobuf:"bytes,60,opt,name=FundingFeeR,proto3,customtype=gaea/Num.Flt" json:"FundingFeeR" xorm:"char(64)"`
+    // 交易对分组. 比如分组
+    Grp int64 `protobuf:"varint,100,opt,name=Grp,proto3" json:"Grp,omitempty"`
 }
 
 // **定义手续分的收取方式**

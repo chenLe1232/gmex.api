@@ -97,26 +97,26 @@ GMEX官方的生产环境：
 type AssetFlag int32
 
 const (
-	// 占位、无任何标志
-	AssetFlag_CF_INVALID AssetFlag = 0
-	// 例:盈亏 = 合约数量 * 乘数 * ( ( - 1/平仓价格) - ( - 1/开仓价格 ) ).如果是正向合约: 盈亏 = 合约数量 * 乘数 * ( ( 1 * 平仓价格 ) - ( 1 * 开仓价格 ) )
-	AssetFlag_PRZ_INVERSE AssetFlag = 1
-	// 在必要的情况下，进行自动减仓操作。未使用
-	AssetFlag_DO_ADL AssetFlag = 2
-	// 自动结算
-	AssetFlag_AUTO_SETTLE AssetFlag = 4
-	// 禁止开仓
-	AssetFlag_DENY_OPEN AssetFlag = 8
-	// 停止交易
-	AssetFlag_TRADE_STOPPED AssetFlag = 16
-	// 手续费率设定方法
-	AssetFlag_FEE_R_FOR_BUYSELL AssetFlag = 32
-	// 激活挖矿系统
-	AssetFlag_ENABLE_MINING AssetFlag = 64
-	// KNodelist更新时，更新价格区段
-	AssetFlag_UPDATE_PRZ_LIMIT AssetFlag = 256
-	// 数据失效
-	AssetFlag_DATA_INVALID AssetFlag = 512
+    // 占位、无任何标志
+    AssetFlag_CF_INVALID AssetFlag = 0
+    // 例:盈亏 = 合约数量 * 乘数 * ( ( - 1/平仓价格) - ( - 1/开仓价格 ) ).如果是正向合约: 盈亏 = 合约数量 * 乘数 * ( ( 1 * 平仓价格 ) - ( 1 * 开仓价格 ) )
+    AssetFlag_PRZ_INVERSE AssetFlag = 1
+    // 在必要的情况下，进行自动减仓操作。未使用
+    AssetFlag_DO_ADL AssetFlag = 2
+    // 自动结算
+    AssetFlag_AUTO_SETTLE AssetFlag = 4
+    // 禁止开仓
+    AssetFlag_DENY_OPEN AssetFlag = 8
+    // 停止交易
+    AssetFlag_TRADE_STOPPED AssetFlag = 16
+    // 手续费率设定方法
+    AssetFlag_FEE_R_FOR_BUYSELL AssetFlag = 32
+    // 激活挖矿系统
+    AssetFlag_ENABLE_MINING AssetFlag = 64
+    // KNodelist更新时，更新价格区段
+    AssetFlag_UPDATE_PRZ_LIMIT AssetFlag = 256
+    // 数据失效
+    AssetFlag_DATA_INVALID AssetFlag = 512
 )
 
 // **交易对/合约的结构定义**
@@ -177,70 +177,70 @@ const (
 
 // **交易对的扩展配置数据**
 type V2AssetCfg struct {
-	// 交易对(合约对)
-	Sym string `protobuf:"bytes,1,opt,name=Sym,proto3" json:"Sym,omitempty"`
-	// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 手续费计费方法
-	FM FeeMethod `protobuf:"varint,5,opt,name=FM,proto3,enum=Protocol.FeeMethod" json:"FM,omitempty"`
-	// 尚未支持
-	// 手续费，货币符号，如果未指定，则现货：按照收入额进行收取。期货：按照SettleCoin进行。
-	// 如果指定了FeeCoin则从该币种钱包内进行扣除。注意到，如果该钱包余额不足，则依旧使用SettleCoin进行
-	FeeCoin string `protobuf:"bytes,6,opt,name=FeeCoin,proto3" json:"FeeCoin,omitempty"`
-	// 折扣率
-	FeeDiscR gaea_Num.Flt `protobuf:"bytes,7,opt,name=FeeDiscR,proto3,customtype=gaea/Num.Flt" json:"FeeDiscR" xorm:"char(64)"`
-	// 开放交易时间 (日内,毫秒)
-	OnAt uint64 `protobuf:"varint,10,opt,name=OnAt,proto3" json:"OnAt,omitempty"`
-	// 关闭交易时间 (日内,毫秒)
-	OffAt uint64 `protobuf:"varint,11,opt,name=OffAt,proto3" json:"OffAt,omitempty"`
-	// 价格涨价幅度 万分比 * 10000
-	RiseR int64 `protobuf:"varint,15,opt,name=RiseR,proto3" json:"RiseR,omitempty"`
-	// 价格跌价幅度 万分比 * 10000
-	FallR int64 `protobuf:"varint,16,opt,name=FallR,proto3" json:"FallR,omitempty"`
-	// 最小价格
-	PrzMin float64 `protobuf:"fixed64,17,opt,name=PrzMin,proto3" json:"PrzMin,omitempty"`
-	// 买入量
-	LmtBid float64 `protobuf:"fixed64,20,opt,name=LmtBid,proto3" json:"LmtBid,omitempty"`
-	// 卖出量
-	LmtAsk float64 `protobuf:"fixed64,21,opt,name=LmtAsk,proto3" json:"LmtAsk,omitempty"`
-	// 买入卖出总量
-	LmtBidAsk float64 `protobuf:"fixed64,22,opt,name=LmtBidAsk,proto3" json:"LmtBidAsk,omitempty"`
-	// 买入次数
-	LmtNumBid uint64 `protobuf:"varint,23,opt,name=LmtNumBid,proto3" json:"LmtNumBid,omitempty"`
-	// 卖出次数
-	LmtNumAsk uint64 `protobuf:"varint,24,opt,name=LmtNumAsk,proto3" json:"LmtNumAsk,omitempty"`
-	// 买入卖出总次数
-	LmtNumBidAsk uint64 `protobuf:"varint,25,opt,name=LmtNumBidAsk,proto3" json:"LmtNumBidAsk,omitempty"`
-	// 委托的买价偏离盘口比例(小数)
-	BidPrzR float64 `protobuf:"fixed64,26,opt,name=BidPrzR,proto3" json:"BidPrzR,omitempty"`
-	// 委托的买价偏离盘口比例(小数)
-	AskPrzR float64 `protobuf:"fixed64,27,opt,name=AskPrzR,proto3" json:"AskPrzR,omitempty"`
-	// 每统计周期 净卖量。如果为0，则表示不进行检查
-	LmtNetAsk float64 `protobuf:"fixed64,28,opt,name=LmtNetAsk,proto3" json:"LmtNetAsk,omitempty"`
-	// 每统计周期 卖/买比率. 如果为0，则表示不进行检查
-	LmtAskQBid float64 `protobuf:"fixed64,29,opt,name=LmtAskQBid,proto3" json:"LmtAskQBid,omitempty"`
-	// 从0点开始，在每天的什么时间，开始重置统计值(绝对时间,毫秒)
-	SumAt uint64 `protobuf:"varint,30,opt,name=SumAt,proto3" json:"SumAt,omitempty"`
-	// 重置间隔
-	SumInterval uint64 `protobuf:"varint,31,opt,name=SumInterval,proto3" json:"SumInterval,omitempty"`
-	// 下次重制
-	SumResetNext uint64 `protobuf:"varint,32,opt,name=SumResetNext,proto3" json:"SumResetNext,omitempty"`
-	// 求用户的最近的买入价格的量
-	SzForAvg float64 `protobuf:"fixed64,33,opt,name=SzForAvg,proto3" json:"SzForAvg,omitempty"`
-	// Maker最低手续费
-	FeeMkrMin gaea_Num.Flt `protobuf:"bytes,40,opt,name=FeeMkrMin,proto3,customtype=gaea/Num.Flt" json:"FeeMkrMin" xorm:"char(64)"`
-	// Taker最低手续费
-	FeeTkrMin gaea_Num.Flt `protobuf:"bytes,41,opt,name=FeeTkrMin,proto3,customtype=gaea/Num.Flt" json:"FeeTkrMin" xorm:"char(64)"`
-	// 下面是挖矿相关设定
-	// 每日有挖矿算力的交易量
-	SzMaxFM float64 `protobuf:"fixed64,50,opt,name=SzMaxFM,proto3" json:"SzMaxFM,omitempty"`
-	// 每日有挖矿算力的交易次数
-	NumMaxFM float64 `protobuf:"fixed64,51,opt,name=NumMaxFM,proto3" json:"NumMaxFM,omitempty"`
-	// 涨经验的交易量完成率.当交易量达到 SzMaxFM * ExpRatio Exp ++
-	ExpRatio float64 `protobuf:"fixed64,52,opt,name=ExpRatio,proto3" json:"ExpRatio,omitempty"`
-	// 最大Exp
-	ExpMax int64 `protobuf:"varint,53,opt,name=ExpMax,proto3" json:"ExpMax,omitempty"`
-	// 标志位
-	Flag AssetFlag `protobuf:"varint,98,opt,name=Flag,proto3,enum=Protocol.AssetFlag" json:"Flag,omitempty"`
+    // 交易对(合约对)
+    Sym string `protobuf:"bytes,1,opt,name=Sym,proto3" json:"Sym,omitempty"`
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 手续费计费方法
+    FM FeeMethod `protobuf:"varint,5,opt,name=FM,proto3,enum=Protocol.FeeMethod" json:"FM,omitempty"`
+    // 尚未支持
+    // 手续费，货币符号，如果未指定，则现货：按照收入额进行收取。期货：按照SettleCoin进行。
+    // 如果指定了FeeCoin则从该币种钱包内进行扣除。注意到，如果该钱包余额不足，则依旧使用SettleCoin进行
+    FeeCoin string `protobuf:"bytes,6,opt,name=FeeCoin,proto3" json:"FeeCoin,omitempty"`
+    // 折扣率
+    FeeDiscR gaea_Num.Flt `protobuf:"bytes,7,opt,name=FeeDiscR,proto3,customtype=gaea/Num.Flt" json:"FeeDiscR" xorm:"char(64)"`
+    // 开放交易时间 (日内,毫秒)
+    OnAt uint64 `protobuf:"varint,10,opt,name=OnAt,proto3" json:"OnAt,omitempty"`
+    // 关闭交易时间 (日内,毫秒)
+    OffAt uint64 `protobuf:"varint,11,opt,name=OffAt,proto3" json:"OffAt,omitempty"`
+    // 价格涨价幅度 万分比 * 10000
+    RiseR int64 `protobuf:"varint,15,opt,name=RiseR,proto3" json:"RiseR,omitempty"`
+    // 价格跌价幅度 万分比 * 10000
+    FallR int64 `protobuf:"varint,16,opt,name=FallR,proto3" json:"FallR,omitempty"`
+    // 最小价格
+    PrzMin float64 `protobuf:"fixed64,17,opt,name=PrzMin,proto3" json:"PrzMin,omitempty"`
+    // 买入量
+    LmtBid float64 `protobuf:"fixed64,20,opt,name=LmtBid,proto3" json:"LmtBid,omitempty"`
+    // 卖出量
+    LmtAsk float64 `protobuf:"fixed64,21,opt,name=LmtAsk,proto3" json:"LmtAsk,omitempty"`
+    // 买入卖出总量
+    LmtBidAsk float64 `protobuf:"fixed64,22,opt,name=LmtBidAsk,proto3" json:"LmtBidAsk,omitempty"`
+    // 买入次数
+    LmtNumBid uint64 `protobuf:"varint,23,opt,name=LmtNumBid,proto3" json:"LmtNumBid,omitempty"`
+    // 卖出次数
+    LmtNumAsk uint64 `protobuf:"varint,24,opt,name=LmtNumAsk,proto3" json:"LmtNumAsk,omitempty"`
+    // 买入卖出总次数
+    LmtNumBidAsk uint64 `protobuf:"varint,25,opt,name=LmtNumBidAsk,proto3" json:"LmtNumBidAsk,omitempty"`
+    // 委托的买价偏离盘口比例(小数)
+    BidPrzR float64 `protobuf:"fixed64,26,opt,name=BidPrzR,proto3" json:"BidPrzR,omitempty"`
+    // 委托的买价偏离盘口比例(小数)
+    AskPrzR float64 `protobuf:"fixed64,27,opt,name=AskPrzR,proto3" json:"AskPrzR,omitempty"`
+    // 每统计周期 净卖量。如果为0，则表示不进行检查
+    LmtNetAsk float64 `protobuf:"fixed64,28,opt,name=LmtNetAsk,proto3" json:"LmtNetAsk,omitempty"`
+    // 每统计周期 卖/买比率. 如果为0，则表示不进行检查
+    LmtAskQBid float64 `protobuf:"fixed64,29,opt,name=LmtAskQBid,proto3" json:"LmtAskQBid,omitempty"`
+    // 从0点开始，在每天的什么时间，开始重置统计值(绝对时间,毫秒)
+    SumAt uint64 `protobuf:"varint,30,opt,name=SumAt,proto3" json:"SumAt,omitempty"`
+    // 重置间隔
+    SumInterval uint64 `protobuf:"varint,31,opt,name=SumInterval,proto3" json:"SumInterval,omitempty"`
+    // 下次重制
+    SumResetNext uint64 `protobuf:"varint,32,opt,name=SumResetNext,proto3" json:"SumResetNext,omitempty"`
+    // 求用户的最近的买入价格的量
+    SzForAvg float64 `protobuf:"fixed64,33,opt,name=SzForAvg,proto3" json:"SzForAvg,omitempty"`
+    // Maker最低手续费
+    FeeMkrMin gaea_Num.Flt `protobuf:"bytes,40,opt,name=FeeMkrMin,proto3,customtype=gaea/Num.Flt" json:"FeeMkrMin" xorm:"char(64)"`
+    // Taker最低手续费
+    FeeTkrMin gaea_Num.Flt `protobuf:"bytes,41,opt,name=FeeTkrMin,proto3,customtype=gaea/Num.Flt" json:"FeeTkrMin" xorm:"char(64)"`
+    // 下面是挖矿相关设定
+    // 每日有挖矿算力的交易量
+    SzMaxFM float64 `protobuf:"fixed64,50,opt,name=SzMaxFM,proto3" json:"SzMaxFM,omitempty"`
+    // 每日有挖矿算力的交易次数
+    NumMaxFM float64 `protobuf:"fixed64,51,opt,name=NumMaxFM,proto3" json:"NumMaxFM,omitempty"`
+    // 涨经验的交易量完成率.当交易量达到 SzMaxFM * ExpRatio Exp ++
+    ExpRatio float64 `protobuf:"fixed64,52,opt,name=ExpRatio,proto3" json:"ExpRatio,omitempty"`
+    // 最大Exp
+    ExpMax int64 `protobuf:"varint,53,opt,name=ExpMax,proto3" json:"ExpMax,omitempty"`
+    // 标志位
+    Flag AssetFlag `protobuf:"varint,98,opt,name=Flag,proto3,enum=Protocol.AssetFlag" json:"Flag,omitempty"`
 }
 
 ```
@@ -983,7 +983,8 @@ type AssetEx struct {
 
 ```js
 // 发送下单请求
-// COrdId 是 Client Order ID 的意思，不能为空，由用户生成管理并维护其唯一性，当报单成功后，会对应一个OrdId，为系统能够识别的报单编号;
+// COrdId 是 Client Order ID 的意思，不能为空，由用户生成管理并维护其唯一性(长度不超过40的字符串).
+// 当报单成功后，会对应一个OrdId，为系统能够识别的报单编号;
 // 注意，用户发起下单后，要通过 onOrder 消息来监控管理报单的状态变化;
 {
     "req":"OrderNew",
@@ -991,7 +992,7 @@ type AssetEx struct {
     "expires":1537712923999,
     "args":{
         "AId":"123456701",
-        "COrdId":"0",
+        "COrdId":"c4681144dc5b4051925f00e8339ee97f",
         "Sym":"BTC1809",
         "Dir":1,
         "OType":1,
@@ -1014,7 +1015,7 @@ type AssetEx struct {
         "AId":"123456701",
         "Sym":"BTC1809",
         "OrdId":"01CQES0XMVV3SMWJ7N683FWJR8",
-        "COrdId":"0",
+        "COrdId":"c4681144dc5b4051925f00e8339ee97f",
         "Dir":1,
         "OType":1,
         "Prz":6500,
@@ -1065,17 +1066,18 @@ type AssetEx struct {
 报单的基本参数说明：
 ```js
 args: {
-"AId": "账户Id",
-"COrdId": "filled by client,客户端自己填写",
-"Sym": "BTC1809",           // 交易符号，比如XBTUSD
-"Dir": 1,                   // 委单方向 买/卖, 1:BID/BUY, -1:ASK/SELL
-"OType": 1,                 // 报价类型, 1:Limit(限价委单 ), 2: Market(市价委单,匹配后转限价), 3: StopMarket (市价止损);
-"Prz": 8000,                // 价格
-"Qty": 10000,               // 数量(如果>0则为做多,如果<0则为做空)
-"QtyDsp": 0,                // 显示数量, 0表示不隐藏, 用于支持冰山委托
-"Tif": 0,                   // 生效时间设定, 0:GoodTillCancel, 1:ImmediateOrCancel/FillAndKill, 2:FillOrKill
-"OrdFlag": 0,               // 标志位, 0: OF_INVALID, 1: POSTONLY, 2: REDUCEONLY, 4: CLOSEONTRIGGER;
-"PrzChg" 0,                 // 市价成交档位
+    "AId": "账户Id",
+    "COrdId": "<uuid>", // COrdId 是 Client Order ID 的意思，不能为空，由用户生成管理并维护其唯一性(长度不超过40的字符串).
+    "Sym": "BTC1809",   // 交易符号，比如XBTUSD
+    "Dir": 1,           // 委单方向 买/卖, 1:BID/BUY, -1:ASK/SELL
+    "OType": 1,         // 报价类型, 1:Limit(限价委单 ), 2: Market(市价委单,匹配后转限价), 3: StopMarket (市价止损);
+    "Prz": 8000,        // 价格
+    "Qty": 10000,       // 数量(如果>0则为做多,如果<0则为做空)
+    "QtyDsp": 0,        // 显示数量, 0表示不隐藏, 用于支持冰山委托
+    "Tif": 0,           // 生效时间设定, 0:GoodTillCancel, 1:ImmediateOrCancel/FillAndKill, 2:FillOrKill
+    "OrdFlag": 0,       // 标志位, 0: OF_INVALID, 1: POSTONLY, 2: REDUCEONLY, 4: CLOSEONTRIGGER;
+    "PrzChg" 0,         // 市价成交档位
+    // ... 跟多参数，请参考下面的Ord数据结构定义.
 }
 ```
 更多关于报单数据结构的的参数定义和说明，请参考下面的推送消息章节里的结构定义。
@@ -1211,84 +1213,85 @@ args: {
 
 // GetExchangeRate 返回的结构定义：
 type V2ExchangeRate struct {
-	// 交易对(合约对) Key
-	CoinPair string `protobuf:"bytes,1,opt,name=CoinPair,proto3" json:"CoinPair,omitempty"`
-	// 消耗
-	FromC string `protobuf:"bytes,2,opt,name=FromC,proto3" json:"FromC,omitempty"`
-	// 收入
-	ToC string `protobuf:"bytes,3,opt,name=ToC,proto3" json:"ToC,omitempty"`
-	// 买入价
-	Buy gaea_Num.Flt `protobuf:"bytes,10,opt,name=Buy,proto3,customtype=gaea/Num.Flt" json:"Buy" xorm:"char(64)"`
-	// 卖出价
-	Sell gaea_Num.Flt `protobuf:"bytes,11,opt,name=Sell,proto3,customtype=gaea/Num.Flt" json:"Sell" xorm:"char(64)"`
-	// 更新时间戳(毫秒)
-	Upd int64 `protobuf:"varint,20,opt,name=Upd,proto3" json:"Upd,omitempty"`
-	// 标志位
-	Flag AssetFlag `protobuf:"varint,98,opt,name=Flag,proto3,enum=Protocol.AssetFlag" json:"Flag,omitempty"`
+    // 交易对(合约对) Key
+    CoinPair string `protobuf:"bytes,1,opt,name=CoinPair,proto3" json:"CoinPair,omitempty"`
+    // 消耗
+    FromC string `protobuf:"bytes,2,opt,name=FromC,proto3" json:"FromC,omitempty"`
+    // 收入
+    ToC string `protobuf:"bytes,3,opt,name=ToC,proto3" json:"ToC,omitempty"`
+    // 买入价
+    Buy gaea_Num.Flt `protobuf:"bytes,10,opt,name=Buy,proto3,customtype=gaea/Num.Flt" json:"Buy" xorm:"char(64)"`
+    // 卖出价
+    Sell gaea_Num.Flt `protobuf:"bytes,11,opt,name=Sell,proto3,customtype=gaea/Num.Flt" json:"Sell" xorm:"char(64)"`
+    // 更新时间戳(毫秒)
+    Upd int64 `protobuf:"varint,20,opt,name=Upd,proto3" json:"Upd,omitempty"`
+    // 标志位
+    Flag AssetFlag `protobuf:"varint,98,opt,name=Flag,proto3,enum=Protocol.AssetFlag" json:"Flag,omitempty"`
 }
 
 // GetMktSum 返回的结构定义：
 type V2MktSum struct {
-	// 合约ID
-	Sym string `protobuf:"bytes,1,opt,name=Sym,proto3" json:"Sym,omitempty"`
-	// 开多仓量
-	PosL int64 `protobuf:"varint,2,opt,name=PosL,proto3" json:"PosL,omitempty"`
-	// 开多价值
-	ValL float64 `protobuf:"fixed64,3,opt,name=ValL,proto3" json:"ValL,omitempty"`
-	// 开空仓量
-	PosS int64 `protobuf:"varint,4,opt,name=PosS,proto3" json:"PosS,omitempty"`
-	// 开空价值
-	ValS float64 `protobuf:"fixed64,5,opt,name=ValS,proto3" json:"ValS,omitempty"`
-	// UPNL
-	UPNL float64 `protobuf:"fixed64,6,opt,name=UPNL,proto3" json:"UPNL,omitempty"`
-	// PNL
-	PNL float64 `protobuf:"fixed64,7,opt,name=PNL,proto3" json:"PNL,omitempty"`
-	// 用户数
-	Usrs int64 `protobuf:"varint,10,opt,name=Usrs,proto3" json:"Usrs,omitempty"`
+    // 合约ID
+    Sym string `protobuf:"bytes,1,opt,name=Sym,proto3" json:"Sym,omitempty"`
+    // 开多仓量
+    PosL int64 `protobuf:"varint,2,opt,name=PosL,proto3" json:"PosL,omitempty"`
+    // 开多价值
+    ValL float64 `protobuf:"fixed64,3,opt,name=ValL,proto3" json:"ValL,omitempty"`
+    // 开空仓量
+    PosS int64 `protobuf:"varint,4,opt,name=PosS,proto3" json:"PosS,omitempty"`
+    // 开空价值
+    ValS float64 `protobuf:"fixed64,5,opt,name=ValS,proto3" json:"ValS,omitempty"`
+    // UPNL
+    UPNL float64 `protobuf:"fixed64,6,opt,name=UPNL,proto3" json:"UPNL,omitempty"`
+    // PNL
+    PNL float64 `protobuf:"fixed64,7,opt,name=PNL,proto3" json:"PNL,omitempty"`
+    // 用户数
+    Usrs int64 `protobuf:"varint,10,opt,name=Usrs,proto3" json:"Usrs,omitempty"`
 }
 
 
 // GetTrdSum 返回的结构定义：
 type V2TrdSum struct {
-	// 账号ID
-	AId string `protobuf:"bytes,1,opt,name=AId,proto3" json:"AId,omitempty"`
-	// 交易对
-	Sym string `protobuf:"bytes,2,opt,name=Sym,proto3" json:"Sym,omitempty"`
-	// 买入量
-	Bid float64 `protobuf:"fixed64,3,opt,name=Bid,proto3" json:"Bid,omitempty"`
-	// 卖出量
-	Ask float64 `protobuf:"fixed64,4,opt,name=Ask,proto3" json:"Ask,omitempty"`
-	// 买入次数
-	NumBid uint64 `protobuf:"varint,5,opt,name=NumBid,proto3" json:"NumBid,omitempty"`
-	// 卖出次数
-	NumAsk uint64 `protobuf:"varint,6,opt,name=NumAsk,proto3" json:"NumAsk,omitempty"`
-	// 本周期结束的时间戳(毫秒)
-	Next uint64 `protobuf:"varint,11,opt,name=Next,proto3" json:"Next,omitempty"`
-	// 最近一次买交易
-	LstPB float64 `protobuf:"fixed64,20,opt,name=LstPB,proto3" json:"LstPB,omitempty"`
-	// 最近一次买数量
-	LstQB float64 `protobuf:"fixed64,21,opt,name=LstQB,proto3" json:"LstQB,omitempty"`
-	// 最近一次买交易的时间(毫秒)
-	LstTB uint64 `protobuf:"varint,22,opt,name=LstTB,proto3" json:"LstTB,omitempty"`
-	// 最近一次卖交易价格
-	LstPA float64 `protobuf:"fixed64,25,opt,name=LstPA,proto3" json:"LstPA,omitempty"`
-	// 最近一次卖交易数量
-	LstQA float64 `protobuf:"fixed64,26,opt,name=LstQA,proto3" json:"LstQA,omitempty"`
-	// 最近一次卖交易的时间(毫秒)
-	LstTA uint64 `protobuf:"varint,27,opt,name=LstTA,proto3" json:"LstTA,omitempty"`
-	// 平均买入价
-	BAvg float64 `protobuf:"fixed64,30,opt,name=BAvg,proto3" json:"BAvg,omitempty"`
-	// 买入量
-	NBid float64 `protobuf:"fixed64,31,opt,name=NBid,proto3" json:"NBid,omitempty"`
-	// 平均卖出价
-	AAvg float64 `protobuf:"fixed64,32,opt,name=AAvg,proto3" json:"AAvg,omitempty"`
-	// 卖出量
-	NAsk float64 `protobuf:"fixed64,33,opt,name=NAsk,proto3" json:"NAsk,omitempty"`
-	// 挖矿算力等级
-	MPL int64 `protobuf:"varint,40,opt,name=MPL,proto3" json:"MPL,omitempty"`
-	// 挖矿Exp
-	MPExp int64 `protobuf:"varint,41,opt,name=MPExp,proto3" json:"MPExp,omitempty"`
+    // 账号ID
+    AId string `protobuf:"bytes,1,opt,name=AId,proto3" json:"AId,omitempty"`
+    // 交易对
+    Sym string `protobuf:"bytes,2,opt,name=Sym,proto3" json:"Sym,omitempty"`
+    // 买入量
+    Bid float64 `protobuf:"fixed64,3,opt,name=Bid,proto3" json:"Bid,omitempty"`
+    // 卖出量
+    Ask float64 `protobuf:"fixed64,4,opt,name=Ask,proto3" json:"Ask,omitempty"`
+    // 买入次数
+    NumBid uint64 `protobuf:"varint,5,opt,name=NumBid,proto3" json:"NumBid,omitempty"`
+    // 卖出次数
+    NumAsk uint64 `protobuf:"varint,6,opt,name=NumAsk,proto3" json:"NumAsk,omitempty"`
+    // 本周期结束的时间戳(毫秒)
+    Next uint64 `protobuf:"varint,11,opt,name=Next,proto3" json:"Next,omitempty"`
+    // 最近一次买交易
+    LstPB float64 `protobuf:"fixed64,20,opt,name=LstPB,proto3" json:"LstPB,omitempty"`
+    // 最近一次买数量
+    LstQB float64 `protobuf:"fixed64,21,opt,name=LstQB,proto3" json:"LstQB,omitempty"`
+    // 最近一次买交易的时间(毫秒)
+    LstTB uint64 `protobuf:"varint,22,opt,name=LstTB,proto3" json:"LstTB,omitempty"`
+    // 最近一次卖交易价格
+    LstPA float64 `protobuf:"fixed64,25,opt,name=LstPA,proto3" json:"LstPA,omitempty"`
+    // 最近一次卖交易数量
+    LstQA float64 `protobuf:"fixed64,26,opt,name=LstQA,proto3" json:"LstQA,omitempty"`
+    // 最近一次卖交易的时间(毫秒)
+    LstTA uint64 `protobuf:"varint,27,opt,name=LstTA,proto3" json:"LstTA,omitempty"`
+    // 平均买入价
+    BAvg float64 `protobuf:"fixed64,30,opt,name=BAvg,proto3" json:"BAvg,omitempty"`
+    // 买入量
+    NBid float64 `protobuf:"fixed64,31,opt,name=NBid,proto3" json:"NBid,omitempty"`
+    // 平均卖出价
+    AAvg float64 `protobuf:"fixed64,32,opt,name=AAvg,proto3" json:"AAvg,omitempty"`
+    // 卖出量
+    NAsk float64 `protobuf:"fixed64,33,opt,name=NAsk,proto3" json:"NAsk,omitempty"`
+    // 挖矿算力等级
+    MPL int64 `protobuf:"varint,40,opt,name=MPL,proto3" json:"MPL,omitempty"`
+    // 挖矿Exp
+    MPExp int64 `protobuf:"varint,41,opt,name=MPExp,proto3" json:"MPExp,omitempty"`
 }
+
 ```
 
 
@@ -1329,107 +1332,246 @@ type V2TrdSum struct {
 对应的数据结构定义如下:
 
 ```golang
-type Ord struct {    // **报单结构体字段定义说明**
-    UId     string   // 用户Id
-    AId     string   // 账户Id
-    Sym     string   // 交易符号，比如BTC1809
-    WId     string   // 钱包Id
-    OrdId   string   // 服务器端为其分配的ID
-    COrdId  string   // 客户端为其分配的ID
-    Dir     int32    // 委单方向 买/卖, 1:BID/BUY, -1:ASK/SELL
-    OType   int32    // 报价类型, 1:Limit(限价委单 ), 2: Market(市价委单,匹配后转限价), 3: StopMarket (市价止损);
-    Prz     float64  // 报价
-    Qty     float64  // 数量(如果>0则为做多,如果<0则为做空)
-    QtyDsp  float64  // 显示数量, 0表示不隐藏, 用于支持冰山委托
-    Tif     int32    // 生效时间设定, 0:GoodTillCancel, 1:ImmediateOrCancel/FillAndKill, 2:FillOrKill
-    OrdFlag int32    // 标志位, 0: OF_INVALID, 1: POSTONLY, 2: REDUCEONLY, 4: CLOSEONTRIGGER;
-    Via     int32    // 订单来源
-    At      int64    // 报单时间戳，毫秒
-    Upd     int64    // 报单更新时间戳，毫秒
-    Until   int64    // 有效期，毫秒 。绝对时间
-    PrzChg  int32    // 最大价格变动次数， 市价成交档位
-    Frz     float64  // 冻结的金额
-    ErrCode int32    // 错误编码
-    ErrTxt  string   // 错误文本
-    Status  int32    // 0-无效, 1-正在排队, 2-有效(撮合中), 3-提交失败, 4-已执行, 其它值则表示执行失败, 参考ErrCode,ErrTxt
-    QtyF    float64  // 已成交
-    PrzF    float64  // 已成交的平均价格
-    Val     float64  // 合约价值:
-    StopBy  int32    // 判断依据, 0-PriceMark, 1-PriceLatest, 2-PriceIndex
-    StopPrz float64  // 止损价格,止盈价格
+
+// 报单数据结构
+type Ord struct {
+    // /用户Id
+    UId string `protobuf:"bytes,1,opt,name=UId,proto3" json:"UId,omitempty" xorm:"char(40)"`
+    // /账户Id
+    AId string `protobuf:"bytes,2,opt,name=AId,proto3" json:"AId,omitempty" xorm:"char(40)"`
+    // 交易对。比如XBTUSD
+    Sym string `protobuf:"bytes,3,opt,name=Sym,proto3" json:"Sym,omitempty" xorm:"char(16)"`
+    // /钱包ID
+    WId string `protobuf:"bytes,4,opt,name=WId,proto3" json:"WId,omitempty" xorm:"char(40)"`
+    // / 服务器端为其分配的ID
+    OrdId string `protobuf:"bytes,5,opt,name=OrdId,proto3" json:"OrdId,omitempty" xorm:"char(40)"`
+    // / 客户端为其分配的ID
+    COrdId string `protobuf:"bytes,6,opt,name=COrdId,proto3" json:"COrdId,omitempty" xorm:"char(40)"`
+    // 委单方向 1=买/-1=卖
+    Dir OrderDir `protobuf:"varint,7,opt,name=Dir,proto3,enum=Protocol.OrderDir" json:"Dir,omitempty"`
+    // 报价类型
+    OType OfferType `protobuf:"varint,8,opt,name=OType,proto3,enum=Protocol.OfferType" json:"OType,omitempty"`
+    // 价格
+    Prz gaea_Num.Flt `protobuf:"bytes,9,opt,name=Prz,proto3,customtype=gaea/Num.Flt" json:"Prz" xorm:"char(64)"`
+    // 数量。
+    Qty gaea_Num.Flt `protobuf:"bytes,10,opt,name=Qty,proto3,customtype=gaea/Num.Flt" json:"Qty" xorm:"char(64)"`
+    // 显示数量。如果为0,则显示全部Qty
+    QtyDsp gaea_Num.Flt `protobuf:"bytes,11,opt,name=QtyDsp,proto3,customtype=gaea/Num.Flt" json:"QtyDsp" xorm:"char(64)"`
+    // 有效期
+    Tif TimeInForce `protobuf:"varint,12,opt,name=Tif,proto3,enum=Protocol.TimeInForce" json:"Tif,omitempty"`
+    // 委托标志
+    OrdFlag OrdFlag `protobuf:"varint,13,opt,name=OrdFlag,proto3,enum=Protocol.OrdFlag" json:"OrdFlag,omitempty"`
+    // 未使用
+    PrzStop gaea_Num.Flt `protobuf:"bytes,14,opt,name=PrzStop,proto3,customtype=gaea/Num.Flt" json:"PrzStop" xorm:"char(64)"`
+    // 来源
+    Via OrderVia `protobuf:"varint,15,opt,name=Via,proto3,enum=Protocol.OrderVia" json:"Via,omitempty"`
+    // 下单时间戳.单位:毫秒
+    At uint64 `protobuf:"varint,16,opt,name=At,proto3" json:"At,omitempty"`
+    // 更新时间戳.单位:毫秒
+    Upd int64 `protobuf:"varint,17,opt,name=Upd,proto3" json:"Upd,omitempty"`
+    // 有效期: 毫秒。绝对时间
+    Until uint64 `protobuf:"varint,18,opt,name=Until,proto3" json:"Until,omitempty"`
+    // 市价委托的最大档位(当撮合进行匹配的时候，会从Orderbook依档位进行)
+    PrzChg int32 `protobuf:"varint,19,opt,name=PrzChg,proto3" json:"PrzChg,omitempty"`
+    // 冻结金额
+    Frz gaea_Num.Flt `protobuf:"bytes,20,opt,name=Frz,proto3,customtype=gaea/Num.Flt" json:"Frz" xorm:"char(64)"`
+    // 错误代码
+    ErrCode ErrorCode `protobuf:"varint,21,opt,name=ErrCode,proto3,enum=Protocol.ErrorCode" json:"ErrCode,omitempty"`
+    // 错误文本
+    ErrTxt string `protobuf:"bytes,22,opt,name=ErrTxt,proto3" json:"ErrTxt,omitempty"`
+    // 状态
+    Status OrderStatus `protobuf:"varint,23,opt,name=Status,proto3,enum=Protocol.OrderStatus" json:"Status,omitempty"`
+    // 已成交	Qty Filled
+    QtyF gaea_Num.Flt `protobuf:"bytes,24,opt,name=QtyF,proto3,customtype=gaea/Num.Flt" json:"QtyF" xorm:"char(64)"`
+    // 已成交的平均价格 Prz Filled
+    PrzF gaea_Num.Flt `protobuf:"bytes,25,opt,name=PrzF,proto3,customtype=gaea/Num.Flt" json:"PrzF" xorm:"char(64)"`
+    // 合约价值,对于PRZ_INVERSE的合约：  - Dir * Qty / Prz; 对于正向合约 Dir * Qty * Prz
+    Val gaea_Num.Flt `protobuf:"bytes,26,opt,name=Val,proto3,customtype=gaea/Num.Flt" json:"Val" xorm:"char(64)"`
+    // 判断依据
+    StopBy StopBy `protobuf:"varint,61,opt,name=StopBy,proto3,enum=Protocol.StopBy" json:"StopBy,omitempty"`
+    // 止损价格,止盈价格
+    StopPrz gaea_Num.Flt `protobuf:"bytes,62,opt,name=StopPrz,proto3,customtype=gaea/Num.Flt" json:"StopPrz" xorm:"char(64)"`
+    // 追踪委托中，回调的比率. Reverse Ratio. 小数。
+    TraceRR float64 `protobuf:"fixed64,40,opt,name=TraceRR,proto3" json:"TraceRR,omitempty"`
+    // 追踪的Min
+    TraceMin float64 `protobuf:"fixed64,41,opt,name=TraceMin,proto3" json:"TraceMin,omitempty"`
+    // 追踪的Max
+    TraceMax float64 `protobuf:"fixed64,42,opt,name=TraceMax,proto3" json:"TraceMax,omitempty"`
     // //////////////////////////////////////////////////////////////////////////////////////////////////
-    MM      float64  // 委托保证金 Mgn Initial + 佣金
-    FeeEst  float64  // 预估的手续费：按照手续费计算
-    UPNLEst float64  // 预估的UPNL .. Predicatee
+    // 委托保证金 Mgn Initial + 佣金
+    MM float64 `protobuf:"fixed64,30,opt,name=MM,proto3" json:"MM,omitempty"`
+    // 预估的手续费：按照手续费计算
+    FeeEst float64 `protobuf:"fixed64,31,opt,name=FeeEst,proto3" json:"FeeEst,omitempty"`
+    // 预估的UPNL .. Predicatee
+    UPNLEst float64 `protobuf:"fixed64,32,opt,name=UPNLEst,proto3" json:"UPNLEst,omitempty"`
 }
 
-type Position struct {    // **持仓结构体字段定义说明**
-    UId     string   // 用户Id
-    AId     string   // 账户Id
-    PId     string   // 持仓Id
-    Sym     string   // 交易符号，比如BTC1809
-    Sz      float64  //仓位(正数为多仓，负数为空仓)
-    PrzIni  float64  // 开仓平均价格
-    RPNL    float64  // 已实现盈亏
-    Val     float64  // 计算值：价值,仓位现时的名义价值，受到标记价格价格的影响
-    MMnF    float64  // 保证金，被仓位使用并锁定的保证金
-    MI      float64  //
-    UPNL    float64  // 计算值：未实现盈亏 PNL==  Profit And Loss
-    PrzLiq  float64  // 计算值: 强平价格 亏光当前保证金的 (如果是多仓，并且标记价格低于PrzLiq,则会被强制平仓。/如果是空仓,并缺标记价格高于PrzLiq，则会被强制平仓
-    PrzBr   float64  // 计算值: 破产价格 BandRuptcy
-    FeeEst  float64  // 预估的平仓费
+// 用户持仓
+type Position struct {
+    // 用户Id
+    UId string `protobuf:"bytes,1,opt,name=UId,proto3" json:"UId,omitempty" xorm:"char(40)"`
+    // 仓位Id
+    PId string `protobuf:"bytes,2,opt,name=PId,proto3" json:"PId,omitempty" xorm:"char(40)"`
+    // /AId
+    AId string `protobuf:"bytes,3,opt,name=AId,proto3" json:"AId,omitempty" xorm:"char(40)"`
+    // 交易对/合约名
+    Sym string `protobuf:"bytes,4,opt,name=Sym,proto3" json:"Sym,omitempty" xorm:"char(16)"`
+    // 钱包Id
+    WId string `protobuf:"bytes,5,opt,name=WId,proto3" json:"WId,omitempty" xorm:"char(40)"`
+    // 仓位(正数为多仓，负数为空仓)
+    Sz gaea_Num.Flt `protobuf:"bytes,6,opt,name=Sz,proto3,customtype=gaea/Num.Flt" json:"Sz" xorm:"char(64)"`
+    // 开仓平均价格()
+    PrzIni gaea_Num.Flt `protobuf:"bytes,7,opt,name=PrzIni,proto3,customtype=gaea/Num.Flt" json:"PrzIni" xorm:"char(64)"`
+    // 已实现盈亏
+    RPNL float64 `protobuf:"fixed64,8,opt,name=RPNL,proto3" json:"RPNL,omitempty"`
+    // 杠杆
+    Lever float64 `protobuf:"fixed64,9,opt,name=Lever,proto3" json:"Lever,omitempty"`
+    // 逐仓下仓位保证金
+    MgnISO gaea_Num.Flt `protobuf:"bytes,10,opt,name=MgnISO,proto3,customtype=gaea/Num.Flt" json:"MgnISO" xorm:"char(64)"`
+    // 逐仓下已实现盈亏
+    PNLISO gaea_Num.Flt `protobuf:"bytes,11,opt,name=PNLISO,proto3,customtype=gaea/Num.Flt" json:"PNLISO" xorm:"char(64)"`
+    // 下面是动态数据
+    // 最大杠杆
+    LeverMax float64 `protobuf:"fixed64,12,opt,name=LeverMax,proto3" json:"LeverMax,omitempty"`
+    // 有效MMR
+    MMR float64 `protobuf:"fixed64,13,opt,name=MMR,proto3" json:"MMR,omitempty"`
+    // 有效MIR
+    MIR float64 `protobuf:"fixed64,14,opt,name=MIR,proto3" json:"MIR,omitempty"`
+    // 计算值：价值,仓位现时的名义价值，受到标记价格价格的影响
+    Val float64 `protobuf:"fixed64,20,opt,name=Val,proto3" json:"Val,omitempty"`
+    // 保证金，被仓位使用并锁定的保证金。
+    MMnF float64 `protobuf:"fixed64,21,opt,name=MMnF,proto3" json:"MMnF,omitempty"`
+    MI float64 `protobuf:"fixed64,22,opt,name=MI,proto3" json:"MI,omitempty"`
+    // 计算值：未实现盈亏 PNL==  Profit And Loss
+    UPNL float64 `protobuf:"fixed64,23,opt,name=UPNL,proto3" json:"UPNL,omitempty"`
+    // 计算值: 强平价格 亏光当前保证金的 (如果是多仓，并且标记价格低于PrzLiq,则会被强制平仓。/如果是空仓,并缺标记价格高于PrzLiq，则会被强制平仓
+    PrzLiq float64 `protobuf:"fixed64,24,opt,name=PrzLiq,proto3" json:"PrzLiq,omitempty"`
+    // 计算值: 破产价格 BandRuptcy
+    PrzBr float64 `protobuf:"fixed64,25,opt,name=PrzBr,proto3" json:"PrzBr,omitempty"`
+    // 预估的平仓费
+    FeeEst float64 `protobuf:"fixed64,26,opt,name=FeeEst,proto3" json:"FeeEst,omitempty"`
     // //////////////////////////////////////////////////////////////////////////
-    ROE     float64
-    ADLIdx  float64  // ADLIdx, 这个是用来排序ADL的
-    ADLLight int32   // ADL红绿灯
+    // 下面会因为结算操作而变更。每次结算的时候，当前的未实现盈亏，将变成累加到已实现盈亏后，未实现盈亏清0
+    ROE float64 `protobuf:"fixed64,39,opt,name=ROE,proto3" json:"ROE,omitempty"`
+    // ADLIdx, 这个是用来排序ADL的
+    ADLIdx float64 `protobuf:"fixed64,40,opt,name=ADLIdx,proto3" json:"ADLIdx,omitempty"`
+    // ADL红绿灯
+    ADLLight int32 `protobuf:"varint,41,opt,name=ADLLight,proto3" json:"ADLLight,omitempty"`
 }
 
 // **用户钱包（合约和币币）**
-type Wlt struct {    // **钱包结构体字段定义说明**
-    UId     string   // 用户Id
-    AId     string   // 账户Id
-    Coin    string   // 货币符号 BTC/ETH/GAEA
-    Depo    float64  // 入金金额
-    WDrw    float64  // 出金金额
-    PNL     float64  // 已实现盈亏
-    Frz     float64  // 冻结金额
-    UPNL    float64  // 未实现盈亏：根据持仓情况、标记价格 刷新， 统计值
-    MI      float64  // 委托保证金 = 计算自已有委单 + 平仓佣金 + 开仓佣金 Mgn Initial
-    MM      float64  // 仓位保证金 + 平仓佣金 Mgn Maintaince
-    RD      float64  // 风险度 // Risk Degree.
-    Status  int32    // 账户状态，0-INVALID，1-NOT_ACTIVED，2-NORMAL，3-LIQUIDATION，4-TAKEN_OVER
+type Wlt struct {
+    // 投资者帐号
+    UId string `protobuf:"bytes,1,opt,name=UId,proto3" json:"UId,omitempty" xorm:"char(40)"`
+    // /Account Id
+    AId string `protobuf:"bytes,2,opt,name=AId,proto3" json:"AId,omitempty" xorm:"char(40)"`
+    // 货币类型
+    Coin string `protobuf:"bytes,3,opt,name=Coin,proto3" json:"Coin,omitempty" xorm:"char(16)"`
+    // 钱包索引
+    WId string `protobuf:"bytes,4,opt,name=WId,proto3" json:"WId,omitempty" xorm:"char(40)"`
+    // 入金金额
+    Depo gaea_Num.Flt `protobuf:"bytes,5,opt,name=Depo,proto3,customtype=gaea/Num.Flt" json:"Depo" xorm:"char(64)"`
+    // 出金金额
+    WDrw gaea_Num.Flt `protobuf:"bytes,6,opt,name=WDrw,proto3,customtype=gaea/Num.Flt" json:"WDrw" xorm:"char(64)"`
+    // 已实现盈亏
+    PNL gaea_Num.Flt `protobuf:"bytes,7,opt,name=PNL,proto3,customtype=gaea/Num.Flt" json:"PNL" xorm:"char(64)"`
+    // 冻结金额
+    Frz gaea_Num.Flt `protobuf:"bytes,8,opt,name=Frz,proto3,customtype=gaea/Num.Flt" json:"Frz" xorm:"char(64)"`
+    // ///////////////////////////////////////////////////////////////////////
+    // 下面是统计值
+    // 未实现盈亏：根据持仓情况、标记价格 刷新， 统计值
+    UPNL float64 `protobuf:"fixed64,9,opt,name=UPNL,proto3" json:"UPNL,omitempty"`
+    // //////////////////////////////////////////
+    // 委托保证金 = 计算自已有委单 + 平仓佣金 + 开仓佣金 Mgn Initial
+    MI float64 `protobuf:"fixed64,10,opt,name=MI,proto3" json:"MI,omitempty"`
+    // 仓位保证金 + 平仓佣金 Mgn Maintaince
+    MM float64 `protobuf:"fixed64,11,opt,name=MM,proto3" json:"MM,omitempty"`
+    // 风险度 // Risk Degree.
+    RD float64 `protobuf:"fixed64,12,opt,name=RD,proto3" json:"RD,omitempty"`
+    // 可取余额 . 定时刷新。
+    Wdrawable float64 `protobuf:"fixed64,13,opt,name=Wdrawable,proto3" json:"Wdrawable,omitempty"`
+    // 现货交易出入金
+    Spot gaea_Num.Flt `protobuf:"bytes,20,opt,name=Spot,proto3,customtype=gaea/Num.Flt" json:"Spot" xorm:"char(64)"`
+    // 赠送金额 不允许取出。
+    Gift gaea_Num.Flt `protobuf:"bytes,21,opt,name=Gift,proto3,customtype=gaea/Num.Flt" json:"Gift" xorm:"char(64)"`
+    // 账户状态
+    Status WltStatus `protobuf:"varint,50,opt,name=Status,proto3,enum=Protocol.WltStatus" json:"Status,omitempty"`
 }
 
-type WltLog struct {    // **资金历史结构体字段定义说明**
-    UId     string   // 用户Id
-    AId     string   // 账户Id
-    Seq     string   // 顺序号
-    Coin    string   // 货币类型
-    Qty     float64  // 货币数量
-    Fee     float64  // 手续费
-    Peer    string   // 货币地址(假设是出金，则是地址)
-    WalBal  float64  //
-    At      int64    // 时间
-    Op      int32    // 钱包操作: 0-非法, 1-存钱, 2-取钱, 3-已实现盈亏, 4-现货交易, 5-查询
-    Via     int32    // OrderVia
-    ErrCode int32    // 错误代码
-    ErrTxt  string   // 错误文本
-    Stat    int32    // OrderStatus
+// 钱包日志
+type WltLog struct {
+    UId string `protobuf:"bytes,1,opt,name=UId,proto3" json:"UId,omitempty" h_EN:"AId" h_CN:"账户ID" xorm:"char(40)"`
+    AId string `protobuf:"bytes,2,opt,name=AId,proto3" json:"AId,omitempty" xorm:"char(40)"`
+    Seq string `protobuf:"bytes,3,opt,name=Seq,proto3" json:"Seq,omitempty" xorm:"char(40)"`
+    // 货币类型
+    Coin string `protobuf:"bytes,4,opt,name=Coin,proto3" json:"Coin,omitempty" xorm:"char(16)"`
+    // 投资者帐号
+    WId string       `protobuf:"bytes,5,opt,name=WId,proto3" json:"WId,omitempty" xorm:"char(40)"`
+    Qty gaea_Num.Flt `protobuf:"bytes,6,opt,name=Qty,proto3,customtype=gaea/Num.Flt" json:"Qty" xorm:"char(64)"`
+    Fee gaea_Num.Flt `protobuf:"bytes,7,opt,name=Fee,proto3,customtype=gaea/Num.Flt" json:"Fee" xorm:"char(64)"`
+    // 货币地址(假设是出金，则是地址)
+    Peer string `protobuf:"bytes,8,opt,name=Peer,proto3" json:"Peer,omitempty" xorm:"char(128)"`
+    // 在进行完本次操作后，钱包的CalcWltBal函数的返回值。请注意，在合约交易中，当逐仓保证金变化的时候，本字段不会有对应的记录。
+    WalBal gaea_Num.Flt `protobuf:"bytes,9,opt,name=WalBal,proto3,customtype=gaea/Num.Flt" json:"WalBal" xorm:"char(64)"`
+    // 时间
+    At int64 `protobuf:"varint,10,opt,name=At,proto3" json:"At,omitempty"`
+    // 类型
+    Op WltOp `protobuf:"varint,11,opt,name=Op,proto3,enum=Protocol.WltOp" json:"Op,omitempty"`
+    // 来源
+    Via OrderVia `protobuf:"varint,12,opt,name=Via,proto3,enum=Protocol.OrderVia" json:"Via,omitempty"`
+    // Info
+    Info string `protobuf:"bytes,13,opt,name=Info,proto3" json:"Info,omitempty"`
+    // 错误代码
+    ErrCode ErrorCode `protobuf:"varint,21,opt,name=ErrCode,proto3,enum=Protocol.ErrorCode" json:"ErrCode,omitempty"`
+    // 错误文本
+    ErrTxt    string      `protobuf:"bytes,22,opt,name=ErrTxt,proto3" json:"ErrTxt,omitempty"`
+    Stat      OrderStatus `protobuf:"varint,23,opt,name=Stat,proto3,enum=Protocol.OrderStatus" json:"Stat,omitempty"`
 }
 
-type TrdRec struct {        // **成交结构体字段定义说明**
-    UId             string  // 用户Id
-    AId             string  // 账户Id
-    Sym             string  // 交易对符号
-    MatchId         string  // 撮合ID
-    OrdId           string  // 报单ID
-    Sz              float64 // 数量
-    Prz             float64 // 价格
-    Fee             float64 // 手续费
-    FeeCoin         string  // 手续费货币类型
-    At              int64   // 成交时间(ms)
-    Via             int32   // 报单来源， 0-无效, 1-WEB, 2-APP, 3-API, 4-平仓Liquidate, 5-ADLEngine, 6-Settlement, 7-Trade, 8-Fee, 9-Depo, 10-Wdrw
-
+type TrdRec struct {
+    // 投资者帐号
+    UId             string       `protobuf:"bytes,1,opt,name=UId,proto3" json:"UId,omitempty" h_EN:"AId" h_CN:"账户ID" xorm:"char(40)"`
+    AId             string       `protobuf:"bytes,2,opt,name=AId,proto3" json:"AId,omitempty" xorm:"char(40)"`
+    Sym             string       `protobuf:"bytes,3,opt,name=Sym,proto3" json:"Sym,omitempty" xorm:"char(16)"`
+    WId             string       `protobuf:"bytes,4,opt,name=WId,proto3" json:"WId,omitempty" xorm:"char(40)"`
+    MatchId         string       `protobuf:"bytes,5,opt,name=MatchId,proto3" json:"MatchId,omitempty" xorm:"char(40)"`
+    OrdId           string       `protobuf:"bytes,6,opt,name=OrdId,proto3" json:"OrdId,omitempty" xorm:"char(40)"`
+    Sz              gaea_Num.Flt `protobuf:"bytes,7,opt,name=Sz,proto3,customtype=gaea/Num.Flt" json:"Sz" xorm:"char(64)"`
+    Prz             gaea_Num.Flt `protobuf:"bytes,8,opt,name=Prz,proto3,customtype=gaea/Num.Flt" json:"Prz" xorm:"char(64)"`
+    Fee             gaea_Num.Flt `protobuf:"bytes,9,opt,name=Fee,proto3,customtype=gaea/Num.Flt" json:"Fee" xorm:"char(64)"`
+    FeeCoin         string       `protobuf:"bytes,10,opt,name=FeeCoin,proto3" json:"FeeCoin,omitempty" h_CN:"货币符号" h_EN:"The Symbol you pay for Fee" xorm:"char(16)"`
+    At              int64        `protobuf:"varint,11,opt,name=At,proto3" json:"At,omitempty"`
+    Via             OrderVia     `protobuf:"varint,12,opt,name=Via,proto3,enum=Protocol.OrderVia" json:"Via,omitempty"`
+    GrossVal        float64      `protobuf:"fixed64,20,opt,name=GrossVal,proto3" json:"GrossVal,omitempty"`
+    HomeNotional    float64      `protobuf:"fixed64,21,opt,name=HomeNotional,proto3" json:"HomeNotional,omitempty"`
+    ForeignNotional float64      `protobuf:"fixed64,22,opt,name=foreignNotional,proto3" json:"foreignNotional,omitempty"`
+    // 下面的数据，来自Trdsum
+    // 平均买入价
+    BAvg float64 `protobuf:"fixed64,30,opt,name=BAvg,proto3" json:"BAvg,omitempty"`
+    // 计算平均值的买入量
+    NBid float64 `protobuf:"fixed64,31,opt,name=NBid,proto3" json:"NBid,omitempty"`
+    // 平均卖出价
+    AAvg float64 `protobuf:"fixed64,32,opt,name=AAvg,proto3" json:"AAvg,omitempty"`
+    // 计算平均值的卖出量
+    NAsk float64 `protobuf:"fixed64,33,opt,name=NAsk,proto3" json:"NAsk,omitempty"`
+    // 统计周期内买入量
+    SzBid float64 `protobuf:"fixed64,34,opt,name=SzBid,proto3" json:"SzBid,omitempty"`
+    // 统计周期内卖出量
+    SzAsk float64 `protobuf:"fixed64,35,opt,name=SzAsk,proto3" json:"SzAsk,omitempty"`
+    // 统计周期内买入次数
+    NumBid uint64 `protobuf:"varint,36,opt,name=NumBid,proto3" json:"NumBid,omitempty"`
+    // 统计周期内卖出次数
+    NumAsk uint64 `protobuf:"varint,37,opt,name=NumAsk,proto3" json:"NumAsk,omitempty"`
+    // 算力等级
+    MPL int64 `protobuf:"varint,40,opt,name=MPL,proto3" json:"MPL,omitempty"`
+    // 买入算力 Mine Power for Bid
+    MPB float64 `protobuf:"fixed64,41,opt,name=MPB,proto3" json:"MPB,omitempty"`
+    // 卖出算力 Mine Power for Ask
+    MPA float64 `protobuf:"fixed64,42,opt,name=MPA,proto3" json:"MPA,omitempty"`
+    // 算力相关量. 可能并不会等于 Sz
+    MPS float64 `protobuf:"fixed64,43,opt,name=MPS,proto3" json:"MPS,omitempty"`
+    // 扩展字段
+    Ext string `protobuf:"bytes,50,opt,name=Ext,proto3" json:"Ext,omitempty"`
 }
 
 ```

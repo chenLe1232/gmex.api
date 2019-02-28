@@ -245,6 +245,17 @@ type V2AssetCfg struct {
 
 ```
 
+补充内测功能：
+开始支持虚拟运营的概念，因此在查询取交易对时需要增加参数vp来获取指定虚拟运营商的编号。
+
+```js
+// 查询交易对，带参数vp
+{"req":"GetAssetD","rid":"0","expires":1537706670830,"args":{"vp":1}}
+// 查询交易对扩展定义，带参数vp
+{"req":"GetAssetEx","rid":"1","expires":1537706670830,"args":{"vp":1}}
+```
+内测版返回的交易对属性中会多一个 Lbl 属性，表示该交易的所属板块.
+
 
 2. 获取综合指数列表： GetCompositeIndex
 ```js

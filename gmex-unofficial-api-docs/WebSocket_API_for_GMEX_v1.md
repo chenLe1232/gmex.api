@@ -169,10 +169,10 @@ type AssetD struct {
 type FeeMethod int32
 
 const (
-    FeeMethod_FM_IN_FROM_TO         FeeMethod = 0
-    FeeMethod_FM_IN_FROM            FeeMethod = 1
-    FeeMethod_FM_IN_FROM_TO_FEECOIN FeeMethod = 2
-    FeeMethod_FM_IN_FROM_FEECOIN    FeeMethod = 3
+    FeeMethod_FM_IN_FROM_TO         FeeMethod = 0	// 收入货币中支付。对于买卖双方，使用不同的货币支付手续费
+    FeeMethod_FM_IN_FROM            FeeMethod = 1	// 使用购买行为中消费的币种为手续费
+    FeeMethod_FM_IN_FROM_TO_FEECOIN FeeMethod = 2	// 可以使用第三货币进行手续费抵扣。如果额度不足，则使用FROM_TO 的逻辑
+    FeeMethod_FM_IN_FROM_FEECOIN    FeeMethod = 3	// 可以使用第三货币进行手续费抵扣。如果额度不足，则使用FROM    的逻辑
 )
 
 // **交易对的扩展配置数据**

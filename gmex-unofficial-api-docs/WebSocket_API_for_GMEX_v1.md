@@ -453,7 +453,7 @@ type V2AssetCfg struct {
  * 根据上面的信息可以生成如下签名:
  * signature = md5("Login"+"1"+ JSON.stringify({UserName:"example@gaea.com",UserCred:"mVAAADjNHzhvehaEvU$BMJoU7BZk"}) +"1538222696758" + "uLgAAHMw62di3hUPypuETMWGzHx852swxM7V0b2HObba5gYNNrLkuvQ4I")
  * signature结果为:"74c33368e9a1f8d6d13cdf0bf5aa02a8"
- * */
+ ***/
 
 // 需要注意的是: Args 参数一般为JSON对象(除Time)，在签名时需要序列化为字符串，序列化没有字段顺序要求,但是需要保持签名时序列化的顺序与最终发出消息时序列化的顺序一致。
 // 补充: Time消息不要签名
@@ -986,7 +986,7 @@ type AssetEx struct {
 ```js
 // 发送请求消息
 {
-    "req":"GetTrades",
+    "req":"GetHistOrders",
     "rid":"7",
     "expires":1537712072667,
     "args":{
@@ -1000,24 +1000,13 @@ type AssetEx struct {
     "rid":"7",
     "code":0,
     "data":[
-        {
-            "UId":"1234567",
-            "AId":"123456701",
-            "Sym":"BTC1809",
-            "MatchId":"01CQES0XMV4VFBEETKJ2522BKH",
-            "OrdId":"01CQES0XMVW9BFVS1QNZXXE3AC",
-            "Sz":-120,
-            "Prz":6737.5,
-            "Fee":-0.000005343228200371059,
-            "FeeCoin":"BTC",
-            "At":1537711867713,
-            "Via":7
-        },
-        {"UId":"1234567","AId":"123456701","Sym":"ETH1809","MatchId":"01CQES0XMVJKBYW747NX6HKYMV","OrdId":"01CQES0XMVM6BR3JQC4Y3TJ0GP","Sz":50,"Prz":245.55,"Fee":-0.00006108735491753208,"FeeCoin":"ETH","At":1537711603240,"Via":7},
-        {"UId":"1234567","AId":"123456701","Sym":"ETH1812","MatchId":"01CQES0XMVPEVSRHC5N6F44NVQ","OrdId":"01CQES0XMVMQ06C0MDCJ9FN4SC","Sz":100,"Prz":246.75,"Fee":-0.0001215805471124620,"FeeCoin":"ETH","At":1537711597374,"Via":7},
-        {"UId":"1234567","AId":"123456701","Sym":"BTC1812","MatchId":"01CQES0XMV1WWWXP63PMPKE9RF","OrdId":"01CQES0XMV4M3XNJBXKBCKHPZ3","Sz":259,"Prz":6.75E+3,"Fee":-0.00001151111111111111,"FeeCoin":"BTC","At":1537703229547,"Via":7},
-        {"UId":"1234567","AId":"123456701","Sym":"BTC1812","MatchId":"01CQES0XMVKDQCD192BG4STJF6","OrdId":"01CQES0XMV4M3XNJBXKBCKHPZ3","Sz":519,"Prz":6.75E+3,"Fee":-0.00002306666666666667,"FeeCoin":"BTC","At":1537703229346,"Via":7},
-    ]
+		{"AId":"123456701","At":1551057354296,"COrdId":"1551057354239","Dir":1,"Frz":0,"OrdId":"01D16QEQFCHP3JH4VA3FYFTDEN","OType":1,"Prz":3700,"PrzF":3700,"PrzStop":0,"Qty":60,"QtyDsp":0,"QtyF":60,"Status":4,"StopPrz":0,"Sym":"BTC1903","UId":"1234567","Until":9223372036853775000,"Upd":1551299771782,"Val":0,"WId":"123456701BTC"},
+		{"AId":"123456701","At":1551057304192,"COrdId":"1551057304136","Dir":1,"Frz":0,"OrdId":"01D16QEQFC08QK9N655H2NETKE","OType":2,"Prz":3790,"PrzChg":10,"PrzF":3790,"PrzStop":0,"Qty":50,"QtyDsp":0,"QtyF":50,"Status":4,"StopPrz":0,"Sym":"BTC1903","Tif":1,"UId":"1234567","Until":9223372036853775000,"Upd":1551057304192,"Val":0,"WId":"123456701BTC"},
+		{"AId":"123456701","At":1550765634218,"COrdId":"1550765634165","Dir":-1,"Frz":0,"OrdId":"01D16QEQFCVNA8KG86DKZDRKQC","OType":1,"Prz":3939,"PrzF":3939,"PrzStop":0,"Qty":50,"QtyDsp":0,"QtyF":50,"Status":4,"StopPrz":0,"Sym":"BTC1903","UId":"1234567","Until":9223372036853775000,"Upd":1550800893882,"Val":0,"WId":"123456701BTC"},
+		{"AId":"123456701","At":1550765301943,"COrdId":"1550765301926","Dir":-1,"ErrCode":27,"Frz":0,"OrdId":"01D16QEQFCXFBB21QJ32SHWVHG","OType":1,"Prz":3939.5,"PrzF":0,"PrzStop":0,"Qty":50,"QtyDsp":0,"QtyF":0,"Status":4,"StopPrz":0,"Sym":"BTC1903","UId":"1234567","Until":9223372036853775000,"Upd":1550765362567,"Val":0.01269196598,"WId":"123456701BTC"},
+		{"AId":"123456701","At":1550635738299,"COrdId":"1550635738201","Dir":-1,"Frz":0,"OrdId":"01D16QEQFC6E1WN77PRWG8DGRZ","OType":2,"Prz":3913,"PrzChg":10,"PrzF":3913,"PrzStop":0,"Qty":40,"QtyDsp":0,"QtyF":40,"Status":4,"StopPrz":0,"Sym":"BTC1903","Tif":1,"UId":"1234567","Until":9223372036853775000,"Upd":1550635738299,"Val":0,"WId":"123456701BTC"},
+		{"AId":"123456701","At":1548655357742,"Dir":-1,"Frz":0,"OrdId":"01D16QEQFCVF74KVQHQ6WAD2ZP","OType":1,"Prz":103.85,"PrzF":106.05,"PrzStop":0,"Qty":1,"QtyDsp":0,"QtyF":1,"Status":4,"StopPrz":0,"Sym":"ETH1903","Tif":2,"UId":"1234567","Upd":1548655357742,"Val":0,"Via":4,"WId":"123456701ETH"}
+	]
 }
 ```
 
@@ -1147,7 +1136,7 @@ type AssetEx struct {
         "Upd":1537712923017,
         "Frz":0,
         "PrzF":0,
-        "AId":"112562301",
+        "AId":"123456701",
         "COrdId":"0",
         "QtyDsp":0,
         "PrzStop":0,
@@ -1157,7 +1146,7 @@ type AssetEx struct {
         "Status":2,
         "QtyF":0,
         "StopPrz":0,
-        "UId":"1125623",
+        "UId":"1234567",
         "Sym":"BTC1809",
         "OrdId":"01CQES0XMVV3SMWJ7N683FWJR8",
         "OType":1,
@@ -1421,7 +1410,7 @@ type V2TrdSum struct {
         "MI":0.04240898874506015,
         "Status":2,
         "Coin":"BTC",
-        "WId":"112562301BTC",
+        "WId":"123456701BTC",
         "Depo":0.16518449,
         "Frz":0,
         "RD":0.2635360067663513,

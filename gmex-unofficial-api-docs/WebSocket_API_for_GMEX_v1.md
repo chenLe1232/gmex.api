@@ -1098,7 +1098,7 @@ type AssetEx struct {
     "signature": "1234567890abcdef1234567890abcdef"
 }
 
-# 收到返回消息
+// 收到返回消息
 {
     "rid":"10",
     "code":0,
@@ -1254,22 +1254,22 @@ args: {
 
  13. 查询用户的风险限额GetRiskLimit(内测中)
 ```JavaScript
-    /**
-    * 功能: 查询某个交易对用户的风险限额
-    * 参数说明:
-    * expires:          // 消息的有效时间
-    * rid: 10           //用户发送请求的唯一编号，由于websocket是异步通讯，用户需要通过匹配收到消息的rid和自己发送的rid来匹配操作和应答。
-    * req: 'GetRiskLimit'   // 请求的动作名称
-    * signature: ""         // 签名,参考签名的生成规则
-    * args: {
-    *  "AId": "",           // 账号的AId,
-    *  "Sym": "",           // 交易对名称
-    * }
-    */
-    // 请求发送参数
-    {"req":"GetRiskLimit","rid":"15","expires":1537712072667,"args":{"AId":"123456701","Sym":"BTC1812"},"signature": "1234567890abcdef1234567890abcdef"}
-    // 接收到的返回消息
-    {"rid":"15","code":0,"data":{....}}
+/**
+* 功能: 查询某个交易对用户的风险限额
+* 参数说明:
+* expires:          // 消息的有效时间
+* rid: 10           //用户发送请求的唯一编号，由于websocket是异步通讯，用户需要通过匹配收到消息的rid和自己发送的rid来匹配操作和应答。
+* req: 'GetRiskLimit'   // 请求的动作名称
+* signature: ""         // 签名,参考签名的生成规则
+* args: {
+*  "AId": "",           // 账号的AId,
+*  "Sym": "",           // 交易对名称
+* }
+*/
+// 请求发送参数
+{"req":"GetRiskLimit","rid":"15","expires":1537712072667,"args":{"AId":"123456701","Sym":"BTC1812"},"signature": "1234567890abcdef1234567890abcdef"}
+// 接收到的返回消息
+{"rid":"15","code":0,"data":{....}}
 
 ```
 
@@ -1665,6 +1665,116 @@ type TrdRec struct {
     // 扩展字段
     Ext string `protobuf:"bytes,50,opt,name=Ext,proto3" json:"Ext,omitempty"`
 }
+
+
+
+//
+// 委托的状态
+type OrderStatus int32
+
+const (
+	// 未指定
+	OrderStatus_OS_Invalid OrderStatus = 0
+	// 正在排队
+	OrderStatus_Queueing OrderStatus = 1
+	// 有效
+	OrderStatus_Matching OrderStatus = 2
+	// 提交失败
+	OrderStatus_PostFail OrderStatus = 3
+	// 已执行
+	OrderStatus_Executed OrderStatus = 4
+)
+
+
+type OfferType int32
+
+const (
+	OfferType_OT_Invalid OfferType = 0
+	// 限价委单
+	OfferType_Limit OfferType = 1
+	// 市价委单,匹配后转限价
+	OfferType_Market OfferType = 2
+	// 限价止损/盈利
+	OfferType_StopLimit OfferType = 3
+	// 市价止损/盈利
+	OfferType_StopMarket OfferType = 4
+	// 追踪 限价
+	OfferType_TraceLimit OfferType = 5
+	// 追踪 市价
+	OfferType_TraceMarket OfferType = 6
+)
+
+
+//
+// 条件委托触发的判据
+type StopBy int32
+
+const (
+	// 标记价格
+	StopBy_PriceMark StopBy = 0
+	// 最新成交
+	StopBy_PriceLatest StopBy = 1
+	// 指数价格
+	StopBy_PriceIndex StopBy = 2
+)
+
+
+//
+// 交易指令的标志
+type OrdFlag int32
+
+const (
+	// 占位，无意义
+	OrdFlag_OF_INVALID OrdFlag = 0
+	// 如果委托会立即成交，则不发送此委托
+	OrdFlag_POSTONLY OrdFlag = 1
+	// 如果委托会导致增加仓位，则不发送此委托
+	OrdFlag_REDUCEONLY OrdFlag = 2
+	// 触发后平仓 TODO 目前未实现
+	// 	CLOSEONTRIGGER 	= 4;
+	// 条件指定为 如果价格大于StopBy
+	OrdFlag_IF_GREATERTHAN OrdFlag = 8
+	// 条件指定为 如果价格低于StopBy
+	OrdFlag_IF_LESSTHAN OrdFlag = 16
+	// 行情追踪委托的激活状态
+	OrdFlag_TRACE_ACTIVE OrdFlag = 32
+	// 行情追踪委托的触发状态
+	OrdFlag_TRACE_FIRE OrdFlag = 64
+	// 设定此标志以跟踪最大值的回调。不设定此标志以跟踪最小值的回调
+	OrdFlag_TRACE_AT_MAX OrdFlag = 128
+)
+
+
+//
+//
+type TimeInForce int32
+
+const (
+	// 一直有效
+	TimeInForce_GoodTillCancel TimeInForce = 0
+	// 部分成交后剩余委托取消
+	TimeInForce_ImmediateOrCancel TimeInForce = 1
+	// 部分成交后剩余委托取消
+	TimeInForce_FillAndKill TimeInForce = 1
+	// 如果不能全部成交则取消委托			全部成交或者全部撤销
+	TimeInForce_FillOrKill TimeInForce = 2
+)
+
+
+
+//
+//
+type TradeClass int32
+
+const (
+	TradeClass_TC_INVALID TradeClass = 0
+	// Spot Trading 现货交易
+	TradeClass_TC_SPOT TradeClass = 1
+	// Future Trading 期货交易
+	TradeClass_TC_FUTURE TradeClass = 2
+	// 永续
+	TradeClass_TC_PERPETUAL TradeClass = 3
+)
 
 ```
 

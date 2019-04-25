@@ -90,21 +90,28 @@ def callback_on_mkt_request_response(_, code, data):
 
 def sample_main():
     cfg = {
-        'simgo': {
-            'trd_ws_url': consts.GMEX_SIMGO_TRADE_WEBSOCKET_URL,
-            'mkt_ws_url': consts.GMEX_SIMGO_MARKET_WEBSOCKET_URL,
-            'user_name': 'hexiaoyuan@126.com',
-            'api_key': 'dNwAAB85TNjiDsDGT7LEOxhZnBN4',
-            'api_secret': 'dPQAAHJ2msQ4cLEyT2dgOsYV2H$EyJ3aaMRk9k1NoZg$WE1g35s2nnQyh'
+        "prod" : {
+            "trd_ws_url": consts.GMEX_PROD_TRADE_WEBSOCKET_URL,
+            "mkt_ws_url": consts.GMEX_PROD_MARKET_WEBSOCKET_URL,
+            "user_name": "<your-user-name>",
+            "api_key": "<your-api-key>",
+            "api_secret": "<your-api-secret>",
+            },
+        "simgo": {
+            "trd_ws_url": consts.GMEX_SIMGO_TRADE_WEBSOCKET_URL,
+            "mkt_ws_url": consts.GMEX_SIMGO_MARKET_WEBSOCKET_URL,
+            "user_name": "<your-user-name>",
+            "api_key": "<your-api-key>",
+            "api_secret": "<your-api-secret>",
+            }
         }
-    }
 
     user_cfg_fname = 'user_cfg.json'
     if os.path.isfile(user_cfg_fname):
         json_data=open('user_cfg.json').read()
         cfg = my_json_unmarshal(json_data)
 
-    env = 'simgo'
+    env = 'prod'
     trd_ws = GmexTradeWebsocket(cfg[env]['trd_ws_url'],
                                 cfg[env]['user_name'],
                                 cfg[env]['api_key'],
@@ -128,12 +135,14 @@ def sample_main():
                                  on_mkt_notification=callback_on_mkt_notification
                                  )
 
+    # 查询可以订阅的指数行情
     mkt_ws.REQ_GetCompositeIndex(callback_on_mkt_request_response)
 
+    # 获取到服务端返回的交易对后的回调处理函数
     def callback_on_mkt_GetAssetD(_, code, data):
         # logger.debug("on_mkt_resp: %d %s" % (code, my_json_marshal(data)))
         for it in data:
-            logger.debug("inst: Sym=%s TrdCls=%d" % (it['Sym'], it['TrdCls']))
+            logger.debug("[交易对]: 符号=%s 类型=%d" % (it['Sym'], it['TrdCls'])) # 具体字段定请参考API文档里的说明
             sym = it['Sym']
             if 'BTC.USDT' == sym:
                 # mkt_ws.REQ_Sub_tick(sym)
@@ -141,7 +150,9 @@ def sample_main():
                 # mkt_ws.REQ_Sub_orderl2(sym)
                 mkt_ws.REQ_Sub_trade(sym)
 
+    # 查询可以访问的交易对
     mkt_ws.REQ_GetAssetD(callback_on_mkt_GetAssetD)
+
     # mkt_ws.REQ_GetAssetEx(callback_on_mkt_request_response)
     # mkt_ws.REQ_Sub_index('GMEX_CI_BTC')
     # mkt_ws.REQ_Sub_tick('BTC.USDT')

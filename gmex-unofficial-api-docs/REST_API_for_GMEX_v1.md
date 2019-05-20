@@ -165,7 +165,6 @@ type AssetEx struct {
 
 ```
 
-
 * 获取可订阅的指数信息 GetCompositeIndex
 
 ```JavaScript
@@ -434,6 +433,16 @@ type AssetEx struct {
             "Sym": "BTC1812"                // 交易对名称
         }
     }
+```
+
+* 批量获取数据 GetIndexTickList, GetTickList, GetOrd20List, 可以一次获取多个行数据
+
+```JavaScript
+
+http GET https://market02.gmex.io/v1/rest/GetIndexTickList?idx_list=GMEX_CI_BTC,GMEX_CI_ETH
+http GET https://market02.gmex.io/v1/rest/GetTickList?sym_list=BTC.BTC,BTC.USDT,ETH.ETH,ETH.USDT
+http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym=BTC.BTC,BTC.USDT,ETH.ETH,ETH.USDT
+
 ```
 
 ## 交易API示例
@@ -1072,4 +1081,5 @@ type AssetEx struct {
 AId和Sym，对应的数据结构请参考WebSocket_API的文档.
 
 ## 错误码定义
+
 错误码在REST和WS两种API中定义是一致的，请参考 WebSocket_API_for_GMEX_v1.md 里的定义和说明。

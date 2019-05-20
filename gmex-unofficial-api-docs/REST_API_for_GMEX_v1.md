@@ -441,7 +441,7 @@ type AssetEx struct {
 
 http GET https://market02.gmex.io/v1/rest/GetIndexTickList?idx_list=GMEX_CI_BTC,GMEX_CI_ETH
 http GET https://market02.gmex.io/v1/rest/GetTickList?sym_list=BTC.BTC,BTC.USDT,ETH.ETH,ETH.USDT
-http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym=BTC.BTC,BTC.USDT,ETH.ETH,ETH.USDT
+http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT,ETH.ETH,ETH.USDT
 
 ```
 

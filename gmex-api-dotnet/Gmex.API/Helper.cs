@@ -63,7 +63,15 @@ namespace Gmex.API
 
         public static T MyJsonUnmarshal<T>(string value)
         {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(value);
+            try
+            {
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(value);
+            }
+            catch (Exception ex)
+            {
+                //Debug.WriteLine("[ERROR] MyJsonSafeToObj: " + ex.Message);
+                throw new InvalidOperationException($"JSON.Deserialize Failed: TXT={value}", ex);
+            }
         }
 
         private static Newtonsoft.Json.JsonSerializerSettings _json_default_setting = new Newtonsoft.Json.JsonSerializerSettings

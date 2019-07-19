@@ -79,6 +79,10 @@ namespace Gmex.API.REST
             {
                 var res = await httpClient.GetAsync(url);
                 var contentStr = await res.Content.ReadAsStringAsync();
+                if (res.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    throw new InvalidOperationException($"http failed: code={res.StatusCode}. {contentStr}");
+                }
                 return JsonConvert.DeserializeObject<Models.ServerInfo>(contentStr);
             }
         }
@@ -98,6 +102,10 @@ namespace Gmex.API.REST
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
+                if (res.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    throw new InvalidOperationException($"http failed: code={res.StatusCode}. {contentStr}");
+                }
                 var resp = Helper.MyJsonUnmarshal<RestResponse>(contentStr);
                 if (resp != null && resp.Code == 0)
                 {

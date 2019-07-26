@@ -256,6 +256,59 @@ type AssetEx struct {
     }
 ```
 
+* 获取最近K线数据 GetLatestKLine
+
+```JavaScript
+    // 请求
+    /**
+     * 参数说明
+     * Sym:交易对名称
+     * Count: K线的数量
+     * Type: K线的周期类型
+     * */
+    http POST https://api-market.gmex.io/v1/rest/GetLatestKLine  Sym='BTC.USDT' Count:=2 Typ='1m'
+
+    // 返回
+    {
+        "code": 0,
+        "data": {
+            "Count": 2,
+            "PrzClose": [
+                9690.5,
+                9689.5
+            ],
+            "PrzHigh": [
+                9690.5,
+                9690.5
+            ],
+            "PrzLow": [
+                9689,
+                9689
+            ],
+            "PrzOpen": [
+                9690.5,
+                9689.5
+            ],
+            "Sec": [
+                1564109760,
+                1564109700
+            ],
+            "Sym": "BTC.USDT",
+            "Turnover": [
+                64244.37,
+                199173.4075
+            ],
+            "Typ": "1m",
+            "Volume": [
+                1326,
+                4111
+            ]
+        }
+    }
+```
+
+
+
 * 指数的聚合行情 GetIndexTick
 
 ```JavaScript

@@ -7,17 +7,12 @@
     其中交易服务操作是需要用户提供相应的签名数据方可验证是否能获取到数据,关于签名的生产方法可参考下文中的"签名生成方法",
     行情服务的数据则无需签名可自由访问。
 
-    官方推荐首选使用 WebSockets 方式访问对接服务，REST 方式更适合一些不考虑性能和效能的场合。
+    官方推荐首选使用 WebSockets 方式访问对接服务， REST 方式更适合一些不考虑性能和效能的场合。
 
     GMEX官方的生产环境:
         官网地址: https://www.gmex.io
         行情服务: https://api-market.gmex.io/v1/rest
         交易服务: https://api-trade.gmex.io/v1/rest
-
-    GMEX官方的模拟环境(供开发者测试使用):
-        官网地址: https://simgo.gmex.io
-        行情服务: https://market02.gmex.io/v1/rest
-        交易服务: https://trade02.gmex.io/v1/rest
 
 ## 签名生成方法
 
@@ -43,7 +38,7 @@
 
 ```JavaScript
     // 请求
-    http GET https://market02.gmex.io/v1/rest/Time
+    http GET https://api-market.gmex.io/v1/rest/Time
 
     // 返回
     {
@@ -57,7 +52,7 @@
 
 ```JavaScript
     // 请求
-    http GET https://market02.gmex.io/v1/rest/GetAssetD
+    http GET https://api-market.gmex.io/v1/rest/GetAssetD
 
     // 返回
     {
@@ -170,7 +165,7 @@ type AssetEx struct {
 ```JavaScript
     // 请求
 
-    http GET https://market02.gmex.io/v1/rest/GetCompositeIndex
+    http GET https://api-market.gmex.io/v1/rest/GetCompositeIndex
 
     // 返回
     {
@@ -215,7 +210,7 @@ type AssetEx struct {
      * Offset: 偏移量
      * */
 
-    http POST https://market02.gmex.io/v1/rest/GetHistKLine  Sym='BTC1812' Sec:=1541987816 Count:=2 Offset:=0 Typ='1m'
+    http POST https://api-market.gmex.io/v1/rest/GetHistKLine  Sym='BTC1812' Sec:=1541987816 Count:=2 Offset:=0 Typ='1m'
 
     // 返回
     {
@@ -319,7 +314,7 @@ type AssetEx struct {
      *
      * */
 
-    http GET https://market02.gmex.io/v1/rest/GetIndexTick?idx=GMEX_CI_ETH
+    http GET https://api-market.gmex.io/v1/rest/GetIndexTick?idx=GMEX_CI_ETH
 
     // 返回
     {
@@ -375,7 +370,7 @@ type AssetEx struct {
      *
      * */
 
-    http GET https://market02.gmex.io/v1/rest/GetTick?sym=BTC1812
+    http GET https://api-market.gmex.io/v1/rest/GetTick?sym=BTC1812
 
     // 返回
     {
@@ -417,7 +412,7 @@ type AssetEx struct {
      *
      * */
 
-    http GET https://market02.gmex.io/v1/rest/GetTrades?sym=BTC1812
+    http GET https://api-market.gmex.io/v1/rest/GetTrades?sym=BTC1812
 
     // 返回
     {
@@ -456,7 +451,7 @@ type AssetEx struct {
      *
      * */
 
-    http GET https://market02.gmex.io/v1/rest/GetOrd20?sym=BTC1812
+    http GET https://api-market.gmex.io/v1/rest/GetOrd20?sym=BTC1812
 
     // 返回
     {
@@ -492,9 +487,9 @@ type AssetEx struct {
 
 ```JavaScript
 
-http GET https://market02.gmex.io/v1/rest/GetIndexTickList?idx_list=GMEX_CI_BTC,GMEX_CI_ETH
-http GET https://market02.gmex.io/v1/rest/GetTickList?sym_list=BTC.BTC,BTC.USDT,ETH.ETH,ETH.USDT
-http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT,ETH.ETH,ETH.USDT
+http GET https://api-market.gmex.io/v1/rest/GetIndexTickList?idx_list=GMEX_CI_BTC,GMEX_CI_ETH
+http GET https://api-market.gmex.io/v1/rest/GetTickList?sym_list=BTC.BTC,BTC.USDT,ETH.ETH,ETH.USDT
+http GET https://api-market.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT,ETH.ETH,ETH.USDT
 
 ```
 
@@ -504,7 +499,7 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
 
 ```JavaScript
     // 请求
-    http GET https://trade02.gmex.io/v1/rest/Time
+    http GET https://api-trade.gmex.io/v1/rest/Time
 
     // 返回
     {
@@ -529,7 +524,7 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
      * signature: 签名,参考签名生成方法
      * */
 
-    echo '{"req":"GetUserInfo", "username":"tt@gaea.com", "args":{}, "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544166435858, "signature":"7166be64f351c68318c835d4eb219cc3"}' | http POST https://trade02.gmex.io/v1/rest/Action
+    echo '{"req":"GetUserInfo", "username":"tt@gaea.com", "args":{}, "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544166435858, "signature":"7166be64f351c68318c835d4eb219cc3"}' | http POST https://api-trade.gmex.io/v1/rest/Action
 
     //返回
     {
@@ -556,7 +551,7 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
      * signature: 签名,参考签名生成方法
      * */
 
-    echo '{"req":"GetCcsWallets", "username":"tt@gaea.com", "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544166944189, "signature":"ac1234c94034566e7943217cd243259e"}' | http POST https://trade02.gmex.io/v1/rest/Action
+    echo '{"req":"GetCcsWallets", "username":"tt@gaea.com", "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544166944189, "signature":"ac1234c94034566e7943217cd243259e"}' | http POST https://api-trade.gmex.io/v1/rest/Action
 
     {
         "code": 0,                                          // 0成功,其它则失败
@@ -604,7 +599,7 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
      * signature: 签名,参考签名生成方法
      **/
 
-    echo '{"req":"GetWallets", "username":"tt@gaea.com", "args":{"AId":"102041501"}, "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544166944189, "signature":"ac5fdac94088cb6e79d5ed7cd20eba9e"}' | http POST https://trade02.gmex.io/v1/rest/Action
+    echo '{"req":"GetWallets", "username":"tt@gaea.com", "args":{"AId":"102041501"}, "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544166944189, "signature":"ac5fdac94088cb6e79d5ed7cd20eba9e"}' | http POST https://api-trade.gmex.io/v1/rest/Action
 
     // 返回
     {
@@ -663,7 +658,7 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
      * signature: 签名,参考签名生成方法
      * */
 
-    echo '{"req":"GetWalletsLog", "username":"tt@gaea.com", "args":{"AId":"102041501"}, "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544167142509, "signature":"b094142522364fab85ef82b8f875ca89"}' | http POST https://trade02.gmex.io/v1/rest/Action
+    echo '{"req":"GetWalletsLog", "username":"tt@gaea.com", "args":{"AId":"102041501"}, "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544167142509, "signature":"b094142522364fab85ef82b8f875ca89"}' | http POST https://api-trade.gmex.io/v1/rest/Action
 
     // 返回
     {
@@ -722,7 +717,7 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
      * signature: 签名,参考签名生成方法
      * */
 
-    echo '{"req":"GetHistOrders", "username":"tt@gaea.com", "args":{"AId":"102041501"}, "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544167420498, "signature":"417377f8c05efdd8d6364dad48f70cb0"}' | http POST https://trade02.gmex.io/v1/rest/Action
+    echo '{"req":"GetHistOrders", "username":"tt@gaea.com", "args":{"AId":"102041501"}, "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544167420498, "signature":"417377f8c05efdd8d6364dad48f70cb0"}' | http POST https://api-trade.gmex.io/v1/rest/Action
 
     // 返回
     {
@@ -811,7 +806,7 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
      * signature: 签名,参考签名生成方法
      * */
 
-    echo '{"req":"GetOrderByID", "username":"tt@gaea.com", "args":{"AId":"102041501", "OrdId":"01CXT69HBCWCGAQXSPK26G070N"}, "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544167420498, "signature":"417377f8c05efdd8d6364dad48f70cb0"}' | http POST https://trade02.gmex.io/v1/rest/Action
+    echo '{"req":"GetOrderByID", "username":"tt@gaea.com", "args":{"AId":"102041501", "OrdId":"01CXT69HBCWCGAQXSPK26G070N"}, "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544167420498, "signature":"417377f8c05efdd8d6364dad48f70cb0"}' | http POST https://api-trade.gmex.io/v1/rest/Action
 
     // 返回
     {
@@ -866,7 +861,7 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
      * signature: 签名,参考签名生成方法
      * */
 
-    echo '{"req":"GetPositions", "username":"tt@gaea.com", "args":{"AId":"102041501"}, "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544167570475, "signature":"ea545fdf01aea172c2bbdce204a9186b"}' | http POST https://trade02.gmex.io/v1/rest/Action
+    echo '{"req":"GetPositions", "username":"tt@gaea.com", "args":{"AId":"102041501"}, "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544167570475, "signature":"ea545fdf01aea172c2bbdce204a9186b"}' | http POST https://api-trade.gmex.io/v1/rest/Action
 
     // 返回
     {
@@ -913,7 +908,7 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
      * signature: 签名,参考签名生成方法
      * */
 
-    echo '{"req":"GetOrders", "username":"tt@gaea.com", "args":{"AId":"102041501"}, "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544167683629, "signature":"a0efd3adad53143b1fb09c06bbc02811"}' | http POST https://trade02.gmex.io/v1/rest/Action
+    echo '{"req":"GetOrders", "username":"tt@gaea.com", "args":{"AId":"102041501"}, "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544167683629, "signature":"a0efd3adad53143b1fb09c06bbc02811"}' | http POST https://api-trade.gmex.io/v1/rest/Action
 
     // 返回
     {
@@ -980,7 +975,7 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
      * signature: 签名,参考签名生成方法
      * */
 
-    echo '{"args":{"AId":"102041501","COrdId":"1544169579283102041501","Dir":1,"OType":1,"OrdFlag":0,"Prz":100,"PrzChg":1,"Qty":3000,"QtyDsp":0,"Sym":"BTC1812","Tif":0},"req":"OrderNew","expires":1544170179229,"signature":"5e6967d6b0715207243be37636d95c45","username":"tt@gaea.com","apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw"}' | http POST https://trade02.gmex.io/v1/rest/Action
+    echo '{"args":{"AId":"102041501","COrdId":"1544169579283102041501","Dir":1,"OType":1,"OrdFlag":0,"Prz":100,"PrzChg":1,"Qty":3000,"QtyDsp":0,"Sym":"BTC1812","Tif":0},"req":"OrderNew","expires":1544170179229,"signature":"5e6967d6b0715207243be37636d95c45","username":"tt@gaea.com","apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw"}' | http POST https://api-trade.gmex.io/v1/rest/Action
 
     // 返回
     {
@@ -1036,7 +1031,7 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
      * signature: 签名,参考签名生成方法
      * */
 
-    echo '{"args":{"AId":"102041501","OrdId":"01CY1X0RRRK6G77QTMVDFB5FE7","Sym":"BTC1812"},"req":"OrderDel","expires":1544170922227,"signature":"607c940ca12c7fab55035c95a0e06c83","username":"tt@gaea.com","apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw"}' | http POST https://trade02.gmex.io/v1/rest/Action
+    echo '{"args":{"AId":"102041501","OrdId":"01CY1X0RRRK6G77QTMVDFB5FE7","Sym":"BTC1812"},"req":"OrderDel","expires":1544170922227,"signature":"607c940ca12c7fab55035c95a0e06c83","username":"tt@gaea.com","apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw"}' | http POST https://api-trade.gmex.io/v1/rest/Action
 
     // 返回
     {
@@ -1090,7 +1085,7 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
      * signature: 签名,参考签名生成方法
      * */
 
-    echo '{"args":{"Sym":"BTC1812","AId":"102041501","PId":null,"Param":10},"req":"PosLeverage","expires":1544171021791,"signature":"5f8c60c9d6c572b06fb614465af3cac9","username":"tt@gaea.com","apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw"}' | http POST https://trade02.gmex.io/v1/rest/Action
+    echo '{"args":{"Sym":"BTC1812","AId":"102041501","PId":null,"Param":10},"req":"PosLeverage","expires":1544171021791,"signature":"5f8c60c9d6c572b06fb614465af3cac9","username":"tt@gaea.com","apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw"}' | http POST https://api-trade.gmex.io/v1/rest/Action
 
     // 返回
     {
@@ -1119,7 +1114,7 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
      * signature: 签名,参考签名生成方法
      * */
 
-    echo '{"args":{"Sym":"BTC1812","AId":"102041501","PId":"01CXT69HBDZXF36MW2NHPBDG43","Param":500},"req":"PosTransMgn","expires":1544171208181,"signature":"07ebfaf6202dfa1d1f74cbfa5a5ebf83","username":"tt@gaea.com","apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw"}' | http POST https://trade02.gmex.io/v1/rest/Action
+    echo '{"args":{"Sym":"BTC1812","AId":"102041501","PId":"01CXT69HBDZXF36MW2NHPBDG43","Param":500},"req":"PosTransMgn","expires":1544171208181,"signature":"07ebfaf6202dfa1d1f74cbfa5a5ebf83","username":"tt@gaea.com","apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw"}' | http POST https://api-trade.gmex.io/v1/rest/Action
 
     // 返回
     {
@@ -1146,7 +1141,7 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
      * signature: 签名,参考签名生成方法
      * */
 
-    echo '{"args":{"AId":"102041501","Sec":70},"req":"CancelAllAfter","expires":1544171689842,"signature":"b4b9f476392ca8ccffe41a66a045b825","username":"tt@gaea.com","apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw"}' | http POST https://trade02.gmex.io/v1/rest/Action
+    echo '{"args":{"AId":"102041501","Sec":70},"req":"CancelAllAfter","expires":1544171689842,"signature":"b4b9f476392ca8ccffe41a66a045b825","username":"tt@gaea.com","apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw"}' | http POST https://api-trade.gmex.io/v1/rest/Action
 
     // 返回
     {
@@ -1171,7 +1166,7 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
      * }
      * */
 
-    echo '{"args":{"AId":"102041501","Sym":"BTC1812"},"req":"GetRiskLimit","expires":1544965066515,"signature":"12467507854c08c09e75142cef1c0f64","username":"tt@gaea.com","apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw"}' | http POST https://trade02.gmex.io/v1/rest/Action
+    echo '{"args":{"AId":"102041501","Sym":"BTC1812"},"req":"GetRiskLimit","expires":1544965066515,"signature":"12467507854c08c09e75142cef1c0f64","username":"tt@gaea.com","apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw"}' | http POST https://api-trade.gmex.io/v1/rest/Action
 
     // 返回
     {

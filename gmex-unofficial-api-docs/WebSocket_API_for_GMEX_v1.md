@@ -3,7 +3,7 @@
 ## 说明
 
 目前 GMEX (https://www.gmex.io) 对于外提供 WebSocket API 开发接口， 供开发者获取行情数据和进行交易操作。
-请注意，行情和交易两个服务是分开的，行情接口无需认证可以自由访问，交易部分则需要用户开通 API-KEY 后通过自己的 KEY 认证授权后方可使用。
+*请注意行情和交易是两个不同服务器*，行情接口无需认证可以自由访问，交易部分则需要用户开通 API-KEY 后通过自己的 KEY 认证授权后方可使用。
 
 GMEX官方的生产环境：
 
@@ -13,13 +13,6 @@ GMEX官方的生产环境：
 交易服务： wss://api-trade.gmex.io/v1/trade
 ```
 
-为方便大家测试，官方提供模拟环境:
-
-```txt
-模拟网址： https://simgo.gmex.io
-模拟行情： wss://market01.gmex.io/v1/market
-模拟交易： wss://trade01.gmex.io/v1/trade
-```
 
 ## 行情API
 
@@ -1049,6 +1042,7 @@ type AssetEx struct {
 	]
 }
 ```
+
 
 8. 查询用户子账号的最近钱包日志列表(必须参数 AId)： GetWalletsLog
 ```js

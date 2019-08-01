@@ -715,6 +715,8 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
      * apikey: 用户在官网申请的apikey
      * args: {
      *  AId: 账号AId,合约AId=UserID+'01',现货AId=UserID+'02'
+     *  Start: 0,  // 默认0, 可选参数
+     *  Stop: 100, // 默认100，最大500，可选参数
      * }
      * expires: 消息的有效时间
      * signature: 签名,参考签名生成方法
@@ -786,6 +788,64 @@ http GET https://market02.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.USDT
                 "Val": -0.02
             }
         ]
+    }
+```
+
+
+* 根据OrdID来查询委托单 GetOrderByID
+
+```JavaScript
+    // 请求
+    /**
+     * 接口功能: 根据OrdID来查询委托单信息。
+    *  重要说明: 服务器会从用户的当前有效委托单以及最近500条历史委托中查找，没有则返回Code=404；过期的委托单就查不到了。
+     * 参数说明:
+     * req: Action类型
+     * username: 用户名
+     * apikey: 用户在官网申请的apikey
+     * args: {
+     *  AId: 账号AId,合约AId=UserID+'01',现货AId=UserID+'02'
+     *  OrdID: 委托单的编号(注意是服务器返回给用户OrdId而不是COrdId)
+     * }
+     * expires: 消息的有效时间
+     * signature: 签名,参考签名生成方法
+     * */
+
+    echo '{"req":"GetOrderByID", "username":"tt@gaea.com", "args":{"AId":"102041501", "OrdId":"01CXT69HBCWCGAQXSPK26G070N"}, "apikey":"bEwAA4NCzhexYsNtnyaYnhbMFQw", "expires":1544167420498, "signature":"417377f8c05efdd8d6364dad48f70cb0"}' | http POST https://trade02.gmex.io/v1/rest/Action
+
+    // 返回
+    {
+        "code": 0,  // 0成功,其它则失败
+        "data": {
+            "AId": "102041501",
+            "At": 1543912373321,
+            "COrdId": "SN7",
+            "Dir": 1,
+            "ErrTxt": "NOERROR",
+            "FeeEst": 0,
+            "Frz": 0,
+            "MM": 0,
+            "OType": 1,
+            "OrdId": "01CXT69HBCWCGAQXSPK26G070N",
+            "Prz": 5000.0,
+            "PrzChg": 10,                               // 成交的档位, 1档 5档 10档
+            "PrzF": 0,
+            "PrzStop": 0,
+            "Qty": 100.0,
+            "QtyDsp": 0,
+            "QtyF": 0,
+            "Status": 4,
+            "StopPrz": 0,
+            "Sym": "BTC1833",
+            "TraceMax": 0,
+            "TraceMin": 0,
+            "TraceRR": 0,
+            "UId": "1020415",
+            "UPNLEst": 0,
+            "Until": 9223372036854775807,
+            "Upd": 1543980443526,
+            "Val": -0.02
+        }
     }
 ```
 

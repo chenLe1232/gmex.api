@@ -47,3 +47,8 @@ git clone https://github.com/hexiaoyuan/gmex.api.git your-gmex-api
 + gmex-api-java
 
   TODO
+
++ gmex-api-rust
+
+  接口数据结构定义完成，http和ws的例子可以运行.
+

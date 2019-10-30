@@ -31,13 +31,13 @@ fn get_now_msec() -> i64 {
 
 #[derive(Debug, Serialize, Deserialize)]
 struct WsResponseMessage {
-    // 如果有 rid，怎说明是request的返回结果.
+    // 如果有 rid，则说明是request的返回结果消息
     rid: Option<String>,
-    // 操作结果，0表示成功，其它表示失败.
+    // 操作结果，0表示成功，其它表示失败, 失败时data里通常是个string说明原因
     code: Option<i32>,
     // 如果有 subj，则说明是推送过来的消息
     subj: Option<String>,
-    // 结果信息
+    // 结果信息, 根据请求对应返回结果，具体结构定义根据请求而来，请参考API文档对应
     data: Option<serde_json::Value>,
 }
 

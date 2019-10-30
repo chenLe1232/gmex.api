@@ -1,3 +1,4 @@
+NOTE: 运行examples前请创建 `.env` 文件.
 
 $ cat .env
 
@@ -11,3 +12,6 @@ GMEX_USER_NAME=<your@email.com>
 GMEX_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxx
 GMEX_API_SECRET=yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 
+跑例子试试：
+cd examples/http_client; cargo run
+cd examples/websocket_client; cargo run

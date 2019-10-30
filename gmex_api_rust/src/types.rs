@@ -1,4 +1,4 @@
-// GMEX 数据结构定义
+// GMEX-API 数据结构定义
 
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
@@ -844,15 +844,15 @@ pub struct CcsWallet03 {
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct CcsWallet0102 {
-    #[serde(skip_serializing_if = "is_default")] pub wType: String,       //  币种
-    #[serde(skip_serializing_if = "is_default")] pub Num: f64,       // 金额（入金总额-出金总额）
-    #[serde(skip_serializing_if = "is_default")] pub PNL: f64,      // 已实现盈亏
-    #[serde(skip_serializing_if = "is_default")] pub Frz: f64,     // 冻结金额
-    #[serde(skip_serializing_if = "is_default")] pub UPNL: f64,       // 未实现盈亏：根据持仓情况、标记价格 刷新， 统计值
-    #[serde(skip_serializing_if = "is_default")] pub PNLISO: f64,      // 持仓新加的
-    #[serde(skip_serializing_if = "is_default")] pub MI: f64,   // 委托保证金 = 计算自已有委单 + 平仓佣金 + 开仓佣金 Mgn Initial
-    #[serde(skip_serializing_if = "is_default")] pub MM: f64,      // 仓位保证金 + 平仓佣金 Mgn Maintaince
-    #[serde(skip_serializing_if = "is_default")] pub RD: f64,    // 风险度 // Risk Degree.
+    #[serde(skip_serializing_if = "is_default")] pub wType: String,     // 币种
+    #[serde(skip_serializing_if = "is_default")] pub Num: f64,          // 金额（入金总额-出金总额）
+    #[serde(skip_serializing_if = "is_default")] pub PNL: f64,          // 已实现盈亏
+    #[serde(skip_serializing_if = "is_default")] pub Frz: f64,          // 冻结金额
+    #[serde(skip_serializing_if = "is_default")] pub UPNL: f64,         // 未实现盈亏：根据持仓情况、标记价格 刷新，统计值
+    #[serde(skip_serializing_if = "is_default")] pub PNLISO: f64,       // 逐仓下已实现盈亏
+    #[serde(skip_serializing_if = "is_default")] pub MI: f64,           // 委托保证金 = 计算自已有委单 + 平仓佣金 + 开仓佣金 Mgn Initial
+    #[serde(skip_serializing_if = "is_default")] pub MM: f64,           // 仓位保证金 + 平仓佣金 Mgn Maintaince
+    #[serde(skip_serializing_if = "is_default")] pub RD: f64,           // 风险度 // Risk Degree.
     #[serde(skip_serializing_if = "is_default")] pub balance: f64,      // 计算得出的余额，仅当时有效
-    #[serde(skip_serializing_if = "is_default")] pub wdrawable: f64,  // 撮合计算出来的可取余额
+    #[serde(skip_serializing_if = "is_default")] pub wdrawable: f64,    // 撮合计算出来的可取余额
 }

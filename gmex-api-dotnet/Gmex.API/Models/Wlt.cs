@@ -82,5 +82,16 @@ namespace Gmex.API.Models
         /// </summary>
         public decimal Gift { get; set; }
 
+        /// <summary>
+        /// 赠送金额 不允许取出。
+        /// </summary>
+        public decimal PNLG { get; set; }
+
+
+        /// <summary>
+        /// 钱包状态
+        /// </summary>
+        public int Status { get; set; }
+
     }
 }

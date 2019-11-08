@@ -345,7 +345,6 @@ pub struct Ord {
     #[serde(skip_serializing_if = "is_default")] pub QtyDsp: f64,       // 显示数量。如果为0,则显示全部Qty
     #[serde(skip_serializing_if = "is_default")] pub Tif: TimeInForce,  // 有效期
     #[serde(skip_serializing_if = "is_default")] pub OrdFlag: u32,      // OrdFlags 委托标志位
-    #[serde(skip_serializing_if = "is_default")] pub PrzStop: f64,      // 未使用
     #[serde(skip_serializing_if = "is_default")] pub Via: OrderVia,     // 来源
     #[serde(skip_serializing_if = "is_default")] pub At: i64,           // 下单时间戳.单位:毫秒
     #[serde(skip_serializing_if = "is_default")] pub Upd: i64,          // 更新时间戳.单位:毫秒

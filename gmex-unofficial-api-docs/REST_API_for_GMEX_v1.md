@@ -736,7 +736,6 @@ http GET https://api-market.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.US
                 "OrdId": "01CXT69HBC5RZM9W6EVM31GSJ8",
                 "Prz": 3850.5,                                  // 非条件或者非止盈止损时的价格
                 "PrzF": 3850.5,                                 // 已成交的平均价格
-                "PrzStop": 0,                                   // 已废弃
                 "Qty": 500.0,                                   // 交易的量
                 "QtyDsp": 0,                                    // 大于0小于委托的量则表示冰山的量
                 "QtyF": 500.0,
@@ -766,7 +765,6 @@ http GET https://api-market.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.US
                 "Prz": 5000.0,
                 "PrzChg": 10,                               // 成交的档位, 1档 5档 10档
                 "PrzF": 0,
-                "PrzStop": 0,
                 "Qty": 100.0,
                 "QtyDsp": 0,
                 "QtyF": 0,
@@ -825,7 +823,6 @@ http GET https://api-market.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.US
             "Prz": 5000.0,
             "PrzChg": 10,                               // 成交的档位, 1档 5档 10档
             "PrzF": 0,
-            "PrzStop": 0,
             "Qty": 100.0,
             "QtyDsp": 0,
             "QtyF": 0,
@@ -926,7 +923,6 @@ http GET https://api-market.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.US
                 "OrdId": "01CY1X0RRRDP8FWFA3AFCWR76M",
                 "Prz": 3414.5,
                 "PrzF": 0,
-                "PrzStop": 0,
                 "Qty": 1000.0,
                 "QtyDsp": 0,
                 "QtyF": 0,
@@ -993,7 +989,6 @@ http GET https://api-market.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.US
             "Prz": 100.0,
             "PrzChg": 1,
             "PrzF": 0,
-            "PrzStop": 0,
             "Qty": 3000.0,
             "QtyDsp": 0,
             "QtyF": 0,
@@ -1046,7 +1041,6 @@ http GET https://api-market.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.US
             "OrdId": "01CY1X0RRRK6G77QTMVDFB5FE7",
             "Prz": 0,
             "PrzF": 0,
-            "PrzStop": 0,
             "Qty": 0,
             "QtyDsp": 0,
             "QtyF": 0,

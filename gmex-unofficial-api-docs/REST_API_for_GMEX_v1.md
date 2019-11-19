@@ -60,9 +60,9 @@
         "data": [                                       // 所有可订阅交易对列表
             {
                 "Sym": "XRP.USDTP",                     // 交易对名称
-                "TrdCls": 3,                            // 交易对的类型 1.合约 2.现货 3.永续
-                "FromC": "USDT",
-                "ToC": "XRP",
+                "TrdCls": 3,                            // 交易类型, 1-现货交易, 2-期货交易, 3-永续
+                "FromC": "USDT",                        // 从什么货币
+                "ToC": "XRP",                           // 到什么货币
                 "QuoteCoin": "USDT",                    // 报价货币
                 "SettleCoin": "USDT",                   // 结算货币
                 "SettleR": 0.001,                       // 结算费率

@@ -854,4 +854,6 @@ pub struct CcsWallet0102 {
     #[serde(skip_serializing_if = "is_default")] pub RD: f64,           // 风险度 // Risk Degree.
     #[serde(skip_serializing_if = "is_default")] pub balance: f64,      // 计算得出的余额，仅当时有效
     #[serde(skip_serializing_if = "is_default")] pub wdrawable: f64,    // 撮合计算出来的可取余额
+    #[serde(skip_serializing_if = "is_default")] pub Gift: f64,         // 合约赠金
+    #[serde(skip_serializing_if = "is_default")] pub PNLG: f64,         // 合约赠金盈亏
 }

@@ -1705,50 +1705,49 @@ type WltLog struct {
     Stat      OrderStatus `json:"Stat,omitempty"`
 }
 
+// TrdRec 成交记录
 type TrdRec struct {
-    // 投资者帐号
-    UId             string       `json:"UId,omitempty"`
-    AId             string       `json:"AId,omitempty"`
-    Sym             string       `json:"Sym,omitempty"`
-    WId             string       `json:"WId,omitempty"`
-    MatchId         string       `json:"MatchId,omitempty"`
-    OrdId           string       `json:"OrdId,omitempty"`
-    Sz              gaea_Num.Flt `json:"Sz"`
-    Prz             gaea_Num.Flt `json:"Prz"`
-    Fee             gaea_Num.Flt `json:"Fee"`
-    FeeCoin         string       `json:"FeeCoin,omitempty"`
-    At              int64        `json:"At,omitempty"`
-    Via             OrderVia     `json:"Via,omitempty"`
-    GrossVal        float64      `json:"GrossVal,omitempty"`
-    HomeNotional    float64      `json:"HomeNotional,omitempty"`
-    ForeignNotional float64      `json:"foreignNotional,omitempty"`
+    UId             string   `json:"UId,omitempty"`
+    AId             string   `json:"AId,omitempty"`
+    Sym             string   `json:"Sym,omitempty"`
+    WId             string   `json:"WId,omitempty"`      // 钱包ID
+    MatchId         string   `json:"MatchId,omitempty"`  // 撮合ID
+    OrdId           string   `json:"OrdId,omitempty"`    // 委托单ID
+    Sz              MyFloat  `json:"Sz,omitempty"`       // 成交的张数
+    Prz             MyFloat  `json:"Prz,omitempty"`      // 成交的价格
+    Fee             MyFloat  `json:"Fee,omitempty"`      // 手续费
+    FeeCoin         string   `json:"FeeCoin,omitempty"`  // 手续费币种
+    At              int64    `json:"At,omitempty"`       // 发生的时间，毫秒
+    Via             OrderVia `json:"Via,omitempty"`      // 委托来源
+    Liq             float64  `json:"Liq,omitempty"`      // 强平价格
+    Br              float64  `json:"Br,omitempty"`       // 破产价格
+    Lvr             float64  `json:"Lvr,omitempty"`      // Lever
+    PrzM            float64  `json:"PrzM,omitempty"`     // 标记加盟
+    PId             string   `json:"PId,omitempty"`      // 仓位ID
+    GrossVal        float64  `json:"GrossVal,omitempty"` // 本次成交的价值
+    HomeNotional    float64  `json:"HomeNotional,omitempty"`
+    ForeignNotional float64  `json:"foreignNotional,omitempty"`
+    Gift            float64  `json:"Gift,omitempty"` // 赠金
     // 下面的数据，来自Trdsum
-    // 平均买入价
-    BAvg float64 `json:"BAvg,omitempty"`
-    // 计算平均值的买入量
-    NBid float64 `json:"NBid,omitempty"`
-    // 平均卖出价
-    AAvg float64 `json:"AAvg,omitempty"`
-    // 计算平均值的卖出量
-    NAsk float64 `json:"NAsk,omitempty"`
-    // 统计周期内买入量
-    SzBid float64 `json:"SzBid,omitempty"`
-    // 统计周期内卖出量
-    SzAsk float64 `json:"SzAsk,omitempty"`
-    // 统计周期内买入次数
-    NumBid uint64 `json:"NumBid,omitempty"`
-    // 统计周期内卖出次数
-    NumAsk uint64 `json:"NumAsk,omitempty"`
-    // 算力等级
-    MPL int64 `json:"MPL,omitempty"`
-    // 买入算力 Mine Power for Bid
-    MPB float64 `json:"MPB,omitempty"`
-    // 卖出算力 Mine Power for Ask
-    MPA float64 `json:"MPA,omitempty"`
-    // 算力相关量. 可能并不会等于 Sz
-    MPS float64 `json:"MPS,omitempty"`
-    // 扩展字段
-    Ext string `json:"Ext,omitempty"`
+    BAvg   float64 `json:"BAvg,omitempty"`   // 平均买入价
+    NBid   float64 `json:"NBid,omitempty"`   // 计算平均值的买入量
+    AAvg   float64 `json:"AAvg,omitempty"`   // 平均卖出价
+    NAsk   float64 `json:"NAsk,omitempty"`   // 计算平均值的卖出量
+    SzBid  float64 `json:"SzBid,omitempty"`  // 统计周期内买入量
+    SzAsk  float64 `json:"SzAsk,omitempty"`  // 统计周期内卖出量
+    NumBid uint64  `json:"NumBid,omitempty"` // 统计周期内买入次数
+    NumAsk uint64  `json:"NumAsk,omitempty"` // 统计周期内卖出次数
+    MPL    int64   `json:"MPL,omitempty"`    // 算力等级
+    MPB    float64 `json:"MPB,omitempty"`    // 买入算力 Mine Power for Bid
+    MPA    float64 `json:"MPA,omitempty"`    // 卖出算力 Mine Power for Ask
+    MPS    float64 `json:"MPS,omitempty"`    // 算力相关量. 可能并不会等于 Sz
+    Ext    string  `json:"Ext,omitempty"`    // 扩展字段
+    // 下面字段用来描述开平仓和收益的
+    PrzIC  float64 `json:"PrzIC,omitempty"`  // 平仓操作的开仓价
+    SzCls  float64 `json:"SzCls,omitempty"`  // 平仓数量
+    PnlCls float64 `json:"PnlCls,omitempty"` // 平仓收益
+    PrzIO  float64 `json:"PrzIO,omitempty"`  // 仓位的最终开仓价格
+    SzOpn  float64 `json:"SzOpn,omitempty"`  // 仓位的最终值
 }
 
 

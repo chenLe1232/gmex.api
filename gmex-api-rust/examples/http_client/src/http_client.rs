@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 extern crate failure;
 use failure::Error;
 
-use gmex_api::types as gmex_types;
+use gmex_api;
 
 fn http_market_demo(market_base_url: &String) -> Result<(), Error> {
     let client = reqwest::Client::new();
@@ -42,7 +42,7 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Error> {
         #[derive(Debug, Serialize, Deserialize)]
         struct Response {
             code: i32,
-            data: Vec<gmex_types::MktCompositeIndexTick>,
+            data: Vec<gmex_api::MktCompositeIndexTick>,
         }
         let res: Response = client
             .get(&(base_url.to_owned() + "/GetCompositeIndex"))
@@ -56,7 +56,7 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Error> {
         #[derive(Debug, Serialize, Deserialize)]
         struct Response {
             code: i32,
-            data: Vec<gmex_types::AssetD>,
+            data: Vec<gmex_api::AssetD>,
         }
         let mut res: Response = client
             .get(&(base_url.to_owned() + "/GetAssetD?VP=0"))
@@ -73,11 +73,12 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Error> {
                 if a.TrdCls == b.TrdCls {
                     a.Sym.cmp(&b.Sym)
                 } else {
-                    (a.TrdCls as i32).cmp(&(b.TrdCls as i32))
+                    // a.TrdCls.cmp(b.TrdCls)
+                    (a.TrdCls.unwrap_or_default() as i32).cmp(&(b.TrdCls.unwrap_or_default() as i32))
                 }
             });
             for it in res.data {
-                log::info!("  {} {:?}", it.Sym, it.TrdCls);
+                log::info!("  {:?} {:?}", it.Sym, it.TrdCls);
             }
         }
     }
@@ -89,7 +90,7 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Error> {
         #[derive(Debug, Serialize, Deserialize)]
         struct Response {
             code: i32,
-            data: Vec<gmex_types::V2AssetCfg>,
+            data: Vec<gmex_api::V2AssetCfg>,
         }
         let res: Response = client
             .get(&(base_url.to_owned() + "/GetAssetEx?VP=0"))
@@ -100,17 +101,17 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Error> {
 
     if true {
         // 获取历史K线数据 GetHistKLine
-        let args = gmex_types::MktQueryKLineHistoryRequestArgs {
-            Sym: "BTC.USDT".to_string(),
-            Typ: "1m".to_string(),
-            Sec: 1541987816,
-            Offset: 0,
-            Count: 15,
+        let args = gmex_api::MktQueryKLineHistoryRequestArgs {
+            Sym: Some(String::from("BTC.USDT")),
+            Typ: Some(gmex_api::MktKLineType::KL_1m),
+            Sec: Some(1541987816),
+            Offset: Some(0),
+            Count: Some(15),
         };
         #[derive(Debug, Serialize, Deserialize)]
         struct Response {
             code: i32,
-            data: gmex_types::MktQueryKLineHistoryResult,
+            data: gmex_api::MktQueryKLineHistoryResult,
         }
         let res: Response = client
             .post(&(base_url.to_owned() + "/GetHistKLine"))
@@ -125,7 +126,7 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Error> {
         #[derive(Debug, Serialize, Deserialize)]
         struct Response {
             code: i32,
-            data: gmex_types::MktQueryKLineHistoryResult,
+            data: gmex_api::MktQueryKLineHistoryResult,
         }
         let res: Response = client
             .post(&(base_url.to_owned() + "/GetLatestKLine"))
@@ -144,7 +145,7 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Error> {
         #[derive(Debug, Serialize, Deserialize)]
         struct Response {
             code: i32,
-            data: gmex_types::MktCompositeIndexTick,
+            data: gmex_api::MktCompositeIndexTick,
         }
         let res: Response = client
             .post(&(base_url.to_owned() + "/GetIndexTick?idx=GMEX_CI_ETH"))
@@ -158,7 +159,7 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Error> {
         #[derive(Debug, Serialize, Deserialize)]
         struct Response {
             code: i32,
-            data: Vec<gmex_types::MktCompositeIndexTick>,
+            data: Vec<gmex_api::MktCompositeIndexTick>,
         }
         let res: Response = client
             .post(&(base_url.to_owned() + "/GetIndexTickList?idx_list=GMEX_CI_BTC,GMEX_CI_ETH"))
@@ -172,7 +173,7 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Error> {
         #[derive(Debug, Serialize, Deserialize)]
         struct Response {
             code: i32,
-            data: gmex_types::MktInstrumentTick,
+            data: gmex_api::MktInstrumentTick,
         }
         let res: Response = client
             .post(&(base_url.to_owned() + "/GetTick?sym=BTC.USDT"))
@@ -185,7 +186,7 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Error> {
         #[derive(Debug, Serialize, Deserialize)]
         struct Response {
             code: i32,
-            data: Vec<gmex_types::MktCompositeIndexTick>,
+            data: Vec<gmex_api::MktCompositeIndexTick>,
         }
         let res: Response = client
             .post(
@@ -201,7 +202,7 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Error> {
         #[derive(Debug, Serialize, Deserialize)]
         struct Response {
             code: i32,
-            data: Vec<gmex_types::MktTradeItem>,
+            data: Vec<gmex_api::MktTradeItem>,
         }
         let res: Response = client
             .get(&(base_url.to_owned() + "/GetTrades?sym=BTC/USDT"))
@@ -215,7 +216,7 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Error> {
         #[derive(Debug, Serialize, Deserialize)]
         struct Response {
             code: i32,
-            data: gmex_types::MktOrder20Result,
+            data: gmex_api::MktOrder20Result,
         }
         let res: Response = client
             .get(&(base_url.to_owned() + "/GetOrd20?sym=ETH/USDT"))
@@ -229,7 +230,7 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Error> {
         #[derive(Debug, Serialize, Deserialize)]
         struct Response {
             code: i32,
-            data: Vec<gmex_types::MktOrder20Result>,
+            data: Vec<gmex_api::MktOrder20Result>,
         }
         let res: Response = client
             .get(
@@ -308,7 +309,7 @@ fn http_trade_demo(
         struct Response {
             code: i32,
             time: i64,
-            data: String,
+            data: Option<String>,
         }
         let res: Response = client
             .get(&(base_url.to_owned() + "/Time?args=my-callback-data"))
@@ -472,10 +473,10 @@ fn main() -> Result<(), Error> {
     let gmex_api_secret = std::env::var("GMEX_API_SECRET").expect("GMEX_API_SECRET must be set");
     //
     let gmex_http_url_market: String = std::env::var("GMEX_HTTP_URL_MARKET")
-        .unwrap_or_else(|_| "https://api-market.gmex.io/v1/rest".to_string());
+        .unwrap_or_else(|_| gmex_api::GMEX_HTTP_URL_MARKET.to_string());
     let gmex_http_url_trade: String = std::env::var("GMEX_HTTP_URL_TRADE")
-        .unwrap_or_else(|_| "https://api-trade.gmex.io/v1/rest".to_string());
-
+        .unwrap_or_else(|_| gmex_api::GMEX_WS_URL_TRADE.to_string());
+        
     log::debug!("GMEX-HTTP-API Test....");
     log::debug!("  GMEX_HTTP_URL_MARKET = {}", gmex_http_url_market);
     log::debug!("  GMEX_HTTP_URL_TRADE = {}", gmex_http_url_trade);

@@ -13,7 +13,7 @@ use failure::Error;
 extern crate serde_json;
 use serde::{Deserialize, Serialize};
 
-use gmex_api::types as gmex_types;
+use gmex_api;
 
 // use std::sync::mpsc::channel;
 // use std::sync::mpsc::Sender as ThreadOut;
@@ -118,42 +118,42 @@ fn websocket_market_demo(market_base_url: &String) -> Result<(), Error> {
             } else {
                 match resp.subj.as_ref().map(|s| &s[..]) {
                     Some("tick") => {
-                        let data: gmex_types::MktInstrumentTick =
+                        let data: gmex_api::MktInstrumentTick =
                             serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
                                 ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
                             })?;
                         log::info!("[mkt.tick]: {:?}", data);
                     }
                     Some("trade") => {
-                        let data: gmex_types::MktTradeItem =
+                        let data: gmex_api::MktTradeItem =
                             serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
                                 ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
                             })?;
                         log::info!("[mkt.trade]: {:?}", data);
                     }
                     Some("order20") => {
-                        let data: gmex_types::MktOrder20Result =
+                        let data: gmex_api::MktOrder20Result =
                             serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
                                 ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
                             })?;
                         log::info!("[mkt.order20]: {:?}", data);
                     }
                     Some("orderl2") => {
-                        let data: gmex_types::MktOrderItem =
+                        let data: gmex_api::MktOrderItem =
                             serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
                                 ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
                             })?;
                         log::info!("[mkt.orderl2]: {:?}", data);
                     }
                     Some("kline") => {
-                        let data: gmex_types::MktKLineItem =
+                        let data: gmex_api::MktKLineItem =
                             serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
                                 ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
                             })?;
                         log::info!("[mkt.kline]: {:?}", data);
                     }
                     Some("index") => {
-                        let data: gmex_types::MktCompositeIndexTick =
+                        let data: gmex_api::MktCompositeIndexTick =
                             serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
                                 ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
                             })?;
@@ -299,35 +299,35 @@ fn websocket_trade_demo(
             } else {
                 match resp.subj.as_ref().map(|s| &s[..]) {
                     Some("onWallet") => {
-                        let data: gmex_types::Wlt =
+                        let data: gmex_api::Wlt =
                             serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
                                 ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
                             })?;
                         log::info!("[trd.onWallet]: {:?}", data);
                     }
                     Some("onTrade") => {
-                        let data: gmex_types::TrdRec =
+                        let data: gmex_api::TrdRec =
                             serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
                                 ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
                             })?;
                         log::info!("[trd.onTrade]: {:?}", data);
                     }
                     Some("onOrder") => {
-                        let data: gmex_types::Ord =
+                        let data: gmex_api::Ord =
                             serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
                                 ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
                             })?;
                         log::info!("[trd.onOrder]: {:?}", data);
                     }
                     Some("onPosition") => {
-                        let data: gmex_types::Position =
+                        let data: gmex_api::Position =
                             serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
                                 ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
                             })?;
                         log::info!("[trd.onPosition]: {:?}", data);
                     }
                     Some("onWltLog") => {
-                        let data: gmex_types::WltLog =
+                        let data: gmex_api::WltLog =
                             serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
                                 ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
                             })?;
@@ -368,9 +368,9 @@ fn main() -> Result<(), Error> {
     let gmex_api_secret = std::env::var("GMEX_API_SECRET").expect("GMEX_API_SECRET must be set");
     //
     let gmex_ws_url_market: String = std::env::var("GMEX_WS_URL_MARKET")
-        .unwrap_or_else(|_| "wss://api-market.gmex.io/v1/market".to_string());
+        .unwrap_or_else(|_| gmex_api::GMEX_WS_URL_MARKET.to_string());
     let gmex_ws_url_trade: String = std::env::var("GMEX_WS_URL_TRADE")
-        .unwrap_or_else(|_| "wss://api-trade.gmex.io/v1/trade".to_string());
+        .unwrap_or_else(|_| gmex_api::GMEX_WS_URL_MARKET.to_string());
 
     log::debug!("GMEX-WebSocket-API Test....");
     log::debug!("  GMEX_WS_URL_MARKET = {}", gmex_ws_url_market);

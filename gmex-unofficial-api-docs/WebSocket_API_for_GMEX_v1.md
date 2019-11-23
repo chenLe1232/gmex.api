@@ -1859,6 +1859,45 @@ const (
     TradeClass_TC_PERPETUAL TradeClass = 3
 )
 
+
+// OrderVia 来源: 用于 委托、交易、结算等
+type OrderVia int32
+
+const (
+    //未知来源
+    OrderVia_OV_INVALID OrderVia = 0
+    //web浏览器
+    OrderVia_Web OrderVia = 1
+    //客户端App
+    OrderVia_App OrderVia = 2
+    //直接访问API
+    OrderVia_Api OrderVia = 3
+    //平仓 Liquidate
+    OrderVia_Liquidate OrderVia = 4
+    //ADL 减仓操作
+    OrderVia_ADLEngine OrderVia = 5
+    //结算
+    OrderVia_Settlement OrderVia = 6
+    //交易
+    OrderVia_Trade OrderVia = 7
+    //手续费
+    OrderVia_Fee OrderVia = 8
+    //存
+    OrderVia_Depo OrderVia = 9
+    //取
+    OrderVia_Wdrw OrderVia = 10
+    //Funding
+    OrderVia_Funding OrderVia = 11
+    // 配售
+    OrderVia_Offer OrderVia = 12
+    // 给予Gift
+    OrderVia_Gift_Give OrderVia = 17
+    // WltSettle 钱包结算
+    OrderVia_Wlt_Settle OrderVia = 18
+    // WltSettle 钱包结算
+    OrderVia_Gift_Settle OrderVia = 19
+)
+
 ```
 
 

@@ -1722,7 +1722,7 @@ type TrdRec struct {
     Liq             float64  `json:"Liq,omitempty"`      // 强平价格
     Br              float64  `json:"Br,omitempty"`       // 破产价格
     Lvr             float64  `json:"Lvr,omitempty"`      // Lever
-    PrzM            float64  `json:"PrzM,omitempty"`     // 标记加盟
+    PrzM            float64  `json:"PrzM,omitempty"`     // 标记价格
     PId             string   `json:"PId,omitempty"`      // 仓位ID
     GrossVal        float64  `json:"GrossVal,omitempty"` // 本次成交的价值
     HomeNotional    float64  `json:"HomeNotional,omitempty"`

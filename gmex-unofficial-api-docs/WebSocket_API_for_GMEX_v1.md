@@ -1952,5 +1952,9 @@ const (
 | 35      |  EXCEED_TRADE_VOL     | 超出交易量限制 |
 | 36      |  EXCEED_TRADE_COUNT     | 超出交易次数限制 |
 | 37      |  EXCEED_ASK_BID_PRZ_RATE     | 委托价格 超过盘口最新价格偏离 |
+| 39      |  EXCEED_TRDSUM     | TRDSUM限制 |
+| 40      |  OVERLOAD     | 系统超负载 |
+| 41      |  TOO_MANY_POS     | 仓位太多 |
+| 42      |  CHANNEL_BUSY     | 系统通道阻塞 |
 | 64      |  NO_DEFAULT_RISKLIMIT     | 没有指定风险限额 |
-
+| 99      |  TIMEOUT     | 执行超时 |

@@ -1040,13 +1040,13 @@ type AssetEx struct {
     "rid":"7",
     "code":0,
     "data":[
-		{"AId":"123456701","At":1551057354296,"COrdId":"1551057354239","Dir":1,"Frz":0,"OrdId":"01D16QEQFCHP3JH4VA3FYFTDEN","OType":1,"Prz":3700,"PrzF":3700,"Qty":60,"QtyDsp":0,"QtyF":60,"Status":4,"StopPrz":0,"Sym":"BTC1903","UId":"1234567","Until":9223372036853775000,"Upd":1551299771782,"Val":0,"WId":"123456701BTC"},
-		{"AId":"123456701","At":1551057304192,"COrdId":"1551057304136","Dir":1,"Frz":0,"OrdId":"01D16QEQFC08QK9N655H2NETKE","OType":2,"Prz":3790,"PrzChg":10,"PrzF":3790,"Qty":50,"QtyDsp":0,"QtyF":50,"Status":4,"StopPrz":0,"Sym":"BTC1903","Tif":1,"UId":"1234567","Until":9223372036853775000,"Upd":1551057304192,"Val":0,"WId":"123456701BTC"},
-		{"AId":"123456701","At":1550765634218,"COrdId":"1550765634165","Dir":-1,"Frz":0,"OrdId":"01D16QEQFCVNA8KG86DKZDRKQC","OType":1,"Prz":3939,"PrzF":3939,"Qty":50,"QtyDsp":0,"QtyF":50,"Status":4,"StopPrz":0,"Sym":"BTC1903","UId":"1234567","Until":9223372036853775000,"Upd":1550800893882,"Val":0,"WId":"123456701BTC"},
-		{"AId":"123456701","At":1550765301943,"COrdId":"1550765301926","Dir":-1,"ErrCode":27,"Frz":0,"OrdId":"01D16QEQFCXFBB21QJ32SHWVHG","OType":1,"Prz":3939.5,"PrzF":0,"Qty":50,"QtyDsp":0,"QtyF":0,"Status":4,"StopPrz":0,"Sym":"BTC1903","UId":"1234567","Until":9223372036853775000,"Upd":1550765362567,"Val":0.01269196598,"WId":"123456701BTC"},
-		{"AId":"123456701","At":1550635738299,"COrdId":"1550635738201","Dir":-1,"Frz":0,"OrdId":"01D16QEQFC6E1WN77PRWG8DGRZ","OType":2,"Prz":3913,"PrzChg":10,"PrzF":3913,"Qty":40,"QtyDsp":0,"QtyF":40,"Status":4,"StopPrz":0,"Sym":"BTC1903","Tif":1,"UId":"1234567","Until":9223372036853775000,"Upd":1550635738299,"Val":0,"WId":"123456701BTC"},
-		{"AId":"123456701","At":1548655357742,"Dir":-1,"Frz":0,"OrdId":"01D16QEQFCVF74KVQHQ6WAD2ZP","OType":1,"Prz":103.85,"PrzF":106.05,"Qty":1,"QtyDsp":0,"QtyF":1,"Status":4,"StopPrz":0,"Sym":"ETH1903","Tif":2,"UId":"1234567","Upd":1548655357742,"Val":0,"Via":4,"WId":"123456701ETH"}
-	]
+        {"AId":"123456701","At":1551057354296,"COrdId":"1551057354239","Dir":1,"Frz":0,"OrdId":"01D16QEQFCHP3JH4VA3FYFTDEN","OType":1,"Prz":3700,"PrzF":3700,"Qty":60,"QtyDsp":0,"QtyF":60,"Status":4,"StopPrz":0,"Sym":"BTC1903","UId":"1234567","Until":9223372036853775000,"Upd":1551299771782,"Val":0,"WId":"123456701BTC"},
+        {"AId":"123456701","At":1551057304192,"COrdId":"1551057304136","Dir":1,"Frz":0,"OrdId":"01D16QEQFC08QK9N655H2NETKE","OType":2,"Prz":3790,"PrzChg":10,"PrzF":3790,"Qty":50,"QtyDsp":0,"QtyF":50,"Status":4,"StopPrz":0,"Sym":"BTC1903","Tif":1,"UId":"1234567","Until":9223372036853775000,"Upd":1551057304192,"Val":0,"WId":"123456701BTC"},
+        {"AId":"123456701","At":1550765634218,"COrdId":"1550765634165","Dir":-1,"Frz":0,"OrdId":"01D16QEQFCVNA8KG86DKZDRKQC","OType":1,"Prz":3939,"PrzF":3939,"Qty":50,"QtyDsp":0,"QtyF":50,"Status":4,"StopPrz":0,"Sym":"BTC1903","UId":"1234567","Until":9223372036853775000,"Upd":1550800893882,"Val":0,"WId":"123456701BTC"},
+        {"AId":"123456701","At":1550765301943,"COrdId":"1550765301926","Dir":-1,"ErrCode":27,"Frz":0,"OrdId":"01D16QEQFCXFBB21QJ32SHWVHG","OType":1,"Prz":3939.5,"PrzF":0,"Qty":50,"QtyDsp":0,"QtyF":0,"Status":4,"StopPrz":0,"Sym":"BTC1903","UId":"1234567","Until":9223372036853775000,"Upd":1550765362567,"Val":0.01269196598,"WId":"123456701BTC"},
+        {"AId":"123456701","At":1550635738299,"COrdId":"1550635738201","Dir":-1,"Frz":0,"OrdId":"01D16QEQFC6E1WN77PRWG8DGRZ","OType":2,"Prz":3913,"PrzChg":10,"PrzF":3913,"Qty":40,"QtyDsp":0,"QtyF":40,"Status":4,"StopPrz":0,"Sym":"BTC1903","Tif":1,"UId":"1234567","Until":9223372036853775000,"Upd":1550635738299,"Val":0,"WId":"123456701BTC"},
+        {"AId":"123456701","At":1548655357742,"Dir":-1,"Frz":0,"OrdId":"01D16QEQFCVF74KVQHQ6WAD2ZP","OType":1,"Prz":103.85,"PrzF":106.05,"Qty":1,"QtyDsp":0,"QtyF":1,"Status":4,"StopPrz":0,"Sym":"ETH1903","Tif":2,"UId":"1234567","Upd":1548655357742,"Val":0,"Via":4,"WId":"123456701ETH"}
+    ]
 }
 ```
 
@@ -1713,9 +1713,9 @@ type TrdRec struct {
     WId             string   `json:"WId,omitempty"`      // 钱包ID
     MatchId         string   `json:"MatchId,omitempty"`  // 撮合ID
     OrdId           string   `json:"OrdId,omitempty"`    // 委托单ID
-    Sz              MyFloat  `json:"Sz,omitempty"`       // 成交的张数
-    Prz             MyFloat  `json:"Prz,omitempty"`      // 成交的价格
-    Fee             MyFloat  `json:"Fee,omitempty"`      // 手续费
+    Sz              gaea_Num.Flt  `json:"Sz,omitempty"`       // 成交的张数
+    Prz             gaea_Num.Flt  `json:"Prz,omitempty"`      // 成交的价格
+    Fee             gaea_Num.Flt  `json:"Fee,omitempty"`      // 手续费
     FeeCoin         string   `json:"FeeCoin,omitempty"`  // 手续费币种
     At              int64    `json:"At,omitempty"`       // 发生的时间，毫秒
     Via             OrderVia `json:"Via,omitempty"`      // 委托来源
@@ -1751,41 +1751,40 @@ type TrdRec struct {
 }
 
 
-
 //
 // 委托的状态
 type OrderStatus int32
 
 const (
-	// 未指定
-	OrderStatus_OS_Invalid OrderStatus = 0
-	// 正在排队
-	OrderStatus_Queueing OrderStatus = 1
-	// 有效
-	OrderStatus_Matching OrderStatus = 2
-	// 提交失败
-	OrderStatus_PostFail OrderStatus = 3
-	// 已执行
-	OrderStatus_Executed OrderStatus = 4
+    // 未指定
+    OrderStatus_OS_Invalid OrderStatus = 0
+    // 正在排队
+    OrderStatus_Queueing OrderStatus = 1
+    // 有效
+    OrderStatus_Matching OrderStatus = 2
+    // 提交失败
+    OrderStatus_PostFail OrderStatus = 3
+    // 已执行
+    OrderStatus_Executed OrderStatus = 4
 )
 
 
 type OfferType int32
 
 const (
-	OfferType_OT_Invalid OfferType = 0
-	// 限价委单
-	OfferType_Limit OfferType = 1
-	// 市价委单,匹配后转限价
-	OfferType_Market OfferType = 2
-	// 限价止损/盈利
-	OfferType_StopLimit OfferType = 3
-	// 市价止损/盈利
-	OfferType_StopMarket OfferType = 4
-	// 追踪 限价
-	OfferType_TraceLimit OfferType = 5
-	// 追踪 市价
-	OfferType_TraceMarket OfferType = 6
+    OfferType_OT_Invalid OfferType = 0
+    // 限价委单
+    OfferType_Limit OfferType = 1
+    // 市价委单,匹配后转限价
+    OfferType_Market OfferType = 2
+    // 限价止损/盈利
+    OfferType_StopLimit OfferType = 3
+    // 市价止损/盈利
+    OfferType_StopMarket OfferType = 4
+    // 追踪 限价
+    OfferType_TraceLimit OfferType = 5
+    // 追踪 市价
+    OfferType_TraceMarket OfferType = 6
 )
 
 
@@ -1794,12 +1793,12 @@ const (
 type StopBy int32
 
 const (
-	// 标记价格
-	StopBy_PriceMark StopBy = 0
-	// 最新成交
-	StopBy_PriceLatest StopBy = 1
-	// 指数价格
-	StopBy_PriceIndex StopBy = 2
+    // 标记价格
+    StopBy_PriceMark StopBy = 0
+    // 最新成交
+    StopBy_PriceLatest StopBy = 1
+    // 指数价格
+    StopBy_PriceIndex StopBy = 2
 )
 
 
@@ -1808,24 +1807,24 @@ const (
 type OrdFlag int32
 
 const (
-	// 占位，无意义
-	OrdFlag_OF_INVALID OrdFlag = 0
-	// 如果委托会立即成交，则不发送此委托
-	OrdFlag_POSTONLY OrdFlag = 1
-	// 如果委托会导致增加仓位，则不发送此委托
-	OrdFlag_REDUCEONLY OrdFlag = 2
-	// 触发后平仓 TODO 目前未实现
-	// 	CLOSEONTRIGGER 	= 4;
-	// 条件指定为 如果价格大于StopBy
-	OrdFlag_IF_GREATERTHAN OrdFlag = 8
-	// 条件指定为 如果价格低于StopBy
-	OrdFlag_IF_LESSTHAN OrdFlag = 16
-	// 行情追踪委托的激活状态
-	OrdFlag_TRACE_ACTIVE OrdFlag = 32
-	// 行情追踪委托的触发状态
-	OrdFlag_TRACE_FIRE OrdFlag = 64
-	// 设定此标志以跟踪最大值的回调。不设定此标志以跟踪最小值的回调
-	OrdFlag_TRACE_AT_MAX OrdFlag = 128
+    // 占位，无意义
+    OrdFlag_OF_INVALID OrdFlag = 0
+    // 如果委托会立即成交，则不发送此委托
+    OrdFlag_POSTONLY OrdFlag = 1
+    // 如果委托会导致增加仓位，则不发送此委托
+    OrdFlag_REDUCEONLY OrdFlag = 2
+    // 触发后平仓 TODO 目前未实现
+    // 	CLOSEONTRIGGER 	= 4;
+    // 条件指定为 如果价格大于StopBy
+    OrdFlag_IF_GREATERTHAN OrdFlag = 8
+    // 条件指定为 如果价格低于StopBy
+    OrdFlag_IF_LESSTHAN OrdFlag = 16
+    // 行情追踪委托的激活状态
+    OrdFlag_TRACE_ACTIVE OrdFlag = 32
+    // 行情追踪委托的触发状态
+    OrdFlag_TRACE_FIRE OrdFlag = 64
+    // 设定此标志以跟踪最大值的回调。不设定此标志以跟踪最小值的回调
+    OrdFlag_TRACE_AT_MAX OrdFlag = 128
 )
 
 
@@ -1834,14 +1833,14 @@ const (
 type TimeInForce int32
 
 const (
-	// 一直有效
-	TimeInForce_GoodTillCancel TimeInForce = 0
-	// 部分成交后剩余委托取消
-	TimeInForce_ImmediateOrCancel TimeInForce = 1
-	// 部分成交后剩余委托取消
-	TimeInForce_FillAndKill TimeInForce = 1
-	// 如果不能全部成交则取消委托			全部成交或者全部撤销
-	TimeInForce_FillOrKill TimeInForce = 2
+    // 一直有效
+    TimeInForce_GoodTillCancel TimeInForce = 0
+    // 部分成交后剩余委托取消
+    TimeInForce_ImmediateOrCancel TimeInForce = 1
+    // 部分成交后剩余委托取消
+    TimeInForce_FillAndKill TimeInForce = 1
+    // 如果不能全部成交则取消委托			全部成交或者全部撤销
+    TimeInForce_FillOrKill TimeInForce = 2
 )
 
 
@@ -1851,13 +1850,13 @@ const (
 type TradeClass int32
 
 const (
-	TradeClass_TC_INVALID TradeClass = 0
-	// Spot Trading 现货交易
-	TradeClass_TC_SPOT TradeClass = 1
-	// Future Trading 期货交易
-	TradeClass_TC_FUTURE TradeClass = 2
-	// 永续
-	TradeClass_TC_PERPETUAL TradeClass = 3
+    TradeClass_TC_INVALID TradeClass = 0
+    // Spot Trading 现货交易
+    TradeClass_TC_SPOT TradeClass = 1
+    // Future Trading 期货交易
+    TradeClass_TC_FUTURE TradeClass = 2
+    // 永续
+    TradeClass_TC_PERPETUAL TradeClass = 3
 )
 
 ```

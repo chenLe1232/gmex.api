@@ -13,6 +13,9 @@ pub const GMEX_WS_URL_TRADE: &str = "wss://api-trade.gmex.io/v1/trade";
 #[macro_use]
 extern crate bitflags;
 
+pub use rust_decimal::Decimal;
+pub use rust_decimal_macros::dec;
+
 mod types;
 mod mkt;
 
@@ -53,5 +56,3 @@ pub use crate::mkt::{
     MktQueryKLineHistoryRequestArgs,
     MktQueryKLineHistoryResult
 };
-
-

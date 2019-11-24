@@ -15,3 +15,8 @@ GMEX_API_SECRET=yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 跑例子试试：
 cd examples/http_client; cargo run
 cd examples/websocket_client; cargo run
+
+
+*NOTE*：
+当前代码使用 rust_decimal 的大数，但是其默认的 json 序列化是 string，但是服务端过来
+的大数还是数字形式，是否存在反序列化丢失精度问题，有待测试。

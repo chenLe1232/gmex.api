@@ -2,6 +2,10 @@ use log;
 use md5;
 use reqwest;
 
+use uuid::Uuid;
+// use rust_decimal::Decimal;
+// use rust_decimal_macros::dec;
+
 #[macro_use]
 extern crate serde_json;
 
@@ -74,7 +78,8 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Error> {
                     a.Sym.cmp(&b.Sym)
                 } else {
                     // a.TrdCls.cmp(b.TrdCls)
-                    (a.TrdCls.unwrap_or_default() as i32).cmp(&(b.TrdCls.unwrap_or_default() as i32))
+                    (a.TrdCls.unwrap_or_default() as i32)
+                        .cmp(&(b.TrdCls.unwrap_or_default() as i32))
                 }
             });
             for it in res.data {
@@ -260,13 +265,7 @@ impl<T> RestTradeMessageRequest<T>
 where
     T: Serialize,
 {
-    pub fn new(
-        req: &str,
-        args: T,
-        uname: &String,
-        api_key: &String,
-        api_secret: &String,
-    ) -> Self {
+    pub fn new(req: &str, args: T, uname: &String, api_key: &String, api_secret: &String) -> Self {
         let now_ms = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .expect("Time went backwards")
@@ -334,7 +333,7 @@ fn http_trade_demo(
         #[derive(Debug, Serialize, Deserialize)]
         struct Response {
             code: i32,
-            data: UserInfo,
+            data: Option<UserInfo>,
         }
         let req =
             RestTradeMessageRequest::new("GetUserInfo", Args {}, user_name, api_key, api_secret);
@@ -345,12 +344,13 @@ fn http_trade_demo(
             .send()?
             .json()?;
         if res.code == 0 {
+            let myinfo = res.data.unwrap();
             log::info!(
                 "交易服务器获取用户信息成功,UserID: {}, UserName: {}",
-                res.data.userid,
-                res.data.username
+                myinfo.userid,
+                myinfo.username
             );
-            userid = res.data.userid;
+            userid = myinfo.userid;
         } else {
             log::warn!("交易服务器获取用户信息失败: {:#?}", res.code);
         }
@@ -363,7 +363,12 @@ fn http_trade_demo(
         let req =
             RestTradeMessageRequest::new("GetCcsWallets", Args {}, user_name, api_key, api_secret);
 
-        let res: serde_json::Value = client
+        #[derive(Debug, Serialize, Deserialize)]
+        struct Response {
+            code: i32,
+            data: Option<Vec<gmex_api::CcsMainWallet>>,
+        }
+        let res: Response = client
             .post(&(base_url.to_owned() + "/Action"))
             .json(&req)
             .send()?
@@ -388,7 +393,13 @@ fn http_trade_demo(
             api_secret,
         );
 
-        let res: serde_json::Value = client
+        #[derive(Debug, Serialize, Deserialize)]
+        struct Response {
+            code: i32,
+            data: Option<Vec<gmex_api::Wlt>>,
+        }
+
+        let res: Response = client
             .post(&(base_url.to_owned() + "/Action"))
             .json(&req)
             .send()?
@@ -404,7 +415,7 @@ fn http_trade_demo(
             api_key,
             api_secret,
         );
-        let res: serde_json::Value = client
+        let res: Response = client
             .post(&(base_url.to_owned() + "/Action"))
             .json(&req)
             .send()?
@@ -424,16 +435,97 @@ fn http_trade_demo(
         // TODO
     }
     if true {
-        // 查询持仓信息 GetPositions
-        // TODO
+        // 查询合约持仓信息 GetPositions
+        #[derive(Debug, Serialize, Deserialize)]
+        struct Args {
+            #[serde(rename = "AId")]
+            aid: String,
+        }
+        let req = RestTradeMessageRequest::new(
+            "GetPositions",
+            Args {
+                aid: format!("{}01", userid),
+            },
+            user_name,
+            api_key,
+            api_secret,
+        );
+
+        #[derive(Debug, Serialize, Deserialize)]
+        struct Response {
+            code: i32,
+            data: Option<Vec<gmex_api::Position>>,
+        }
+        let res: Response = client
+            .post(&(base_url.to_owned() + "/Action"))
+            .json(&req)
+            .send()?
+            .json()?;
+        log::info!("查询合约持仓信息: {:#?}", res);
     }
     if true {
-        // 查询委托 GetOrders
-        // TODO
+        // 查询合约委托 GetOrders
+        #[derive(Debug, Serialize, Deserialize)]
+        struct Args {
+            #[serde(rename = "AId")]
+            aid: String,
+        }
+        let req = RestTradeMessageRequest::new(
+            "GetOrders",
+            Args {
+                aid: format!("{}01", userid), // 要查询现货市场的委托，01改为02即可.
+            },
+            user_name,
+            api_key,
+            api_secret,
+        );
+
+        #[derive(Debug, Serialize, Deserialize)]
+        struct Response {
+            code: i32,
+            data: Option<Vec<gmex_api::Ord>>,
+        }
+        let res: Response = client
+            .post(&(base_url.to_owned() + "/Action"))
+            .json(&req)
+            .send()?
+            .json()?;
+        log::info!("查询合约委托信息: {:#?}", res);
     }
     if true {
-        // 委托下单 OrderNew
-        // TODO
+        // 合约委托下单 OrderNew
+        let myord = gmex_api::Ord{
+            AId: Some(format!("{}01", userid)),
+            COrdId: Some(Uuid::new_v4().to_simple().to_string()),
+            Sym: Some("BTC.USDT".to_string()),
+            Dir: Some(gmex_api::OrderDir::BID),
+            OType: Some(gmex_api::OfferType::Limit),
+            Prz: Some(gmex_api::dec!(15_000)),
+            Qty: Some(gmex_api::dec!(1)),
+            .. Default::default()
+        };
+
+        let req = RestTradeMessageRequest::new("OrderNew", myord, user_name, api_key, api_secret);
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum RspData<T> {
+            None,
+            Msg(String),
+            Some(T),
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        struct Response {
+            code: i32,
+            data: RspData<gmex_api::Ord>,
+        }
+        // serde_json::Value
+        let res: serde_json::Value = client
+            .post(&(base_url.to_owned() + "/Action"))
+            .json(&req)
+            .send()?
+            .json()?;
+        log::info!("合约委托下单 OrderNew 返回: {:#?}", res);
     }
     if true {
         // 撤销委托 OrderDel
@@ -476,7 +568,6 @@ fn main() -> Result<(), Error> {
         .unwrap_or_else(|_| gmex_api::GMEX_HTTP_URL_MARKET.to_string());
     let gmex_http_url_trade: String = std::env::var("GMEX_HTTP_URL_TRADE")
         .unwrap_or_else(|_| gmex_api::GMEX_WS_URL_TRADE.to_string());
-        
     log::debug!("GMEX-HTTP-API Test....");
     log::debug!("  GMEX_HTTP_URL_MARKET = {}", gmex_http_url_market);
     log::debug!("  GMEX_HTTP_URL_TRADE = {}", gmex_http_url_trade);
@@ -484,7 +575,7 @@ fn main() -> Result<(), Error> {
     log::debug!("  GMEX_API_KEY = {}", gmex_api_key);
     log::debug!("  GMEX_API_SECRET = {}", gmex_api_secret);
 
-    if true {
+    if false {
         http_market_demo(&gmex_http_url_market)?;
     }
     if true {
@@ -494,6 +585,24 @@ fn main() -> Result<(), Error> {
             &gmex_api_key,
             &gmex_api_secret,
         )?;
+    }
+
+    if false {
+        let userid="1125623";
+        let myord = gmex_api::Ord{
+            AId: Some(format!("{}01", userid)),
+            COrdId: Some(Uuid::new_v4().to_simple().to_string()),
+            Sym: Some("BTC.USDT".to_string()),
+            Dir: Some(gmex_api::OrderDir::BID),
+            OType: Some(gmex_api::OfferType::Limit),
+            // Prz: Some(Decimal::new(15000,0)),
+            Prz: Some(gmex_api::dec!(15_000)),
+            Qty: Some(gmex_api::dec!(1)),
+            .. Default::default()
+        };
+        // 测试序列化结果...
+        let s1 = serde_json::to_string(&myord).unwrap();
+        log::debug!("[XXX]: {}", s1);
     }
 
     Ok(())

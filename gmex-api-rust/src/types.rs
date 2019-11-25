@@ -611,29 +611,29 @@ pub struct V2AssetCfg {
     #[serde(skip_serializing_if = "Option::is_none")] pub SumInterval: Option<u64>,   // 重置间隔
     #[serde(skip_serializing_if = "Option::is_none")] pub SumResetNext: Option<u64>,  // 下次重置
     #[serde(skip_serializing_if = "Option::is_none")] pub SzForAvg: Option<f64>,      // 求用户的最近的买入价格的量
-    #[serde(skip_serializing_if = "Option::is_none")] pub FeeMkrMin: Option<Decimal>,     // Maker最低手续费
-    #[serde(skip_serializing_if = "Option::is_none")] pub FeeTkrMin: Option<Decimal>,     // Taker最低手续费
+    #[serde(skip_serializing_if = "Option::is_none")] pub FeeMkrMin: Option<Decimal>,   // Maker最低手续费
+    #[serde(skip_serializing_if = "Option::is_none")] pub FeeTkrMin: Option<Decimal>,   // Taker最低手续费
     /** 下面是挖矿相关设定 */
     #[serde(skip_serializing_if = "Option::is_none")] pub SzMaxFM: Option<f64>,       // 每日有挖矿算力的交易量
     #[serde(skip_serializing_if = "Option::is_none")] pub NumMaxFM: Option<f64>,      // 每日有挖矿算力的交易次数
     #[serde(skip_serializing_if = "Option::is_none")] pub ExpRatio: Option<f64>,      // 涨经验的交易量完成率.当交易量达到 SzMaxFM * ExpRatio Exp ++
     #[serde(skip_serializing_if = "Option::is_none")] pub ExpMax: Option<i64>,        // 最大Exp
     #[serde(skip_serializing_if = "Option::is_none")] pub Flag: Option<u32>,          // AssetFlags 标志位
-    /** 一些通用参数 */
-    #[serde(skip_serializing_if = "Option::is_none")] pub F0: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")] pub F1: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")] pub F2: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")] pub F3: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")] pub F4: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")] pub F5: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")] pub F6: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")] pub F7: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")] pub F8: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")] pub F9: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")] pub I0: Option<i64>,
-    #[serde(skip_serializing_if = "Option::is_none")] pub I1: Option<i64>,
-    #[serde(skip_serializing_if = "Option::is_none")] pub I2: Option<i64>,
-    #[serde(skip_serializing_if = "Option::is_none")] pub I3: Option<i64>,
+    // /** 一些通用参数 */
+    // #[serde(skip_serializing_if = "Option::is_none")] pub F0: Option<f64>,
+    // #[serde(skip_serializing_if = "Option::is_none")] pub F1: Option<f64>,
+    // #[serde(skip_serializing_if = "Option::is_none")] pub F2: Option<f64>,
+    // #[serde(skip_serializing_if = "Option::is_none")] pub F3: Option<f64>,
+    // #[serde(skip_serializing_if = "Option::is_none")] pub F4: Option<f64>,
+    // #[serde(skip_serializing_if = "Option::is_none")] pub F5: Option<f64>,
+    // #[serde(skip_serializing_if = "Option::is_none")] pub F6: Option<f64>,
+    // #[serde(skip_serializing_if = "Option::is_none")] pub F7: Option<f64>,
+    // #[serde(skip_serializing_if = "Option::is_none")] pub F8: Option<f64>,
+    // #[serde(skip_serializing_if = "Option::is_none")] pub F9: Option<f64>,
+    // #[serde(skip_serializing_if = "Option::is_none")] pub I0: Option<i64>,
+    // #[serde(skip_serializing_if = "Option::is_none")] pub I1: Option<i64>,
+    // #[serde(skip_serializing_if = "Option::is_none")] pub I2: Option<i64>,
+    // #[serde(skip_serializing_if = "Option::is_none")] pub I3: Option<i64>,
 }
 
 /* 风险限额定义 */

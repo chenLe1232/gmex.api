@@ -18,6 +18,7 @@ pub use rust_decimal_macros::dec;
 
 mod types;
 mod mkt;
+mod msg;
 
 pub use crate::types::{
     ErrorCode,
@@ -43,7 +44,7 @@ pub use crate::types::{
     V2AssetCfg,
     RiskLimitDef,
     CcsMainWallet,
-    CcsMatcherWallet
+    CcsMatcherWallet,
 };
 pub use crate::mkt::{
     MktCompositeIndexTick,
@@ -54,5 +55,11 @@ pub use crate::mkt::{
     MktKLineItem,
     MktOrder20Result,
     MktQueryKLineHistoryRequestArgs,
-    MktQueryKLineHistoryResult
+    MktQueryKLineHistoryResult,
+};
+
+pub use crate::msg::{
+    HttpTradeRequestMessage,
+    HttpResponseMessage,
+    WsResponseMessage,
 };

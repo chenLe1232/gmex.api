@@ -196,3 +196,9 @@ pub struct MktQueryKLineHistoryResult {
     #[serde(skip_serializing_if = "Option::is_none")] pub Volume: Option<Vec<f64>>,     // 总成交量
     #[serde(skip_serializing_if = "Option::is_none")] pub Turnover: Option<Vec<f64>>,   // 总成交额
 }
+
+
+
+/* ------------------------------------------------------------ */
+/* ------------------------------------------------------------ */
+/* ------------------------------------------------------------ */

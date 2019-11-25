@@ -411,7 +411,7 @@ type V2AssetCfg struct {
 
 | 订阅内容 | 描述 |
 | :-----   | :-----  |
-|TICK|比如: tick_BTC.BTC, tick行情当前是没500毫秒更新推送一次.|
+|TICK|比如: tick_BTC.BTC, tick行情当前是每500毫秒更新推送一次.|
 |成交|比如: trade_BTC.BTC, 所有成交都是实时推送的.|
 |20档深度|比如: order20_BTC.BTC 盘口20档深度行情每200毫秒推送一次.|
 |全档深度|比如: orderl2_BTC1.BTC 全深度盘口行情订阅后会先推送全档口,后继推送变更档,推送频率100毫秒.|
@@ -912,7 +912,7 @@ type AssetEx struct {
     "signature": "1234567890abcdef1234567890abcdef"
 }
 
-// 收到返回消息, 默认最多返回200条记录，通过在args中增加设置参数("Start"=0,"Stop"=500)可以最多返回500条记录.
+// 收到返回消息, 默认返回100条记录，通过在args中增加设置参数("Start":0,"Stop":500)可以最多返回500条记录.
 {
     "rid":"4",
     "code":0,
@@ -1035,7 +1035,7 @@ type AssetEx struct {
     "signature": "1234567890abcdef1234567890abcdef"
 }
 
-// 收到返回消息
+// 收到返回消息, 默认返回100条记录，通过在args中增加设置参数("Start":0,"Stop":500)可以最多返回500条记录.
 {
     "rid":"7",
     "code":0,
@@ -1065,7 +1065,7 @@ type AssetEx struct {
     "signature": "1234567890abcdef1234567890abcdef"
 }
 
-// 收到返回消息
+// 收到返回消息, 默认返回100条记录，通过在args中增加设置参数("Start":0,"Stop":500)可以最多返回500条记录.
 {
     "rid":"9",
     "code":0,

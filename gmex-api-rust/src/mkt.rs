@@ -146,6 +146,7 @@ pub struct MktKLineItem {
     #[serde(skip_serializing_if = "Option::is_none")] pub Sym: Option<String>,      // 交易对符号
     #[serde(skip_serializing_if = "Option::is_none")] pub Typ: Option<MktKLineType>,// K线类型
     #[serde(skip_serializing_if = "Option::is_none")] pub Sec: Option<i64>,         // 时间戳,单位:秒
+    #[serde(skip_serializing_if = "Option::is_none")] pub At: Option<i64>,          // 时间戳,单位:毫秒,最后更新时间，也是最后该kline时间段内最后一个成交记录的时间.
     #[serde(skip_serializing_if = "Option::is_none")] pub PrzOpen: Option<f64>,     // 开始价
     #[serde(skip_serializing_if = "Option::is_none")] pub PrzClose: Option<f64>,    // 结束价
     #[serde(skip_serializing_if = "Option::is_none")] pub PrzHigh: Option<f64>,     // 最高价
@@ -188,6 +189,7 @@ pub struct MktQueryKLineHistoryResult {
     #[serde(skip_serializing_if = "Option::is_none")] pub Sym: Option<String>,          // 交易对符号
     #[serde(skip_serializing_if = "Option::is_none")] pub Typ: Option<MktKLineType>,    // K线类型
     #[serde(skip_serializing_if = "Option::is_none")] pub Count: Option<i64>,           // 返回结果的数量个数
+    #[serde(skip_serializing_if = "Option::is_none")] pub InitSec: Option<i64>,         // 这个交易对创建时间，最早的分钟kline的时间，早于这个时间肯定没有数据了.
     #[serde(skip_serializing_if = "Option::is_none")] pub Sec: Option<Vec<i64>>,        // 时间戳,单位:秒,数组
     #[serde(skip_serializing_if = "Option::is_none")] pub PrzOpen: Option<Vec<f64>>,    // 开始价
     #[serde(skip_serializing_if = "Option::is_none")] pub PrzClose: Option<Vec<f64>>,   // 结束价

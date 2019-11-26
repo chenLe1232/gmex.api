@@ -160,8 +160,7 @@
                 api_market.on("index", function (ret) {
                     console.log(`[on.market.index] << `, ret)
                 });
-
-                request_market('GetAssetD', {}, (ret) => {
+                request_market('GetAssetD', {vp: parseInt(document.getElementById('login_vpid').value)}, (ret) => {
                     console.log(`[on.market.GetAssetD] << `, ret)
                     if (ret.code == 0) {
                         // 简易合约列表
@@ -181,7 +180,7 @@
                         G_LOG("warn", `[on.market.GetAssetD]<< error, ret=${JSONStringify(ret)}`)
                     }
                 })
-                request_market('GetCompositeIndex', {}, (ret) => {
+                request_market('GetCompositeIndex', {vp: parseInt(document.getElementById('login_vpid').value)}, (ret) => {
                     console.log(`[on.market.GetCompositeIndex] << `, ret)
                     if (ret.code == 0) {
                         // 简易合约列表
@@ -195,7 +194,7 @@
             });
         }
 
-        var trade_login = function (url, uname, apikey, apisecret) {
+        var trade_login = function (url, uname, apikey, apisecret, vpid) {
             if (!url || url.length < 2 || 
                 !uname || uname.length < 2 || 
                 !apikey || apikey.length < 2 ||
@@ -211,6 +210,7 @@
                 var msg = {
                     UserName: uname,
                     UserCred: apikey,
+                    vp: parseInt(vpid)
                 }
                 request_trade('Login', msg, (ret) => {
                     G_LOG("debug", `<< ${JSONStringify(ret)}`)
@@ -258,11 +258,11 @@
         var contents = {
             "1": {
                 idx: -1,
-                list: [ 'wss://market01.gmex.io/v1/market', 'wss://api-market.gmex.io/v1/market' ]
+                list: [ 'wss://api-market.gmex.io/v1/market', 'wss://s0.gmex.io/v1/market' ]
             },
             "2": {
                 idx: -1,
-                list: [ 'wss://trade01.gmex.io/v1/trade', 'wss://api-trade.gmex.io/v1/trade']
+                list: [ 'wss://api-trade.gmex.io/v1/trade', 'wss://s0.gmex.io/v1/trade']
             },
         };
         function changeContent(id, cid) {
@@ -353,7 +353,8 @@
             trade_login(document.getElementById('login2').value, 
                 document.getElementById('login_uname').value, 
                 document.getElementById('login_api_key').value, 
-                document.getElementById('login_api_secret').value);
+                document.getElementById('login_api_secret').value,
+                document.getElementById('login_vpid').value);
         }
         function TradeClose() {
             api_trade.close();
@@ -387,6 +388,7 @@
                             帐号:<input id="login_uname" type="text" value="<your-email@domain.com>"style="width:180px" spellcheck="false" />
                             API-KEY:<input id="login_api_key" type="text" value="<api-key>" style="width:220px" spellcheck="false" />
                             API-SECRET:<input id="login_api_secret" type="text" value="<api-secret>" style="width:420px" spellcheck="false"/>
+                            VPID:<input id="login_vpid" type="text" value="0" style="width:80px" spellcheck="false" />
                         </td>
                     </tr>
                     <tr>
@@ -592,10 +594,10 @@
         });
 
         // 查询合约详情
-        $("input[id^='mbq1']").click(function () {
+        $("input[id^='mbq']").click(function () {
             var route = $(this).attr("route");
             var name = $(this).attr("value");
-            request_market(route, {}, (ret) => {
+            request_market(route, {vp: parseInt(document.getElementById('login_vpid').value)}, (ret) => {
                 console.log(`[req.market] << `, ret)
                 G_LOG("debug", `<< ${route}(${name}): ${JSONStringify(ret)}`);
             });

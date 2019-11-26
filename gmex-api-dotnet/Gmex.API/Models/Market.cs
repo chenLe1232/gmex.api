@@ -326,6 +326,12 @@ namespace Gmex.API.Models
         /// </summary>
         public Int64 Sec { get; set; }
 
+		/// <summary>
+        /// 时间戳,单位:毫秒,最后更新时间，也是最后该kline时间段内最后一个成交记录的时间.
+        /// </summary>
+        public Int64 At { get; set; }
+
+
         /// <summary>
         /// 开始价
         /// </summary>
@@ -437,6 +443,11 @@ namespace Gmex.API.Models
         /// 返回结果的数量个数
         /// </summary>
         public Int64 Count { get; set; }
+
+        /// <summary>
+        /// 这个交易对创建时间，最早的分钟kline的时间，早于这个时间肯定没有数据了.
+        /// </summary>
+        public Int64 InitSec { get; set; }
 
         /// <summary>
         /// 时间戳,单位:秒,数组

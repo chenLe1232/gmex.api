@@ -11,9 +11,6 @@ path = "src/http_client.rs"
 
 [dependencies]
 gmex-api = { path = "../..", version = "0.1" }
-failure = "0.1"
-# structopt = { version = "0.3", features = [ "paw" ] }
-# paw = "1.0"
 
 reqwest = "0.9"
 dotenv = "0.14"

@@ -1,8 +1,8 @@
 // GMEX-API 行情相关结构体定义
 //
 
-use serde::{Deserialize, Serialize};
 use super::types::OrderDir;
+use serde::{Deserialize, Serialize};
 
 /** [综合指数] 的Tick行情 */
 #[rustfmt::skip]
@@ -198,8 +198,6 @@ pub struct MktQueryKLineHistoryResult {
     #[serde(skip_serializing_if = "Option::is_none")] pub Volume: Option<Vec<f64>>,     // 总成交量
     #[serde(skip_serializing_if = "Option::is_none")] pub Turnover: Option<Vec<f64>>,   // 总成交额
 }
-
-
 
 /* ------------------------------------------------------------ */
 /* ------------------------------------------------------------ */

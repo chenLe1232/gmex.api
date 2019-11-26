@@ -16,50 +16,18 @@ extern crate bitflags;
 pub use rust_decimal::Decimal;
 pub use rust_decimal_macros::dec;
 
-mod types;
+mod helper;
 mod mkt;
 mod msg;
+mod types;
 
-pub use crate::types::{
-    ErrorCode,
-    OrderDir,
-    OrderVia,
-    OrderStatus,
-    OfferType,
-    OrdFlags,
-    StopBy,
-    TimeInForce,
-    TradeClass,
-    AssetFlags,
-    FeeMethod,
-    WltStatus,
-    MkStatus,
-    WltOp,
-    Ord,
-    Position,
-    Wlt,
-    WltLog,
-    TrdRec,
-    AssetD,
-    V2AssetCfg,
-    RiskLimitDef,
-    CcsMainWallet,
-    CcsMatcherWallet,
-};
+pub use crate::helper::get_now_msec;
 pub use crate::mkt::{
-    MktCompositeIndexTick,
-    MktInstrumentTick,
-    MktOrderItem,
-    MktTradeItem,
-    MktKLineType,
-    MktKLineItem,
-    MktOrder20Result,
-    MktQueryKLineHistoryRequestArgs,
-    MktQueryKLineHistoryResult,
+    MktCompositeIndexTick, MktInstrumentTick, MktKLineItem, MktKLineType, MktOrder20Result, MktOrderItem, MktQueryKLineHistoryRequestArgs,
+    MktQueryKLineHistoryResult, MktTradeItem,
 };
-
-pub use crate::msg::{
-    HttpTradeRequestMessage,
-    HttpResponseMessage,
-    WsResponseMessage,
+pub use crate::msg::{HttpResponseMessage, HttpTradeRequestMessage, WsResponseMessage};
+pub use crate::types::{
+    AssetD, AssetFlags, CcsMainWallet, CcsMatcherWallet, ErrorCode, FeeMethod, MkStatus, OfferType, Ord, OrdFlags, OrderDir, OrderStatus, OrderVia, Position,
+    RiskLimitDef, StopBy, TimeInForce, TradeClass, TrdRec, V2AssetCfg, Wlt, WltLog, WltOp, WltStatus,
 };

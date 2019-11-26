@@ -21,13 +21,13 @@ use std::thread;
 use std::thread::sleep;
 use std::time::Duration;
 
-#[inline]
-fn get_now_msec() -> i64 {
-    std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .expect("Time went backwards")
-        .as_millis() as i64
-}
+// #[inline]
+// fn get_now_msec() -> i64 {
+//     std::time::SystemTime::now()
+//         .duration_since(std::time::UNIX_EPOCH)
+//         .expect("Time went backwards")
+//         .as_millis() as i64
+// }
 
 #[derive(Debug, Serialize, Deserialize)]
 struct WsResponseMessage {
@@ -63,7 +63,7 @@ fn websocket_market_demo(market_base_url: &String) -> Result<(), Error> {
             cb: WsMsgCallBack,
         ) -> ws::Result<()> {
             let rid = Uuid::new_v4().to_simple().to_string();
-            let expires = get_now_msec() + 5000; // 设置5秒过期, FIXME!!!
+            let expires = gmex_api::get_now_msec() + 5000; // 设置5秒过期, FIXME!!!
             let msg = json!({
                 "req": req,
                 "rid": rid,
@@ -225,7 +225,7 @@ fn websocket_trade_demo(
             // cb:  Box<dyn FnMut(WsResponseMessage) + 'a>
         ) -> ws::Result<()> {
             let rid = Uuid::new_v4().to_simple().to_string();
-            let expires = get_now_msec() + 5000; // 设置5秒过期, FIXME!!!
+            let expires = gmex_api::get_now_msec() + 5000; // 设置5秒过期, FIXME!!!
             let s1 = serde_json::to_string(&args)
                 .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
             // 生成签名的公式: md5(Req+rid+Args+Expires+API.SecretKey)

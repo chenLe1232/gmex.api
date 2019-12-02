@@ -1,0 +1,51 @@
+API返回Code不为0时的错误消息:
+
+{Code: -1, Data: "expired request"}
+{Code: -1, Data: "invalid AId"})
+{Code: -1, Data: "invalid COrdId"})
+{Code: -1, Data: "invalid OrdId"}
+{Code: -1, Data: "invalid Sym"})
+{Code: -1, Data: "invalid args"}
+{Code: -1, Data: "invalid params"}
+{Code: -1, Data: "invalid json"})
+{Code: -1, Data: "invalid request"}
+{Code: -1, Data: "rejected by firewall"})
+{Code: -1, Data: "unknown action"}
+{Code: -1, Data: "unknown request"}
+{Code: -1, Data: `invalid idx_list`}
+{Code: -1, Data: `invalid sym_list`}
+{Code: -400, Data: "api-key no right"}
+{Code: -400, Data: "invalid args json"})
+{Code: -400, Data: "invalid order json"})
+{Code: -400, Data: "no matcher server"})
+{Code: -400, Data: "please set valid expires(msec)"}
+{Code: -401, Data: "please login first"}
+{Code: -403, Data: "api-key no trade-right"})
+{Code: -403, Data: "block ip"}
+{Code: -403, Data: "invalid signature"}
+{Code: -403, Data: "invalid-aid"}
+{Code: -403, Data: "no-api-right"}
+{Code: -404, Data: "not found"})
+{Code: -405, Data: "JSON Unmarshal Failed."}
+{Code: -406, Data: "invalid signature"}
+{Code: -429, Data: "api-rate-limit is violated"}
+{Code: -429, Data: "market-api-rate-limited"}
+{Code: -491, Data: "Login should only be once!"}
+{Code: -500, Data: "Server Busy"}
+{Code: -500, Data: "Unmarshal error"})
+{Code: -500, Data: "database error"}
+{Code: -500, Data: "server error"}
+{Code: -500, Data: "API-ERROR"})
+{Code: -500, Data: "API-ERROR: api-key server busy"}
+{Code: -500, Data: "API-ERROR: invalid uid in api-key auth response"}
+{Code: -501, Data: "Sorry, RPC LoginApi failed"
+{Code: -501, Data: "Sorry, RPC GetAssets failed"})
+{Code: -501, Data: "Sorry, RPC VerifyToken failed"}
+{Code: -502, Data: "Error, invalid uid"}
+{Code: -505, Data: "Timeout"}
+
+用户中心返回的结果Code有:
+
+{Code: 9010, Data: "用户名或key错误."}
+
+

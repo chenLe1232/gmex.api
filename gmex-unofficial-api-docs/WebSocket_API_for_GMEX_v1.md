@@ -1901,6 +1901,43 @@ const (
     OrderVia_Gift_Settle OrderVia = 19
 )
 
+
+// 钱包操作
+type WltOp int32
+
+const (
+    // 非法操作
+    WltOp_WOP_INVALID WltOp = 0
+    // 存钱
+    WltOp_DEPOSIT WltOp = 1
+    // 取钱
+    WltOp_WITHDRAW WltOp = 2
+    // 已实现盈亏
+    WltOp_PNL WltOp = 3
+    // 现货交易
+    WltOp_SPOT WltOp = 4
+    // 一账户 与 多账户 进行操作
+    WltOp_TRAN_1_TO_MANY WltOp = 5
+    // 逐仓 已实现盈亏
+    WltOp_PNLISO WltOp = 6
+    // 礼金
+    WltOp_GIFT WltOp = 7
+    // 礼金2
+    // GIFT2 = 8;
+    // 查询
+    WltOp_QUERY WltOp = 9
+    //
+    WltOp_GIFT_GIVE WltOp = 17
+    // WltSettle 钱包结算
+    WltOp_WLT_SETTLE WltOp = 18
+    // 礼金结算
+    WltOp_GIFT_SETTLE WltOp = 19
+    // 对指定VP 币种进行礼金结算
+    WltOp_GIFT_SETTLE_ALL_BY_COIN_VP WltOp = 20
+    // 数据Reset
+    WltOp_WLT_RESET WltOp = 99
+)
+
 ```
 
 

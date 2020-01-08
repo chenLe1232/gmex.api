@@ -1613,8 +1613,6 @@ type Position struct {
     MMR float64 `json:"MMR,omitempty"`
     // 有效MIR
     MIR float64 `json:"MIR,omitempty"`
-    // 有Gift的时候
-    PNLGISO float64 `json:"PNLGISO,omitempty"`
     // 计算值：价值,仓位现时的名义价值，受到标记价格价格的影响
     Val float64 `json:"Val,omitempty"`
     // 保证金，被仓位使用并锁定的保证金。

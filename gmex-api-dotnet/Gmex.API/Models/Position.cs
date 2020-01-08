@@ -78,11 +78,6 @@ namespace Gmex.API.Models
         public decimal PNLISO { get; set; }
 
         /// <summary>
-        /// 有Gift的时候
-        /// </summary>
-        public decimal PNLGISO { get; set; }
-
-        /// <summary>
         /// 计算值：价值,仓位现时的名义价值，受到标记价格价格的影响
         /// </summary>
         public decimal Val { get; set; }

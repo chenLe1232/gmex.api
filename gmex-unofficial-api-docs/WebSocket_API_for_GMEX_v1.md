@@ -115,6 +115,7 @@ const (
 // **交易对/合约的结构定义**
 type AssetD struct {
     Sym                 string  // 合约符合/交易对符号
+    DspN                string  // 显示名
     Beg                 int64   // 开始时间,毫秒
     Expire              int64   // 到期时间,毫秒
     PrzMaxChg           int32   // 市价委托的撮合的最多次数。比如5
@@ -623,6 +624,8 @@ type V2AssetCfg struct {
 type AssetD struct {
     // 符号 XBTUSD , XBTM18
     Sym string `json:"Sym,omitempty"`
+    // 显示名
+    DspN string `json:"DspN,omitempty"`
     // 开始时间
     Beg int64 `json:"Beg,omitempty"`
     // 到期日期 永续
@@ -1292,7 +1295,7 @@ args: {
 调用此接口成功后，用户该AId下的所有报单将在n秒后被全部自动撤单。通过设置0秒可以禁用此功能,常见的使用模式是设 timeout 为 60000,并每隔 15 秒调用一次,建议每次使用完API将Sec设置为0,禁用此功能。
 
 
-13. 调整仓位杠杆 PosLeverage  和仓位保证金 PosTransMgn
+13. 调整仓位杠杆 PosLeverage , 仓位保证金 PosTransMgn , 设置仓位的止盈止损
 ```JavaScript
 /*
 * 功能: 调整仓位杠杆 PosLeverage
@@ -1321,6 +1324,25 @@ args: {
 *  "Sym": "BTC.USDT",   // 交易对名称, 必须有
 *  "PId": "xxxxxxxx",   // 仓位的ID, 必须有
 *  "Param": 12.33       // float64 值, 必须有
+* }
+**/
+
+
+/*
+* 功能: 设置仓位的止盈止损 PosStopLP
+* 参数说明:
+* expires:              // 消息的有效时间
+* rid: 10               // request-id
+* req: 'PosStopLP'      // 请求的动作名称
+* signature: ""         // 签名,参考签名的生成规则
+* args: {
+*  "AId": "123456701",  // 账号的AId, 必须有
+*  "Sym": "BTC.USDT",   // 交易对名称, 必须有
+*  "PId": "xxxxxxxx",   // 仓位的ID, 必须有
+*  "StopLBy": 1         // 参考 StopBy 值定义, 止损, 对应仓位的 StopLBy
+*  "StopPBy": 1         // 参考 StopBy 值定义, 止盈, 对应仓位的 StopPBy
+*  "Param": 8515.5      // float64 值, 参数值, 对应仓位的 StopL
+*  "P2": 9515.5         // float64 值, 参数值, 对应仓位的 StopP
 * }
 **/
 
@@ -1626,6 +1648,14 @@ type Position struct {
     PrzBr float64 `json:"PrzBr,omitempty"`
     // 预估的平仓费
     FeeEst float64 `json:"FeeEst,omitempty"`
+    // 止盈方法
+    StopPBy StopBy `json:"StopPBy,omitempty"`
+    // 止盈价
+    StopP float64 `json:"StopP,omitempty"`
+    // 止损方法
+    StopLBy StopBy `json:"StopLBy,omitempty"`
+    // 止损价
+    StopL float64 `json:"StopL,omitempty"`
     // //////////////////////////////////////////////////////////////////////////
     // 下面会因为结算操作而变更。每次结算的时候，当前的未实现盈亏，将变成累加到已实现盈亏后，未实现盈亏清0
     ROE float64 `json:"ROE,omitempty"`

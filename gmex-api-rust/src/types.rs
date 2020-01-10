@@ -393,6 +393,7 @@ pub struct Position {
     #[serde(skip_serializing_if = "Option::is_none")] pub MMR: Option<f64>,           // 有效MMR
     #[serde(skip_serializing_if = "Option::is_none")] pub MIR: Option<f64>,           // 有效MIR
     #[serde(skip_serializing_if = "Option::is_none")] pub Val: Option<f64>,           // 计算值：价值,仓位现时的名义价值，受到标记价格价格的影响
+    #[serde(skip_serializing_if = "Option::is_none")] pub Flg: Option<u32>,           // 标志, 0:NONE, 1:IS_MASTER(缺省仓位), 2:ENABLE_STOPP(启用至盈价), 4:ENABLE_STOPL(启用至损价)
     #[serde(skip_serializing_if = "Option::is_none")] pub MMnF: Option<f64>,          // 保证金，被仓位使用并锁定的保证金
     #[serde(skip_serializing_if = "Option::is_none")] pub MI: Option<f64>,            // 委托保证金 = 计算自已有委单 + 平仓佣金 + 开仓佣金 Mgn Initial
     #[serde(skip_serializing_if = "Option::is_none")] pub UPNL: Option<f64>,          // 计算值：未实现盈亏 PNL==  Profit And Loss
@@ -400,10 +401,14 @@ pub struct Position {
     #[serde(skip_serializing_if = "Option::is_none")] pub PrzBr: Option<f64>,         // 计算值: 破产价格 BandRuptcy
     #[serde(skip_serializing_if = "Option::is_none")] pub FeeEst: Option<f64>,        // 预估的平仓费
     /* ------------------------------------------------------------ */
+    #[serde(skip_serializing_if = "Option::is_none")] pub StopPBy: Option<StopBy>,    // 止盈方法
+    #[serde(skip_serializing_if = "Option::is_none")] pub StopP: Option<f64>,         // 止盈价
+    #[serde(skip_serializing_if = "Option::is_none")] pub StopLBy: Option<StopBy>,    // 止损方法
+    #[serde(skip_serializing_if = "Option::is_none")] pub StopL: Option<f64>,         // 止损价
+    /* ------------------------------------------------------------ */
     #[serde(skip_serializing_if = "Option::is_none")] pub ROE: Option<f64>,           // 净资产收益率
     #[serde(skip_serializing_if = "Option::is_none")] pub ADLIdx: Option<f64>,        // ADLIdx, 这个是用来排序ADL的
     #[serde(skip_serializing_if = "Option::is_none")] pub ADLLight: Option<i32>,      // ADL红绿灯
-    #[serde(skip_serializing_if = "Option::is_none")] pub Flg: Option<u32>,           // 标志, 0: NONE, 1: DEFAULT(缺省仓位)
 }
 
 /* 钱包 */

@@ -483,6 +483,7 @@ type V2AssetCfg struct {
  *  "args":{                    			// 服务端所需的参数
  *      "UserName":"example@gaea.com",              	// 账号
  *      "UserCred":"mVAAADjNHzhvehaEvU$BMJoU7BZk"   	// APIKey
+ *      "DeviceInfo":"my iphoneX"           // 登录设备信息,可选参数
  *  },
  *  "signature": "74c33368e9a1f8d6d13cdf0bf5aa02a8" 	// 签名,可参考生产签名的方法
  * }

@@ -110,6 +110,18 @@ const (
     AssetFlag_UPDATE_PRZ_LIMIT AssetFlag = 256
     // 数据失效
     AssetFlag_DATA_INVALID AssetFlag = 512
+    // 当启动了挖矿模式. 挖矿与卖操作无关
+    AssetFlag_NO_MINING_BY_ASK AssetFlag = 1024
+    // 当启动了挖矿模式. 挖矿与买操作无关
+    AssetFlag_NO_MINING_BY_BID AssetFlag = 2048
+    // VP分离交易对
+    AssetFlag_JUST_A_CONFIG AssetFlag = 4096
+    // 分离ServeWlt FundingWlt InsurWlt
+    AssetFlag_SEPERATE_SYS_ACT_WLT AssetFlag = 8192
+    // 是否允许浮盈作为Margin
+    AssetFlag_ENABLE_UnP_FOR_MARGIN AssetFlag = 16384
+    // 在仓位强平后，是否重新计算保证金，检查风险
+    AssetFlag_NO_STOP_LIQUIDATE AssetFlag = 32768
 )
 
 // **交易对/合约的结构定义**

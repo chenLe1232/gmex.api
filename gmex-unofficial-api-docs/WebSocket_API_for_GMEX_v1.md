@@ -3,6 +3,7 @@
 ## 说明
 
 目前 GMEX (https://www.gmex.io) 对于外提供 WebSocket API 开发接口， 供开发者获取行情数据和进行交易操作。
+
 *请注意行情和交易是两个不同服务器*，行情接口无需认证可以自由访问，交易部分则需要用户开通 API-KEY 后通过自己的 KEY 认证授权后方可使用。
 
 GMEX官方的生产环境：
@@ -16,11 +17,37 @@ GMEX官方的生产环境：
 
 ## 行情API
 
-1. 获取交易对/合约列表： GetAssetD/GetAssetEx/GetCompositeIndex
-```JavaScript
+1. 获取 交易对/扩展属性/指数 列表： GetAssetD/GetAssetEx/GetCompositeIndex
+
+首先通过 GetAssetD 可以获取到所有当前系统开放的可交易的产品(用交易对符号Sym字段来唯一标示)，
+数据结构定义为 AssetD（下文中有定义），其中字段 TrdCls 表明了这个交易对的类型，当前支持
+的有 1-现货交易, 2-期货交易, 3-永续，请注意区分。
+
+通过 GetAssetEx 可以获取所有交易对的扩展属性定义内容，用Sym和前面的记录一一对应，没有定义的则没数据。
+
+注意，客户端程序显示的交易对名称很多时候是做过处理的，比如：
+
+| Sym | 显示 | 描述 |
+| :------: | :------ | :------ |
+|BTC.USDT | BTC/USDT正向永续 | 用USDT结算的BTC正向永续合约 |
+|ETH.USDT | ETH/USDT正向永续 | 用USDT结算的ETH正向永续合约 |
+|BTC.BTC  | BTC反向永续      | 用BTC结算的BTC反向永续合约 |
+|ETH.ETH  | ETH反向永续      | 用ETH结算的ETH反向永续合约 |
+|BTC2003  | BTC季度0327     | 用BTC结算的BTC反向定期季度合约，在本年03月27日到期 |
+|ETH2003  | ETH季度0327     | 用ETH结算的ETH反向定期季度合约，在本年03月27日到期 |
+|BTC/USDT | 币币BTC/USDT    | 币币交易，用USDT标记BTC的价格，花USDT买入BTC，或卖出BTC得到USDT |
+|EOS/BTC  | 币币EOS/BTC     | 币币交易，用BTC标记EOS的价格，花BTC买入EOS，或卖出EOS得到BTC |
+|EOS/ETH  | 币币EOS/ETH     | 币币交易，用ETH标记EOS的价格，花ETH买入EOS，或卖出EOS得到ETH |
+
+下面以js代码的为例展示具体 API 的调用
+
+```js
+//
+// 获取交易对列表,返回结果包含所有类型的交易对.针对虚拟交易所请参考后继VP参数的说明.
+//
 // 发送请求消息
 {"req":"GetAssetD","rid":"0","expires":1537706670830}
-
+//
 // 收到返回消息
 {
     "rid":"0",
@@ -36,7 +63,7 @@ GMEX官方的生产环境：
             "OrderMaxQty":10000000,
             "OrderMinQty":1,
             "LotSz":1,
-            "PrzM":244.8799999999999954525264911353588104248046875,
+            "PrzM":244.88,
             "MIR":0.07,
             "MMR":0.05,
             "PrzLatest":244.95,
@@ -48,7 +75,7 @@ GMEX官方的生产环境：
             "Mult":1,
             "FromC":"ETH",
             "ToC":"USD",
-            "TrdCls":2,
+            "TrdCls":2,                    // 产品类型: 1-币币交易, 2-期货合约, 3-永续合约，请注意区分
             "MkSt":1,
             "Flag":1,
             "SettleCoin":"ETH",
@@ -63,9 +90,9 @@ GMEX官方的生产环境：
             "FundingTolerance": 59,       // 偏移宽容度
             "FundingFeeR": 60             // Funding结算佣金
         },
-        {"Sym":"BTC1812","Beg":1,"Expire":1545984000000,"PrzMaxChg":1000,"PrzMinInc":0.5,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":6731.3100000000004001776687800884246826171875,"MIR":0.07,"MMR":0.05,"PrzLatest":6731.0,"OpenInterest":3431840,"PrzIndex":6737.3525,"PosLmtStart":10000000,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"BTC","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"BTC","QuoteCoin":"BTC","SettleR":0.0005,"DenyOpenAfter":1545980400000},
-        {"Sym":"ETH1809","Beg":1,"Expire":1538121600000,"PrzMaxChg":1000,"PrzMinInc":0.05,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":244.19999999999998863131622783839702606201171875,"MIR":0.07,"MMR":0.05,"PrzLatest":244.20,"OpenInterest":4500733,"PrzIndex":244.8863,"PosLmtStart":10000000,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"ETH","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"ETH","QuoteCoin":"ETH","SettleR":0.0005,"DenyOpenAfter":1538118000000},
-        {"Sym":"BTC1809","Beg":1,"Expire":1538121600000,"PrzMaxChg":1000,"PrzMinInc":0.5,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":6727.5500000000001818989403545856475830078125,"MIR":0.07,"MMR":0.05,"PrzLatest":6728.0,"OpenInterest":1451134,"PrzIndex":6737.3525,"PosLmtStart":10000000,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"BTC","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"BTC","QuoteCoin":"BTC","SettleR":0.0005,"DenyOpenAfter":1538118000000}
+        {"Sym":"BTC1812","Beg":1,"Expire":1545984000000,"PrzMaxChg":1000,"PrzMinInc":0.5,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":6731.31,"MIR":0.07,"MMR":0.05,"PrzLatest":6731.0,"OpenInterest":3431840,"PrzIndex":6737.3525,"PosLmtStart":10000000,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"BTC","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"BTC","QuoteCoin":"BTC","SettleR":0.0005,"DenyOpenAfter":1545980400000},
+        {"Sym":"ETH1809","Beg":1,"Expire":1538121600000,"PrzMaxChg":1000,"PrzMinInc":0.05,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":244.2,"MIR":0.07,"MMR":0.05,"PrzLatest":244.20,"OpenInterest":4500733,"PrzIndex":244.8863,"PosLmtStart":10000000,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"ETH","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"ETH","QuoteCoin":"ETH","SettleR":0.0005,"DenyOpenAfter":1538118000000},
+        {"Sym":"BTC1809","Beg":1,"Expire":1538121600000,"PrzMaxChg":1000,"PrzMinInc":0.5,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":6727.55,"MIR":0.07,"MMR":0.05,"PrzLatest":6728.0,"OpenInterest":1451134,"PrzIndex":6737.3525,"PosLmtStart":10000000,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"BTC","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"BTC","QuoteCoin":"BTC","SettleR":0.0005,"DenyOpenAfter":1538118000000}
     ]
 }
 ```
@@ -74,17 +101,16 @@ GMEX官方的生产环境：
 
 |参数 | 描述|
 | :-----   | :-----   |
-|req|用户的请求操作动作，如： GetAssetD，GetCompositeIndex，GetHistKLine等|
+|req|用户的请求操作动作，如： GetAssetD,GetAssetEx,GetCompositeIndex,GetHistKLine等|
 |rid|用户发送请求的唯一编号，由于websocket是异步通讯，用户需要通过匹配收到消息的rid和自己发送的rid来匹配操作和应答。|
 |expires|消息超时，毫秒，建议每次发送请求时填写当前时间加1秒。一般宜在初始化时先用Time消息获取服务端时间,可以相对时差与服务端保持同步。|
 
 有些交易对规则特别复杂，为此特别设置了一些扩展参数数据，对应的API指令为： GetAssetEx，使用和上面API一样。
-注意返回的结果是数组，只有配置了的交易对才会有，没配置的则没有数据，以交易对Sym为主键。
+注意返回的结果是数组(V2AssetCfg)，只有配置了的交易对才会有，没配置的则没有数据，以交易对Sym为主键。
 
 交易对相关对应的结构定义如下：
 
 ```golang
-
 //
 // 合约标志
 type AssetFlag int32
@@ -175,10 +201,10 @@ type AssetD struct {
 type FeeMethod int32
 
 const (
-    FeeMethod_FM_IN_FROM_TO         FeeMethod = 0	// 收入货币中支付。对于买卖双方，使用不同的货币支付手续费
-    FeeMethod_FM_IN_FROM            FeeMethod = 1	// 使用购买行为中消费的币种为手续费
-    FeeMethod_FM_IN_FROM_TO_FEECOIN FeeMethod = 2	// 可以使用第三货币进行手续费抵扣。如果额度不足，则使用FROM_TO 的逻辑
-    FeeMethod_FM_IN_FROM_FEECOIN    FeeMethod = 3	// 可以使用第三货币进行手续费抵扣。如果额度不足，则使用FROM    的逻辑
+    FeeMethod_FM_IN_FROM_TO         FeeMethod = 0    // 收入货币中支付。对于买卖双方，使用不同的货币支付手续费
+    FeeMethod_FM_IN_FROM            FeeMethod = 1    // 使用购买行为中消费的币种为手续费
+    FeeMethod_FM_IN_FROM_TO_FEECOIN FeeMethod = 2    // 可以使用第三货币进行手续费抵扣。如果额度不足，则使用FROM_TO 的逻辑
+    FeeMethod_FM_IN_FROM_FEECOIN    FeeMethod = 3    // 可以使用第三货币进行手续费抵扣。如果额度不足，则使用FROM    的逻辑
 )
 
 // **交易对的扩展配置数据**
@@ -251,16 +277,21 @@ type V2AssetCfg struct {
 
 ```
 
-补充内测功能：
-开始支持虚拟运营的概念，因此在查询取交易对时需要增加参数vp来获取指定虚拟运营商的编号。
+对于虚拟交易所的，在查询取交易对时需要增加参数VP来获取对应开放的内容。
 
 ```js
 // 查询交易对，带参数vp
-{"req":"GetAssetD","rid":"0","expires":1537706670830,"args":{"vp":1}}
+{"req":"GetAssetD","rid":"0","expires":1537706670830,"args":{"VP":1}}
 // 查询交易对扩展定义，带参数vp
-{"req":"GetAssetEx","rid":"1","expires":1537706670830,"args":{"vp":1}}
+{"req":"GetAssetEx","rid":"1","expires":1537706670830,"args":{"VP":1}}
 ```
-内测版返回的交易对属性中会多一个 Lbl 属性，表示该交易的所属板块.
+
+<b>返回结果字段的重要说明</b>
+
+（1）为了节省流量，所有值为默认值或者为空的参数值，在返回的结果中会被过滤掉不出现，用户需要注意。
+
+（2）平台在升级过程中可能会增加一些字段，为了扩展兼容，请对接API的人注意对于不认识的字段过滤即可，这不是错误。
+
 
 
 2. 获取综合指数列表： GetCompositeIndex
@@ -397,13 +428,13 @@ type V2AssetCfg struct {
         "High24":6774,
         "Low24":6632,
         "Volume24":5659148,
-        "Turnover24":843.7992005395208,
+        "Turnover24":843.78,
         "Volume":40901214,
         "Turnover":0,
         "OpenInterest":3436394,
-    "FundingLongR":0,             // 当前周期内的资金费率
-    "FundingPredictedR":0,        // 下个周期预测的资金费率
-    "FundingShortR":0             // 当前未使用字段
+        "FundingLongR":0,             // 当前周期内的资金费率
+        "FundingPredictedR":0,        // 下个周期预测的资金费率
+        "FundingShortR":0             // 当前未使用字段
     }
 }
 
@@ -442,7 +473,7 @@ type V2AssetCfg struct {
 为了节约网络流量，特别提供慢速模式，此时tick会1500毫秒推一次，order20会1000毫秒推一次.
 启用慢速模式很简单，只需在sub指令的参数列表中增加一行"\_\_slow\_\_"，如下：
 
-```JavaScript
+```js
 // 发送订阅请求消息
 {
     "req":"Sub",
@@ -489,15 +520,15 @@ type V2AssetCfg struct {
 /**
  *  参数说明
  * {
- *  "req":"Login",              			// 请求的动作类型
+ *  "req":"Login",                          // 请求的动作类型
  *  "rid":"1",
- *  "expires":1538222696758,    			// 消息超时时间
- *  "args":{                    			// 服务端所需的参数
- *      "UserName":"example@gaea.com",              	// 账号
- *      "UserCred":"mVAAADjNHzhvehaEvU$BMJoU7BZk"   	// APIKey
+ *  "expires":1538222696758,                // 消息超时时间
+ *  "args":{                                // 服务端所需的参数
+ *      "UserName":"example@gaea.com",                  // 账号
+ *      "UserCred":"mVAAADjNHzhvehaEvU$BMJoU7BZk"       // APIKey
  *      "DeviceInfo":"my iphoneX"           // 登录设备信息,可选参数
  *  },
- *  "signature": "74c33368e9a1f8d6d13cdf0bf5aa02a8" 	// 签名,可参考生产签名的方法
+ *  "signature": "74c33368e9a1f8d6d13cdf0bf5aa02a8"     // 签名,可参考生产签名的方法
  * }
  *
  * 生成签名的方法:
@@ -547,7 +578,7 @@ type V2AssetCfg struct {
 
 |参数| 描述|
 | :-----   | :-----   |
-|req|用户的请求操作动作，如： GetAssetD, GetWallets, GetTrades, GetOrders, GetPositions, OrderNew, OrderDel等等。|
+|req|用户的请求操作动作，如： GetWallets, GetTrades, GetOrders, GetPositions, OrderNew, OrderDel等等。|
 |rid|用户发送请求的唯一编号，由于websocket是异步通讯，用户需要通过匹配收到消息的rid和自己发送的rid来匹配操作和应答。|
 |expires|消息超时，毫秒，建议每次发送请求时填写当前时间加1秒。|
 |args|用户的参数，可选，具体根据req来设置。|
@@ -573,260 +604,10 @@ type V2AssetCfg struct {
 操作资金中心钱包时则不需要这个参数。
 
 
-2. 查询当前系统的合约列表(必须参数 AId)： GetAssetD
+2. 获取交易对列表
 
-```js
-// 发送请求消息
-{
-    "req":"GetAssetD",
-    "rid":"2",
-    "expires":1537710766358,
-    "args":{
-        "AId":"1525354501"
-    },
-    "signature": "1234567890abcdef1234567890abcdef"
-}
-
-// 收到返回消息
-{
-    "rid":"2",
-    "code":0,
-    "data":[
-        {
-            "Sym":"ETH1812",
-            "Beg":1,
-            "Expire":1545984000000,
-            "PrzMaxChg":1000,
-            "PrzMinInc":0.05,
-            "PrzMax":1000000,
-            "OrderMaxQty":10000000,
-            "OrderMinQty":1,
-            "LotSz":1,
-            "PrzM":245.330000000000012505552149377763271331787109375,
-            "MIR":0.07,
-            "MMR":0.05,
-            "PrzLatest":245.35,
-            "OpenInterest":2181137,
-            "PrzIndex":244.9823,
-            "PosLmtStart":10000000,
-            "FeeMkrR":-0.0003,
-            "FeeTkrR":0.0007,
-            "Mult":1,
-            "FromC":"ETH",
-            "ToC":"USD",
-            "TrdCls":2,
-            "MkSt":1,
-            "Flag":1,
-            "SettleCoin":"ETH",
-            "QuoteCoin":"ETH",
-            "SettleR":0.0005,
-            "DenyOpenAfter":1545980400000
-        },
-        {"Sym":"BTC1812","Beg":1,"Expire":1545984000000,"PrzMaxChg":1000,"PrzMinInc":0.5,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":6725.75,"MIR":0.07,"MMR":0.05,"PrzLatest":6724.5,"OpenInterest":3431245,"PrzIndex":6729.2552,"PosLmtStart":10000000,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"BTC","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"BTC","QuoteCoin":"BTC","SettleR":0.0005,"DenyOpenAfter":1545980400000},
-        {"Sym":"ETH1809","Beg":1,"Expire":1538121600000,"PrzMaxChg":1000,"PrzMinInc":0.05,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":244.650000000000005684341886080801486968994140625,"MIR":0.07,"MMR":0.05,"PrzLatest":244.65,"OpenInterest":4501232,"PrzIndex":244.9823,"PosLmtStart":10000000,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"ETH","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"ETH","QuoteCoin":"ETH","SettleR":0.0005,"DenyOpenAfter":1538118000000},
-        {"Sym":"BTC1809","Beg":1,"Expire":1538121600000,"PrzMaxChg":1000,"PrzMinInc":0.5,"PrzMax":1000000,"OrderMaxQty":10000000,"LotSz":1,"PrzM":6726.8000000000001818989403545856475830078125,"MIR":0.07,"MMR":0.05,"PrzLatest":6724.0,"OpenInterest":1449455,"PrzIndex":6729.2552,"PosLmtStart":10000000,"FeeMkrR":-0.0003,"FeeTkrR":0.0007,"Mult":1,"FromC":"BTC","ToC":"USD","TrdCls":2,"MkSt":1,"Flag":1,"SettleCoin":"BTC","QuoteCoin":"BTC","SettleR":0.0005,"DenyOpenAfter":1538118000000}
-    ]
-}
-```
-
-返回的结果和行情中获取到的数据是一样的。注意这里必须使用AId，因此合约和币币是分开来获取到的。
-
-```golang
-
-// **交易对/合约的结构定义**
-type AssetD struct {
-    // 符号 XBTUSD , XBTM18
-    Sym string `json:"Sym,omitempty"`
-    // 显示名
-    DspN string `json:"DspN,omitempty"`
-    // 开始时间
-    Beg int64 `json:"Beg,omitempty"`
-    // 到期日期 永续
-    Expire int64 `json:"Expire,omitempty"`
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // 市价委托的撮合的最多次数。比如5
-    PrzMaxChg int32 `json:"PrzMaxChg,omitempty"`
-    // 最小的价格变化	0.5 USD
-    PrzMinInc gaea_Num.Flt `json:"PrzMinInc"`
-    // 最大委托价格	1,000,000
-    PrzMax gaea_Num.Flt `json:"PrzMax"`
-    // 最大委托数量	10,000,000
-    OrderMaxQty gaea_Num.Flt `json:"OrderMaxQty"`
-    // 最小合约数量	这个就是每次买卖的合约数量必须是LotSz的倍数。
-    LotSz gaea_Num.Flt `json:"LotSz"`
-    // 保证金计算相关参数 开始
-    // 	标记价格	8103.14
-    PrzM gaea_Num.Flt `json:"PrzM"`
-    // double LiqR = 10;	//Unused 已废弃。  从 PrzLiq 向 PrzBr偏离的百分比， 0 表示，= PrzLiq, 1 表示 到达PrzBr
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // 起始保证金	 1.00% + 开仓佣金 + 平仓佣金 Mgn Initial Ratio
-    MIR gaea_Num.Flt `json:"MIR"`
-    // 维持保证金	0.50% + 平仓佣金 + 资金费率 Mgn Maintaince Ratio
-    MMR gaea_Num.Flt `json:"MMR"`
-    // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // 风险限额	200 XBT
-    // Unused int64 RiskLimit = 13;
-    // 风险限额递增值	100 XBT
-    // Unused int64 RiskStep = 14;
-    // 标记方法	Prz Mark Method
-    PrzMMethod string `json:"PrzMMethod,omitempty"`
-    // 合理基差	-12.36
-    PrzMFairBasis int64 `json:"PrzMFairBasis,omitempty"`
-    // 合理基差率	-410%
-    PrzMFairBasisRate int64 `json:"PrzMFairBasisRate,omitempty"`
-    // 合理基差计算公式	此合约的合理基差取决于年化资金费率。
-    PrzMFairBasisCalc int32 `json:"PrzMFairBasisCalc,omitempty"`
-    // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // 委托的最小价值. 废弃字段。
-    OrderMinVal gaea_Num.Flt `json:"OrderMinVal"`
-    // 保证金计算相关参数 结束
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // 统计信息：
-    // 最新成交价格
-    PrzLatest gaea_Num.Flt `json:"PrzLatest"`
-    // 保证金计算相关参数 结束
-    // 最新的成交方向
-    DirLatest OrderDir `json:"DirLatest,omitempty"`
-    // 总交易量	30,585,913,058
-    TotalVol float64 `json:"TotalVol,omitempty"`
-    // 持仓量	99,192,762
-    OpenInterest int64 `json:"OpenInterest,omitempty"`
-    // 总成交额	26,293.1141 XBT
-    Turnover float64 `json:"Turnover,omitempty"`
-    // 增加指数价格
-    PrzIndex gaea_Num.Flt `json:"PrzIndex"`
-    // 类型	结算货币为 XBT，计价货币为 USD
-    // 	int32 SettleUnit = 25; 未使用。
-    // 合约大小	1 USD (目前每张合约价值 0.00012341 XBT)，注意到，是以计价货币来表示的
-    AssetSz int64 `json:"AssetSz,omitempty"`
-    // 结算	此合约为永续无结算合约。
-    // 或者 此合约在 6月29日 下午8:00 (UTC 下午12:00:00) 按照 .BXBT30M 指数 价格结算。
-    // 结算日期
-    // int64 SettleTime = 27;  与 Expire同义
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    PosLmtStart int64 `json:"PosLmtStart,omitempty"`
-    // 个人占用开仓
-    // 当前涨跌价格范围 Prz Rise Fall Range
-    PrzRFMin float64 `json:"PrzRFMin,omitempty"`
-    // 当前涨跌价格范围最大值
-    PrzRFMax float64 `json:"PrzRFMax,omitempty"`
-    // 佣金费率
-    // 提供流动性的费率	FeeMkrR
-    FeeMkrR gaea_Num.Flt `json:"FeeMkrR"`
-    // 消耗流动性的费率
-    FeeTkrR gaea_Num.Flt `json:"FeeTkrR"`
-    // Order中，Qty必须是Mult的倍数
-    Mult gaea_Num.Flt `json:"Mult"`
-    // 从什么货币 购买行为消耗的货币符号
-    FromC string `json:"FromC,omitempty"`
-    // 兑换为 什么货币  购买行为得到的货币符号
-    ToC string `json:"ToC,omitempty"`
-    // 交易类型
-    TrdCls TradeClass `json:"TrdCls,omitempty"`
-    // 市场状态
-    MkSt MkStatus `json:"MkSt,omitempty"`
-    // 标志, 正向报价，反向报价
-    Flag AssetFlag `json:"Flag,omitempty"`
-    // 结算货币
-    SettleCoin string `json:"SettleCoin,omitempty"`
-    // 报价货币
-    QuoteCoin string `json:"QuoteCoin,omitempty"`
-    // 结算费率
-    SettleR gaea_Num.Flt `json:"SettleR"`
-    // 时间节点：当越过了DenyOpenAfter后，不允许开新仓
-    DenyOpenAfter int64 `json:"DenyOpenAfter,omitempty"`
-    // 如果允许使用第三种货币支付手续费，则配置本项目
-    FeeCoin string `json:"FeeCoin,omitempty"`
-    // 如果允许使用第三种货币支付手续费，这里配置折扣率
-    FeeDiscR gaea_Num.Flt `json:"FeeDiscR"`
-    // 最大委托数量	10,000,000
-    OrderMinQty gaea_Num.Flt `json:"OrderMinQty"`
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // 永续合约专属数据
-    // 基础货币利率符号	.XBTBON8H
-    InterestBaseSym string `json:"InterestBaseSym,omitempty"`
-    // 计价货币利率符号	.USDBON8H
-    InterestQuoteSym string `json:"InterestQuoteSym,omitempty"`
-    // 资金费用溢价符号	.XBTUSDPI8H
-    FundingPremiumSym string `json:"FundingPremiumSym,omitempty"`
-    // 资金费率	-0.3750%
-    // 多仓资金费率
-    FundingLongR float64 `json:"FundingLongR,omitempty"`
-    // 空仓资金费率
-    FundingShortR float64 `json:"FundingShortR,omitempty"`
-    // 资金费用收取间隔 秒。	每 8 小时 //秒，8小时 = 8 * 3600 秒 = 28800 秒 = 28800000 毫秒
-    FundingInterval uint32 `json:"FundingInterval,omitempty"`
-    // 下一个资金费率结算的时间。2018年4月16日 下午8:00:00. 时间戳 毫秒
-    FundingNext int64 `json:"FundingNext,omitempty"`
-    // 预测费率	-0.3586%
-    FundingPredictedR float64 `json:"FundingPredictedR,omitempty"`
-    // 每日0点后的 FundingOffset 毫秒后 为第一个结算时间点
-    FundingOffset int64 `json:"FundingOffset,omitempty"`
-    // 资金费率计算参数: 公差
-    FundingTolerance float64 `json:"FundingTolerance,omitempty"`
-    // Funding结算佣金
-    FundingFeeR gaea_Num.Flt `json:"FundingFeeR"`
-    // 交易对分组. 比如分组
-    Grp int64 `json:"Grp,omitempty"`
-}
-
-// **定义手续分的收取方式**
-type FeeMethod int32
-
-const (
-    FeeMethod_FM_IN_FROM_TO         FeeMethod = 0
-    FeeMethod_FM_IN_FROM            FeeMethod = 1
-    FeeMethod_FM_IN_FROM_TO_FEECOIN FeeMethod = 2
-    FeeMethod_FM_IN_FROM_FEECOIN    FeeMethod = 3
-)
-
-// **交易对的扩展配置数据**
-type AssetEx struct {
-    // 合约符合/交易对符号
-    Sym  string  `json:"Sym"`
-    // 手续费计费方法
-    FM FeeMethod `json:"FM,omitempty"`
-    // 手续费，货币符号，如果未指定，则现货：按照收入额进行收取。期货：按照SettleCoin进行。
-    // 如果指定了FeeCoin则从该币种钱包内进行扣除。注意到，如果该钱包余额不足，则依旧使用SettleCoin进行
-    FeeCoin string `json:"FeeCoin,omitempty"`
-    // 折扣率
-    FeeDiscR float64 `json:"FeeDiscR"`
-    // 开放交易时间 (日内,毫秒)
-    OnAt uint64 `json:"OnAt,omitempty"`
-    // 关闭交易时间 (日内,毫秒)
-    OffAt uint64 `json:"OffAt,omitempty"`
-    // 价格涨价幅度 万分比 * 10000
-    RiseR int64 `json:"RiseR,omitempty"`
-    // 价格跌价幅度 万分比 * 10000
-    FallR int64 `json:"FallR,omitempty"`
-    // 最小价格
-    PrzMin float64 `json:"PrzMin,omitempty"`
-    // 买入量
-    LmtBid float64 `json:"LmtBid,omitempty"`
-    // 卖出量
-    LmtAsk float64 `json:"LmtAsk,omitempty"`
-    // 买入卖出总量
-    LmtBidAsk float64 `json:"LmtBidAsk,omitempty"`
-    // 买入次数
-    LmtNumBid uint64 `json:"LmtNumBid,omitempty"`
-    // 卖出次数
-    LmtNumAsk uint64 `json:"LmtNumAsk,omitempty"`
-    // 买入卖出总次数
-    LmtNumBidAsk uint64 `json:"LmtNumBidAsk,omitempty"`
-    // 委托的买价偏离盘口比例(小数)
-    BidPrzR float64 `json:"BidPrzR,omitempty"`
-    // 委托的卖价偏离盘口比例(小数)
-    AskPrzR float64 `json:"AskPrzR,omitempty"`
-    // 从0点开始，在每天的什么时间，开始重置统计值(绝对时间,毫秒)
-    SumAt uint64 `son:"SumAt,omitempty"`
-    // 重置间隔
-    SumInterval uint64 `json:"SumInterval,omitempty"`
-    // 下次重制
-    SumResetNext uint64 `json:"SumResetNext,omitempty"`
-}
-
-```
+注意，交易服务已经不在提供获取此功能，请使用行情服务对应的接口 GetAssetD 和 GetAssetEx 来获取
+对应的内容。
 
 
 3. 查询用户子账号的钱包列表信息： GetWallets 和 GetCcsWallets
@@ -861,13 +642,13 @@ type AssetEx struct {
             "Coin":"ETH",
             "Depo":1.00000000,
             "WDrw":0,
-            "PNL":-0.452374713185744188799864398523351731769754619710,
+            "PNL":-0.45237471,
             "Frz":0,
-            "MI":0.2906262618301145,
-            "RD":0.530702779487773,
+            "MI":0.29062626,
+            "RD":0.53070277,
             "Status":2
         },
-        {"UId":"1234567","AId":"123456701","Coin":"BTC","Depo":0.16518449,"WDrw":0,"PNL":-0.00426155098522019276893748290683797431047794081854,"Frz":0,"MI":0.04244959641866207,"RD":0.26378834912257804,"Status":2},
+        {"UId":"1234567","AId":"123456701","Coin":"BTC","Depo":0.16518449,"WDrw":0,"PNL":-0.00426155,"Frz":0,"MI":0.04244966,"RD":0.26378834,"Status":2},
         {"UId":"1234567","AId":"123456701","Coin":"GAEA","Depo":5,"WDrw":0,"PNL":0,"Frz":0,"Status":2}
     ]
 }
@@ -944,14 +725,14 @@ type AssetEx struct {
             "OrdId":"01CQES0XMV4M3XNJBXKBCKHPZ3",
             "Sz":259,
             "Prz":6.75E+3,
-            "Fee":-0.00001151111111111111,
+            "Fee":-0.00001151,
             "FeeCoin":"BTC",
             "At":1537703229547,
             "Via":7
         },
-        {"UId":"1234567","AId":"123456701","Sym":"BTC1812","MatchId":"01CQES0XMVKDQCD192BG4STJF6","OrdId":"01CQES0XMV4M3XNJBXKBCKHPZ3","Sz":519,"Prz":6.75E+3,"Fee":-0.00002306666666666667,"FeeCoin":"BTC","At":1537703229346,"Via":7},
-        {"UId":"1234567","AId":"123456701","Sym":"BTC1812","MatchId":"01CQES0XMVXD7ZPV22YF49AW93","OrdId":"01CQES0XMV4M3XNJBXKBCKHPZ3","Sz":504,"Prz":6.75E+3,"Fee":-0.00002240000000000000,"FeeCoin":"BTC","At":1537703229146,"Via":7},
-        {"UId":"1234567","AId":"123456701","Sym":"BTC1812","MatchId":"01CQES0XMV9FDYBTRX29VZ1WAP","OrdId":"01CQES0XMV4M3XNJBXKBCKHPZ3","Sz":585,"Prz":6.75E+3,"Fee":-0.00002600000000000000,"FeeCoin":"BTC","At":1537703228944,"Via":7}
+        {"UId":"1234567","AId":"123456701","Sym":"BTC1812","MatchId":"01CQES0XMVKDQCD192BG4STJF6","OrdId":"01CQES0XMV4M3XNJBXKBCKHPZ3","Sz":519,"Prz":6.75E+3,"Fee":-0.00002306,"FeeCoin":"BTC","At":1537703229346,"Via":7},
+        {"UId":"1234567","AId":"123456701","Sym":"BTC1812","MatchId":"01CQES0XMVXD7ZPV22YF49AW93","OrdId":"01CQES0XMV4M3XNJBXKBCKHPZ3","Sz":504,"Prz":6.75E+3,"Fee":-0.0000224,"FeeCoin":"BTC","At":1537703229146,"Via":7},
+        {"UId":"1234567","AId":"123456701","Sym":"BTC1812","MatchId":"01CQES0XMV9FDYBTRX29VZ1WAP","OrdId":"01CQES0XMV4M3XNJBXKBCKHPZ3","Sz":585,"Prz":6.75E+3,"Fee":-0.000026,"FeeCoin":"BTC","At":1537703228944,"Via":7}
     ]
 }
 ```
@@ -1024,19 +805,19 @@ type AssetEx struct {
             "Sym":"ETH1812",
             "Sz":100,
             "PrzIni":246.75,
-            "RPNL":0.000121580547112462,
-            "Val":0.4061408496466575,
-            "MMnF":0.020307042482332876,
-            "MI":0.26066975804143216,
-            "UPNL":-0.0008723592717840498,
-            "PrzLiq":154.1425703534361,
-            "PrzBr":146.7046448590807,
-            "FeeEst":0.0002842985947526602,
-            "ROE":-0.04236534514766641,
-            "ADLIdx":-0.07944234516057963
+            "RPNL":0.00012158,
+            "Val":0.40614084,
+            "MMnF":0.02030704,
+            "MI":0.2606697,
+            "UPNL":-0.0008723,
+            "PrzLiq":154.14257,
+            "PrzBr":146.70464,
+            "FeeEst":0.000284,
+            "ROE":-0.0423653,
+            "ADLIdx":-0.0794423
         },
-        {"UId":"1234567","PId":"01CQES0XMVJGCXCS0MF1P2ZK5V","AId":"123456701","Sym":"BTC1809","Sz":-120,"PrzIni":6737.5,"RPNL":0.000005343228200371059,"Val":0.017813378143875687,"MMnF":0.0008906689071937843,"UPNL":0.0000026174759721611044,"PrzLiq":63949689.43002453,"PrzBr":67365100.00002584,"FeeEst":0.000012469364700712979,"ROE":0.0028982007003982577,"ADLIdx":0.0007826905463650653,"ADLLight":3},
-        {"UId":"1234567","PId":"01CQES0XMVS6XK7P4W46ZTY17H","AId":"123456701","Sym":"ETH1809","Sz":50,"PrzIni":245.55,"RPNL":0.00006108735491753208,"Val":0.20377389248889433,"MMnF":0.010188694624444716,"UPNL":-0.00014937609712074688,"PrzLiq":111.97759051807083,"PrzBr":106.57427478640034,"FeeEst":0.000142641724742226,"ROE":-0.014458545542610519,"ADLIdx":-0.027112272106186153}
+        {"UId":"1234567","PId":"01CQES0XMVJGCXCS0MF1P2ZK5V","AId":"123456701","Sym":"BTC1809","Sz":-120,"PrzIni":6737.5,"RPNL":0.00000534,"Val":0.0178133,"MMnF":0.0008906,"UPNL":0.0000026174,"PrzLiq":63949689.43002453,"PrzBr":67365100.00002584,"FeeEst":0.00001247,"ROE":0.0028982,"ADLIdx":0.00078269,"ADLLight":3},
+        {"UId":"1234567","PId":"01CQES0XMVS6XK7P4W46ZTY17H","AId":"123456701","Sym":"ETH1809","Sz":50,"PrzIni":245.55,"RPNL":0.00006108,"Val":0.2037738,"MMnF":0.010188694624444716,"UPNL":-0.00014937,"PrzLiq":111.9775905,"PrzBr":106.574274,"FeeEst":0.0001426,"ROE":-0.014458,"ADLIdx":-0.0271122}
     ]
 }
 ```
@@ -1309,7 +1090,7 @@ args: {
 
 
 13. 调整仓位杠杆 PosLeverage , 调整仓位保证金 PosTransMgn , 设置仓位的止盈止损触发条件
-```JavaScript
+```js
 /*
 * 功能: 调整仓位杠杆 PosLeverage
 * 参数说明:
@@ -1367,7 +1148,7 @@ args: {
 
 
  14. 查询用户的风险限额GetRiskLimit(内测中)
-```JavaScript
+```js
 /**
 * 功能: 查询某个交易对用户的风险限额
 * 参数说明:
@@ -1408,7 +1189,6 @@ args: {
 15. 更多的查询功能(内测中)
 
 更多查询功能当前内测的有：
-    - GetAssetExCfg, 返回结果对应结构 V2AssetCfg;
     - GetExchangeRate，返回结果对应结构 V2ExchangeRate;
     - GetMktSum，返回结果对应结构 V2MktSum;
     - GetTrdSum；返回结果对应结构 V2TrdSum;
@@ -1853,7 +1633,7 @@ const (
     // 如果委托会导致增加仓位，则不发送此委托
     OrdFlag_REDUCEONLY OrdFlag = 2
     // 触发后平仓 TODO 目前未实现
-    // 	CLOSEONTRIGGER 	= 4;
+    //     CLOSEONTRIGGER     = 4;
     // 条件指定为 如果价格大于StopBy
     OrdFlag_IF_GREATERTHAN OrdFlag = 8
     // 条件指定为 如果价格低于StopBy
@@ -1878,7 +1658,7 @@ const (
     TimeInForce_ImmediateOrCancel TimeInForce = 1
     // 部分成交后剩余委托取消
     TimeInForce_FillAndKill TimeInForce = 1
-    // 如果不能全部成交则取消委托			全部成交或者全部撤销
+    // 如果不能全部成交则取消委托            全部成交或者全部撤销
     TimeInForce_FillOrKill TimeInForce = 2
 )
 
@@ -1958,8 +1738,6 @@ const (
     WltOp_PNLISO WltOp = 6
     // 礼金
     WltOp_GIFT WltOp = 7
-    // 礼金2
-    // GIFT2 = 8;
     // 查询
     WltOp_QUERY WltOp = 9
     //

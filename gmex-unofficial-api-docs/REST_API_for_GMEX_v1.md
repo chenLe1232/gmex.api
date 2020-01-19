@@ -1179,7 +1179,7 @@ http GET https://api-market.gmex.io/v1/rest/GetOrd20List?sym_list=BTC.BTC,BTC.US
 }
 ```
 
-* 其它的一些查询操作 GetAssetExCfg，GetExchangeRate，GetMktSum，GetTrdSum；查询的参数args需要
+* 其它的一些查询操作 GetExchangeRate，GetMktSum，GetTrdSum；查询的参数args需要
 AId和Sym，对应的数据结构请参考WebSocket_API的文档.
 
 ## 错误码定义

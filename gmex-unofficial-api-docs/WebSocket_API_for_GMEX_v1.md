@@ -1089,7 +1089,7 @@ args: {
 调用此接口成功后，用户该AId下的所有报单将在n秒后被全部自动撤单。通过设置0秒可以禁用此功能,常见的使用模式是设 timeout 为 60000,并每隔 15 秒调用一次,建议每次使用完API将Sec设置为0,禁用此功能。
 
 
-13. 调整仓位杠杆 PosLeverage , 调整仓位保证金 PosTransMgn , 设置仓位的止盈止损触发条件
+13. 调整仓位杠杆 PosLeverage , 调整仓位保证金 PosTransMgn , 设置仓位的止盈止损触发条件，新建和删除仓位操作等
 ```js
 /*
 * 功能: 调整仓位杠杆 PosLeverage
@@ -1141,6 +1141,21 @@ args: {
 *  "StopPBy": 1         // 参考 StopBy 值定义, 止盈, 对应仓位的 StopPBy
 *  "Param": 8515.5      // float64 值, 参数值, 对应仓位的 StopL
 *  "P2": 9515.5         // float64 值, 参数值, 对应仓位的 StopP
+* }
+**/
+
+/*
+* 功能: 新建和删除仓位操作
+* 参数说明:
+* expires:              // 消息的有效时间
+* rid: 10               // request-id
+* req: 'PosOp'          // 请求的动作名称
+* signature: ""         // 签名,参考签名的生成规则
+* args: {
+*  "AId": "123456701",  // 账号的AId, 必须有
+*  "Sym": "BTC.USDT",   // 交易对名称, 必须有
+*  "PId": "xxxxxxxx",   // 仓位的ID
+*  "Op": 1              // 操作定义, 0:New, 1:Del
 * }
 **/
 
@@ -1644,6 +1659,10 @@ const (
     OrdFlag_TRACE_FIRE OrdFlag = 64
     // 设定此标志以跟踪最大值的回调。不设定此标志以跟踪最小值的回调
     OrdFlag_TRACE_AT_MAX OrdFlag = 128
+    // 是否允许第三币种支付手续费
+    OrdFlag_FEE_IN_TPCOIN OrdFlag = 256
+    // 超过强平价
+    OrdFlag_PRZ_OVER_LIQUIDATE OrdFlag = 512
 )
 
 

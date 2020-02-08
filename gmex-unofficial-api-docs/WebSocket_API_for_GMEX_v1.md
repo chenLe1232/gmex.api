@@ -606,8 +606,10 @@ type V2AssetCfg struct {
 
 2. 获取交易对列表
 
-注意，交易服务已经不在提供获取此功能，请使用行情服务对应的接口 GetAssetD 和 GetAssetEx 来获取
-对应的内容。
+为了方便用户交易服务API也同时提供了接口 GetAssetD 和 GetAssetEx 来获取交易对信息，行为和行情
+服务API的基本一致，所不同的是，这里需要参数 AId，因此也就锁定了是合约服务还是币币服务，故而返回
+的结果也就只包含这个AId相关的数据了，即只有合约市场的或者只有币币市场的。
+返回结果数据为数组，据结构定义参考 AssetD 和 V2AssetCfg 。
 
 
 3. 查询用户子账号的钱包列表信息： GetWallets 和 GetCcsWallets

@@ -1164,24 +1164,25 @@ args: {
 ```
 
 
- 14. 查询用户的风险限额GetRiskLimit(内测中)
+ 14. 查询用户的风险限额 GetRiskLimits
 ```js
 /**
-* 功能: 查询某个交易对用户的风险限额
+* 功能: 查询用户的风险限额,支持多个sym同时查询
 * 参数说明:
 * expires:          // 消息的有效时间
 * rid: 10           //用户发送请求的唯一编号，由于websocket是异步通讯，用户需要通过匹配收到消息的rid和自己发送的rid来匹配操作和应答。
-* req: 'GetRiskLimit'   // 请求的动作名称
+* req: 'GetRiskLimits'  // 请求的动作名称
 * signature: ""         // 签名,参考签名的生成规则
 * args: {
-*  "AId": "",           // 账号的AId,
-*  "Sym": "",           // 交易对名称
+*  "AId": "123456701",          // 账号的AId,
+*  "Sym": "BTC.USDT,BTC.BTC",   // 交易对名称列表，逗号分割。
 * }
 */
 // 请求发送参数
-{"req":"GetRiskLimit","rid":"15","expires":1537712072667,"args":{"AId":"123456701","Sym":"BTC1812"},"signature": "1234567890abcdef1234567890abcdef"}
-// 接收到的返回消息
-{"rid":"15","code":0,"data":{....}}
+{"req":"GetRiskLimits","rid":"15","expires":1537712072667,"args":{"AId":"123456701","Sym":"BTC.USDT,BTC.BTC"},"signature": "1234567890abcdef1234567890abcdef"}
+// 接收到的返回消息, 注意，结果data是数组，只包含找到数据的结果，如果sym没找到对应定义，则结果中没有该sym的数据。
+// 结果数据结构定义请参考 RiskLimitDef
+{"rid":"15","code":0,"data":[{....},{...}]}
 
 ```
 

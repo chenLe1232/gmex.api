@@ -118,6 +118,7 @@
                 // tick行情
                 api_market.on("tick", function (ret) {
                     console.log(`[on.market.tick] << `, ret)
+                    G_LOG("debug", `[on.market.tick]<< ${JSONStringify(ret)}`)
                 });
                 // 成交记录行情
                 api_market.on("trade", function (ret) {
@@ -150,15 +151,18 @@
                 // order20行情
                 api_market.on("order20", function (ret) {
                     console.log(`[on.market.order20] << `, ret)
+                    G_LOG("debug", `[on.market.order20]<< ${JSONStringify(ret)}`)
                 });
 
                 // kline行情
                 api_market.on("kline", function (ret) {
                     console.log(`[on.market.kline] << `, ret)
+                    G_LOG("debug", `[on.market.kline]<< ${JSONStringify(ret)}`)
                 });
                 // 指数行情
                 api_market.on("index", function (ret) {
                     console.log(`[on.market.index] << `, ret)
+                    G_LOG("debug", `[on.market.index]<< ${JSONStringify(ret)}`)
                 });
                 request_market('GetAssetD', {vp: parseInt(document.getElementById('login_vpid').value)}, (ret) => {
                     console.log(`[on.market.GetAssetD] << `, ret)
@@ -175,7 +179,7 @@
                         $("#me4").val(udata.insts[0])
                         $("#te1").val(udata.insts[0])
                         $("#te11").val(udata.insts[0])
-                        G_LOG("debug", `[on.market.GetAssetD]<< ${JSONStringify(udata.insts)}`)
+                        G_LOG("debug", `[on.market.GetAssetD]<< ${udata.insts.length} 个`)
                     }else {
                         G_LOG("warn", `[on.market.GetAssetD]<< error, ret=${JSONStringify(ret)}`)
                     }
@@ -186,7 +190,8 @@
                         // 简易合约列表
                         udata.indexs = ret.data;
                         $("#me2").val(udata.indexs)
-                        G_LOG("debug", `[on.market.GetCompositeIndex]<< ${JSONStringify(udata.indexs)}`)
+                        //G_LOG("debug", `[on.market.GetCompositeIndex]<< ${JSONStringify(udata.indexs)}`)
+                        G_LOG("debug", `[on.market.GetCompositeIndex]<< ${udata.indexs.length} 个`)
                     }else {
                         G_LOG("warn", `[on.market.GetCompositeIndex]<< error,ret=${JSONStringify(ret)}`)
                     }
@@ -204,6 +209,7 @@
                 return
             }
             console.log(`[+] trade login: ${uname}, apikey: ${apikey}, apisecret: ${apisecret} ...`)
+            G_LOG("debug", "[+] trade login...");
             // gaea trade 连接及一些初始化操作
             api_trade.init({ ws_url: url, api_secret: apisecret}, () => {
                 G_LOG("debug", "[+] trade connected")
@@ -369,13 +375,90 @@
             })
         }
 
+
+        // 根据websocket的地址猜测对应的http接口地址.
+        function _guess_http_url(addr) {
+            if (addr.length < 2) return "";
+            return (new URL(addr)).origin.replace('wss','https').replace('ws','http').replace('20080','20082').replace('50301','50302')
+        }
+        function httpTest1() {
+            let addr = _guess_http_url(document.getElementById('login1').value);
+            if (addr.length < 2) return;
+            let http_url = addr + '/v1/rest/Time';
+            let xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState==4 ) {
+                    if (xmlhttp.status==200) {
+                        G_LOG("debug", `[httpTest1] ok: ${xmlhttp.responseText}`);
+                    }else {
+                        G_LOG("error", `[httpTest1] error: ${xmlhttp.status}`);
+                    }
+                }
+            }
+            xmlhttp.open("GET",http_url,true);
+            xmlhttp.send();
+        }
+        function httpTest2() {
+            let addr = _guess_http_url(document.getElementById('login2').value);
+            if (addr.length < 2) return;
+            let http_url = addr + '/v1/rest/Time';
+            let xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState==4 ) {
+                    if (xmlhttp.status==200) {
+                        G_LOG("debug", `[httpTest2] ok: ${xmlhttp.responseText}`);
+                    }else {
+                        G_LOG("error", `[httpTest2] error: ${xmlhttp.status}`);
+                    }
+                }
+            }
+            xmlhttp.open("GET",http_url,true);
+            xmlhttp.send();
+        }
+        function httpTest3() {
+            let addr = _guess_http_url(document.getElementById('login1').value);
+            if (addr.length < 2) return;
+            let http_url = addr + '/v1/rest/GetHistKLine';
+            let xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState==4 ) {
+                    if (xmlhttp.status==200) {
+                        G_LOG("debug", `[httpTest3] ok: ${xmlhttp.responseText}`);
+                    }else {
+                        G_LOG("error", `[httpTest3] error: ${xmlhttp.status}`);
+                    }
+                }
+            }
+            xmlhttp.open("POST",http_url,true);
+            // xmlhttp.setRequestHeader('Content-Type', 'application/json');
+            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            // NOTE: 设置这个会使得xmlhttp使用 ‘简单请求’ 而不是 ‘Preflighted 请求’ 避免发 Options 消息.
+            var args = {Sym:"BTC.USDT",Sec:1541987816,Count:10,Typ:"1m"};
+            xmlhttp.send(JSON.stringify(args));
+            /**
+curl -X POST -H "Content-Type: application/json" \
+-H "Origin: https://example.com"  \
+https://api-market.gmex.io/v1/rest/GetHistKLine \
+--data '{"Sym":"BTC.USDT", "Typ": "1m", "Sec": 1541400863, "Offset": 0, "Count": 20}'
+
+curl -X POST -H "Content-Type: application/json" \
+-H "Origin: null"  \
+https://api-market.gmex.io/v1/rest/GetHistKLine \
+--data '{"Sym":"BTC.USDT", "Typ": "1m", "Sec": 1541400863, "Offset": 0, "Count": 20}'
+
+curl -v -X POST -H "Content-Type: application/json" \
+-H "Origin: null"  \
+http://192.168.2.48:20082/v1/rest/GetHistKLine \
+--data '{"Sym":"BTC.USDT", "Typ": "1m", "Sec": 1541400863, "Offset": 0, "Count": 20}'
+             */
+        }
+
     </script>
 </head>
 
 <body>
     <div style="font-family:courier">
-
-        <div style="overflow-y: auto; width:100%;height:390px">
+        <div style="overflow-y: auto; width:100%">
             <form id="myForm0">
                 <table id="table0" border="1" width="100%">
                     <tr>
@@ -410,13 +493,14 @@
                         <td align=center width=100>行情</td>
                         <td>
                             <div style="line-height:30px">
-                                <label>可订阅合约：<input id="me1" type="text" value="" style="width:480px" /></label>
-                                <label>可订阅指数：<input id="me2" type="text" value="" style="width:480px" /></label>
-                                <input id="mbq1" type="button" route="GetAssetD" value="查询交易对数据GetAssetD" />
-                                <input id="mbq2" type="button" route="GetAssetEx" value="查询交易对扩展扩展GetAssetEx" />
+                                <label>可订阅指数：<input id="me2" type="text" value="" style="width:240px" /></label>
+                                <label>可订阅交易对：<input id="me1" type="text" value="" style="width:580px" /></label>
+                                <input id="mbq1" type="button" route="GetAssetD" value="查询交易对GetAssetD" />
+                                <input id="mbq2" type="button" route="GetAssetEx" value="查询交易对扩展属性GetAssetEx" />
                             </div>
                             <div style="line-height:30px">
-                                <label>订阅合约：<input id="me3" type="text" value="" style="width:80px" /></label>
+                                <label>订阅交易对：<input id="me3" type="text" value="" style="width:80px" /></label>
+                                <select id="selected-band-mod"><option value="__slow__">slow</option><option value="__fast__">fast</option></select>
                                 <label><input id="mc1" type="checkbox" name="tick" />Tick</label>
                                 <label><input id="mc2" type="checkbox" name="trade" />成交</label>
                                 <label><input id="mc3" type="checkbox" name="order20" />深度20</label>
@@ -449,6 +533,7 @@
                             </div>
                             <div style="line-height:30px">
                                 <label>查询：<input id="me4" type="text" value="" style="width:80px" /></label>
+                                <input id="mbLatestKline" type="button" name="latest" value="最近5个1分钟K">
                                 <label>开始秒<input id="me5-0" type="text" value="1537077600" style="width:80px" /></label>
                                 <label>Offset<input id="me5-1" type="text" value="0" style="width:40px" /></label>
                                 <label>Count<input id="me5-2" type="text" value="1440" style="width:40px" /></label>
@@ -480,6 +565,7 @@
                                 <select name="selected-aid" id="selected-aid"><option value="01">合约账户(01)</option><option value="02">币币账户(02)</option></select>
                                 &nbsp;&lt;&lt;|&gt;&gt;&nbsp;
                                 <input id="tbg1" type="button" route="GetAssetD" value="查询交易对" />
+                                <input id="tbg1" type="button" route="GetAssetEx" value="查交易对扩展属性" />
                                 <input id="tbg2" type="button" route="GetWallets" value="查询钱包" />
                                 <input id="tbg21" type="button" route="GetCcsWallets" value="资金中心钱包" />
                                 <input id="tbg3" type="button" route="GetTrades" value="查询成交记录" />
@@ -488,8 +574,8 @@
                                 <input id="tbg5" type="button" route="GetPositions" value="查询持仓记录" />
                                 <input id="tbg6" type="button" route="GetHistOrders" value="查询报单历史" />
                                 <input id="tbg7" type="button" route="GetWalletsLog" value="查询钱包记录" />
-                                <input id="tbg8" type="button" route="GetRiskLimit" value="查询风险限额" />
-                                <input id="tbg9" type="button" route="GetAssetExCfg" value="查询交易对扩展配置GetAssetExCfg" />
+                                <input id="tbg8" type="button" route="GetRiskLimit" value="GetRiskLimit" />
+                                <input id="tbg8" type="button" route="GetRiskLimits" value="GetRiskLimits" />
                             </div>
                             <div style="line-height:30px" id="div_order1">
                                 <input id="tbordercast" type="button" value="下单" />
@@ -515,11 +601,20 @@
                                 <label>市价成交档位：<input id="te5" type="text" value="0" style="width:40px" /></label>
                             </div>
                             <div style="line-height:30px">
-                                <input id="tbordercancel" type="button" value="撤单" />
+                                <input id="tbOrderCancel" type="button" value="撤单" />
                                 <label>合约：<input id="te11" type="text" value="" style="width:100px" /></label>
                                 <label>订单编号：<input id="te12" type="text" value="" style="width:200px" /></label>
                                 <input id="tbordertimeout" type="button" value="超时撤单" />
                                 <label>时间(s)：<input id="te13" type="text" value="" style="width:40px" /></label>
+                            </div>
+                            <div style="line-height:30px">
+                                <input id="tbPosStopLP" type="button" value="止盈止损" />
+                                <label>合约<input id="tf1" type="text" value="" style="width:100px" /></label>
+                                <label>仓位<input id="tf2" type="text" value="" style="width:200px" /></label>
+                                <label>止损止盈触发条件(1标记价格,2最新成交,3最新成交): <input id="tf3" type="text" value="1" style="width:30px" /></label>
+                                <label><input id="tf4" type="text" value="1" style="width:30px" /></label>
+                                <label>止损止盈触发价格: <input id="tf5" type="text" value="6000" style="width:60px" /></label>
+                                <label><input id="tf6" type="text" value="12000" style="width:60px" /></label>
                             </div>
                         </td>
                     </tr>
@@ -530,13 +625,15 @@
                             <div style="line-height:30px">
                                 <input type="button" value="清空" onclick="clearOutputTxt()" />
                                 <input type="button" value="查询服务器时间" onclick="queryServerTime()" />
+                                <input type="button" value="httpTest1/行情服务器Time" onclick="httpTest1()" />
+                                <input type="button" value="httpTest2/交易服务器Time" onclick="httpTest2()" />
+                                <input type="button" value="httpTest3/查询k线" onclick="httpTest3()" />
                         </td>
                     </tr>
 
                 </table>
             </form>
         </div>
-
         <div>
             <textarea id="my_textarea_output" rows="15" style="width:100%;height:100%" autocomplete="off" spellcheck="false" wrap="soft"></textarea>
         </div>
@@ -547,13 +644,14 @@
     $(function () {
         // 订阅取消行情
         $("input[id^='mc']").click(function () {
+            var band_mod = $("#selected-band-mod").val();
             console.log(this.checked,this.name,$("#me1").val());
             var sym = this.name;
             if (sym.indexOf("GMEX_CI_") < 0)
                 sym = sym + "_" + $("#me3").val();
             if (this.checked) {
                 $(this).attr("sym", sym)
-                request_market('Sub', [sym])
+                request_market('Sub', [sym,band_mod])
             } else {
                 console.log($(this).attr("sym"))
                 request_market('UnSub', [$(this).attr("sym")])
@@ -581,11 +679,27 @@
                 nCount = Number(txt2)
             }
             if (sym) {
-                request_market('GetHistKLine', { Sym: sym, Typ: typ, Sec: nBeginSec, Offset: nOffset, Count: nCount })
+                request_market('GetHistKLine', { Sym: sym, Typ: typ, Sec: nBeginSec, Offset: nOffset, Count: nCount }, function (ret) {
+                    if (ret.code == 0) {
+                        G_LOG("debug", `GetHistKLine ret.data.Count: ${ret.data.Count}`);
+                    } else {
+                        G_LOG("warn", `GetHistKLine ret: ${JSON.stringify(ret)}`);
+                    }
+                    console.log(`[GetHistKLine] << `, ret)
+                })
+            }
+        });
+        // 查询最近5个1分钟k线数据
+        $("input[id^='mbLatestKline']").click(function () {
+            var sym = $("#me4").val();
+            if (sym) {
+                request_market('GetLatestKLine', { Sym: sym, Typ: '1m', Count: 5 },  function (ret) {
+                    G_LOG("debug", `GetLatestKLine: ${JSON.stringify(ret)}`);
+                })
             }
         });
 
-        // 查询k线历史
+        // L2行情查看
         $("input[id^='mbOrderL2']").click(function () {
             L2Init();
             G_LOG("debug", `[orderl2]: asks ${orderl2.asks.length} , bids ${orderl2.bids.length}`)
@@ -611,9 +725,10 @@
             }
             var route = $(this).attr("route");
             var name = $(this).attr("value");
-            var subfix = $("#selected-aid").val()
-            var aid = udata.uid + subfix
-            request_trade(route, { AId: aid }, (ret) => {
+            var subfix = $("#selected-aid").val();
+            var aid = udata.uid + subfix;
+            var sym = $("#te1").val();
+            request_trade(route, { AId: aid, Sym: sym, Start: 0, Stop: 500 }, (ret) => {
                 console.log(`[trade.get] << `, ret)
                 G_LOG("debug", `<< ${route}(${name}): ${JSONStringify(ret)}`);
                 if (route == 'GetOrders' && ret.code == 0 && $("#tc1")[0].checked) {
@@ -671,7 +786,7 @@
         });
 
         // 撤单
-        $("#tbordercancel").click(function () {
+        $("#tbOrderCancel").click(function () {
             if (! udata.uid ) {
                 console.log(`[-] no uid, please login first!`)
                 return
@@ -683,11 +798,18 @@
             var sym = $("#te11").val();
             var OrdId = $("#te12").val();
             console.log("OrderDel:", aid, sym, OrdId)
-            request_trade(route, {
+            var args = {
+                UId: udata.uid,
                 AId: aid,
                 OrdId: OrdId,
-                Sym: sym
-            }, (ret) => {
+                Sym: sym,
+            }
+            if (args.OrdId == "*") {
+                args.Prz = 0.0000001; // 支持撤*单
+                args.StopPrz = 99999999;
+                args.Dir = Number($("#te13").val()) || 0;; // 借用参数设置方向，0则不考虑方向.
+            }
+            request_trade(route, args, (ret) => {
                 console.log(`[trade.OrderDel] << `, ret)
                 G_LOG("debug", `<< ${route}(${name}): ${JSONStringify(ret)}`);
             });
@@ -712,6 +834,36 @@
                 G_LOG("debug", `<< ${route}(${name}): ${JSONStringify(ret)}`);
             });
         });
+
+
+        // PosStopLP 针对仓位设置止盈止损
+        $("#tbPosStopLP").click(function () {
+            if (! udata.uid ) {
+                console.log(`[-] no uid, please login first!`)
+                return
+            }
+            var route = 'PosStopLP'
+            var name = '止盈止损'
+            var subfix = $("#selected-aid").val()
+            var aid = udata.uid + subfix
+            
+            var args = {
+                // UId: udata.uid,
+                AId: aid,
+                Sym: $("#tf1").val(),
+                PId: $("#tf2").val(),
+                StopLBy: Number($("#tf3").val()) || 0,
+                StopPBy: Number($("#tf4").val()) || 0,
+                Param: Number($("#tf5").val()) || 0,
+                P2: Number($("#tf6").val()) || 0,
+            };
+            console.log("PosStopLP:", args)
+            request_trade(route, args, (ret) => {
+                console.log(`[trade.PosStopLP] << `, ret)
+                G_LOG("debug", `<< ${route}(${name}): ${JSONStringify(ret)}`);
+            });
+        });
+
     });
 
 

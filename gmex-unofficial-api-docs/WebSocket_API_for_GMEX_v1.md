@@ -219,7 +219,7 @@ type V2AssetCfg struct {
     // 如果指定了FeeCoin则从该币种钱包内进行扣除。注意到，如果该钱包余额不足，则依旧使用SettleCoin进行
     FeeCoin string `json:"FeeCoin,omitempty"`
     // 折扣率
-    FeeDiscR gaea_Num.Flt `json:"FeeDiscR"`
+    FeeDiscR MyFloat `json:"FeeDiscR"`
     // 开放交易时间 (日内,毫秒)
     OnAt uint64 `json:"OnAt,omitempty"`
     // 关闭交易时间 (日内,毫秒)
@@ -259,9 +259,9 @@ type V2AssetCfg struct {
     // 求用户的最近的买入价格的量
     SzForAvg float64 `json:"SzForAvg,omitempty"`
     // Maker最低手续费
-    FeeMkrMin gaea_Num.Flt `json:"FeeMkrMin"`
+    FeeMkrMin MyFloat `json:"FeeMkrMin"`
     // Taker最低手续费
-    FeeTkrMin gaea_Num.Flt `json:"FeeTkrMin"`
+    FeeTkrMin MyFloat `json:"FeeTkrMin"`
     // 下面是挖矿相关设定
     // 每日有挖矿算力的交易量
     SzMaxFM float64 `json:"SzMaxFM,omitempty"`
@@ -573,7 +573,7 @@ type V2AssetCfg struct {
 }
 ```
 
-用户成功登录交易系统后，所有用户相关信息会自动推送给用户，如报单变更，仓位变化，成交通知，钱包日志等等。
+用户成功登录交易系统后，所有用户相关信息会自动推送给用户，如委托单变更，仓位变化，成交通知，钱包日志等等。
 交易的消息定义和行情类似，但多了签名字段：
 
 |参数| 描述|
@@ -739,7 +739,7 @@ type V2AssetCfg struct {
 }
 ```
 
-5. 查询用户最长的当前有效的报单列表(必须参数 AId)： GetOrders
+5. 查询用户最长的当前有效的委托单列表(必须参数 AId)： GetOrders
 ```js
 // 发送请求消息
 {
@@ -824,7 +824,7 @@ type V2AssetCfg struct {
 }
 ```
 
-7. 查询用户子账号的最近已完成的报单列表(必须参数 AId)： GetHistOrders
+7. 查询用户子账号的最近已完成的委托单列表(必须参数 AId)： GetHistOrders
 ```js
 // 发送请求消息
 {
@@ -919,8 +919,8 @@ type V2AssetCfg struct {
 ```js
 // 发送下单请求
 // COrdId 是 Client Order ID 的意思，不能为空，由用户生成管理并维护其唯一性(长度不超过40的字符串).
-// 当报单成功后，会对应一个OrdId，为系统能够识别的报单编号;
-// 注意，用户发起下单后，要通过 onOrder 消息来监控管理报单的状态变化;
+// 当委托单成功后，会对应一个OrdId，为系统能够识别的委托单编号;
+// 注意，用户发起下单后，要通过 onOrder 消息来监控管理委托单的状态变化;
 {
     "req":"OrderNew",
     "rid":"10",
@@ -968,7 +968,7 @@ type V2AssetCfg struct {
 }
 
 
-// 后继 onOrder 推送消息会汇报报单的变更情况
+// 后继 onOrder 推送消息会汇报委托单的变更情况
 {
     "subj":"onOrder",
     "data":{
@@ -996,7 +996,7 @@ type V2AssetCfg struct {
 }
 ```
 
-报单的基本参数说明：
+委托单的基本参数说明：
 ```js
 args: {
     "AId": "账户Id",
@@ -1013,7 +1013,7 @@ args: {
     // ... 跟多参数，请参考下面的Ord数据结构定义.
 }
 ```
-更多关于报单数据结构的的参数定义和说明，请参考下面的推送消息章节里的结构定义。
+更多关于委托单数据结构的的参数定义和说明，请参考下面的推送消息章节里的结构定义。
 
 
 11. 撤单： OrderDel
@@ -1055,7 +1055,7 @@ args: {
     }
 }
 
-// 后继 onOrder 推送消息会汇报报单的变更情况
+// 后继 onOrder 推送消息会汇报委托单的变更情况
 {
     "subj":"onOrder",
     "data":{
@@ -1086,9 +1086,9 @@ args: {
 |参数| 描述|
 | :-----   | :-----   |
 |AId|用户的子账号ID|
-|Sec|设置N秒后自动撤销AId下的所有报单|
+|Sec|设置N秒后自动撤销AId下的所有委托单|
 
-调用此接口成功后，用户该AId下的所有报单将在n秒后被全部自动撤单。通过设置0秒可以禁用此功能,常见的使用模式是设 timeout 为 60000,并每隔 15 秒调用一次,建议每次使用完API将Sec设置为0,禁用此功能。
+调用此接口成功后，用户该AId下的所有委托单将在n秒后被全部自动撤单。通过设置0秒可以禁用此功能,常见的使用模式是设 timeout 为 60000,并每隔 15 秒调用一次,建议每次使用完API将Sec设置为0,禁用此功能。
 
 
 13. 调整仓位杠杆 PosLeverage , 调整仓位保证金 PosTransMgn , 设置仓位的止盈止损触发条件，新建和删除仓位操作等
@@ -1157,7 +1157,7 @@ args: {
 *  "AId": "123456701",  // 账号的AId, 必须有
 *  "Sym": "BTC.USDT",   // 交易对名称, 必须有
 *  "PId": "xxxxxxxx",   // 仓位的ID
-*  "Op": 1              // 操作定义, 0:New, 1:Del
+*  "Op": 1              // 操作定义, 0:New, 1:Del, 2:MIR
 * }
 **/
 
@@ -1224,9 +1224,9 @@ type V2ExchangeRate struct {
     // 收入
     ToC string `json:"ToC,omitempty"`
     // 买入价
-    Buy gaea_Num.Flt `json:"Buy"`
+    Buy MyFloat `json:"Buy,omitempty"`
     // 卖出价
-    Sell gaea_Num.Flt `json:"Sell"`
+    Sell MyFloat `json:"Sell,omitempty"`
     // 更新时间戳(毫秒)
     Upd int64 `json:"Upd,omitempty"`
     // 标志位
@@ -1303,7 +1303,7 @@ type V2TrdSum struct {
 
 用户登录后会收到的推送消息的subj有：
 
-报单通知 onOrder
+委托通知 onOrder
 
 持仓通知 onPosition
 
@@ -1337,30 +1337,30 @@ type V2TrdSum struct {
 
 ```golang
 
-// 报单数据结构
+// Ord 委托单
 type Ord struct {
-    // /用户Id
+    // 用户Id
     UId string `json:"UId,omitempty"`
-    // /账户Id
+    // 账户Id
     AId string `json:"AId,omitempty"`
     // 交易对。比如XBTUSD
     Sym string `json:"Sym,omitempty"`
-    // /钱包ID
+    // 钱包ID
     WId string `json:"WId,omitempty"`
-    // / 服务器端为其分配的ID
+    // 服务器端为其分配的ID
     OrdId string `json:"OrdId,omitempty"`
-    // / 客户端为其分配的ID
+    // 客户端为其分配的ID
     COrdId string `json:"COrdId,omitempty"`
     // 委单方向 1=买/-1=卖
     Dir OrderDir `json:"Dir,omitempty"`
     // 报价类型
     OType OfferType `json:"OType,omitempty"`
     // 价格
-    Prz gaea_Num.Flt `json:"Prz"`
+    Prz MyFloat `json:"Prz,omitempty"`
     // 数量。
-    Qty gaea_Num.Flt `json:"Qty"`
+    Qty MyFloat `json:"Qty,omitempty"`
     // 显示数量。如果为0,则显示全部Qty
-    QtyDsp gaea_Num.Flt `json:"QtyDsp"`
+    QtyDsp MyFloat `json:"QtyDsp,omitempty"`
     // 有效期
     Tif TimeInForce `json:"Tif,omitempty"`
     // 委托标志
@@ -1376,41 +1376,64 @@ type Ord struct {
     // 市价委托的最大档位(当撮合进行匹配的时候，会从Orderbook依档位进行)
     PrzChg int32 `json:"PrzChg,omitempty"`
     // 冻结金额
-    Frz gaea_Num.Flt `json:"Frz"`
+    Frz MyFloat `json:"Frz,omitempty"`
     // 错误代码
     ErrCode ErrorCode `json:"ErrCode,omitempty"`
     // 错误文本
     ErrTxt string `json:"ErrTxt,omitempty"`
     // 状态
     Status OrderStatus `json:"Status,omitempty"`
-    // 已成交 Qty Filled
-    QtyF gaea_Num.Flt `json:"QtyF"`
+    // 已成交	Qty Filled
+    QtyF MyFloat `json:"QtyF,omitempty"`
     // 已成交的平均价格 Prz Filled
-    PrzF gaea_Num.Flt `json:"PrzF"`
+    PrzF MyFloat `json:"PrzF,omitempty"`
     // 合约价值,对于PRZ_INVERSE的合约：  - Dir * Qty / Prz; 对于正向合约 Dir * Qty * Prz
-    Val gaea_Num.Flt `json:"Val"`
-    // 仓位Id,如果指定了仓位Id,则本委托导致的的仓位变化，为修改指定的仓位
+    Val MyFloat `json:"Val,omitempty"`
+    // 仓位Id
     PId string `json:"PId,omitempty"`
-    // 判断依据
+    // 只开仓模式: 杠杆设定
+    Lvr float64 `json:"Lvr,omitempty"`
+    // 只开仓模式: 止损价
+    StopL float64 `json:"StopL,omitempty"`
+    // 只开仓模式: 止盈价
+    StopP float64 `json:"StopP,omitempty"`
+    // 只开仓模式: 止损止盈依据
+    StopLPBy StopBy `json:"StopLPBy,omitempty"`
+    // 如果用户做全仓，就在这里设定值
+    MIRMy float64 `json:"MIRMy,omitempty"`
+    // 条件委托的判断依据
     StopBy StopBy `json:"StopBy,omitempty"`
-    // 止损价格,止盈价格
-    StopPrz gaea_Num.Flt `json:"StopPrz"`
+    // 条件委托的判断价格
+    StopPrz MyFloat `json:"StopPrz,omitempty"`
     // 追踪委托中，回调的比率. Reverse Ratio. 小数。
     TraceRR float64 `json:"TraceRR,omitempty"`
     // 追踪的Min
     TraceMin float64 `json:"TraceMin,omitempty"`
     // 追踪的Max
     TraceMax float64 `json:"TraceMax,omitempty"`
+    // 触发价格
+    TrgPrz MyFloat `json:"TrgPrz,omitempty"`
+    // 平仓数量
+    SzCls float64 `json:"SzCls,omitempty"`
+    // 平仓收益
+    PnlCls float64 `json:"PnlCls,omitempty"`
+    // 仓位的最终开仓价格
+    PrzIO float64 `json:"PrzIO,omitempty"`
+    // 仓位的最终值
+    SzOpn float64 `json:"SzOpn,omitempty"`
+    // 已支付手续费
+    Fee float64 `json:"Fee,omitempty"`
     // //////////////////////////////////////////////////////////////////////////////////////////////////
     // 委托保证金 Mgn Initial + 佣金
     MM float64 `json:"MM,omitempty"`
     // 预估的手续费：按照手续费计算
     FeeEst float64 `json:"FeeEst,omitempty"`
-    // 预估的UPNL .. Predicatee
+    // 预估的UPNL	.. Predicatee
     UPNLEst float64 `json:"UPNLEst,omitempty"`
+    // 虚拟平台ID,相当于虚拟主机
+    VP int64 `json:"VP,omitempty"`
 }
 
-// 用户持仓
 type Position struct {
     // 用户Id
     UId string `json:"UId,omitempty"`
@@ -1423,17 +1446,17 @@ type Position struct {
     // 钱包Id
     WId string `json:"WId,omitempty"`
     // 仓位(正数为多仓，负数为空仓)
-    Sz gaea_Num.Flt `json:"Sz,omitempty"`
-    // 开仓平均价格()
-    PrzIni gaea_Num.Flt `json:"PrzIni,omitempty"`
+    Sz MyFloat `json:"Sz,omitempty"`
+    // 开仓平均价格
+    PrzIni MyFloat `json:"PrzIni,omitempty"`
     // 已实现盈亏
     RPNL float64 `json:"RPNL,omitempty"`
     // 杠杆
     Lever float64 `json:"Lever,omitempty"`
     // 逐仓下仓位保证金
-    MgnISO gaea_Num.Flt `json:"MgnISO,omitempty"`
+    MgnISO MyFloat `json:"MgnISO,omitempty"`
     // 逐仓下已实现盈亏
-    PNLISO gaea_Num.Flt `json:"PNLISO,omitemptys"`
+    PNLISO MyFloat `json:"PNLISO,omitempty"`
     // 下面是动态数据
     // 最大杠杆
     LeverMax float64 `json:"LeverMax,omitempty"`
@@ -1441,10 +1464,13 @@ type Position struct {
     MMR float64 `json:"MMR,omitempty"`
     // 有效MIR
     MIR float64 `json:"MIR,omitempty"`
+    // 仓位标志, 正向报价，反向报价
+    Flg PosFlag `json:"Flg,omitempty"`
     // 计算值：价值,仓位现时的名义价值，受到标记价格价格的影响
     Val float64 `json:"Val,omitempty"`
     // 保证金，被仓位使用并锁定的保证金。
     MMnF float64 `json:"MMnF,omitempty"`
+    // 保证金
     MI float64 `json:"MI,omitempty"`
     // 计算值：未实现盈亏 PNL==  Profit And Loss
     UPNL float64 `json:"UPNL,omitempty"`
@@ -1454,6 +1480,8 @@ type Position struct {
     PrzBr float64 `json:"PrzBr,omitempty"`
     // 预估的平仓费
     FeeEst float64 `json:"FeeEst,omitempty"`
+    // 用户自定义杠杆
+    MIRMy float64 `json:"MIRMy,omitempty"`
     // 止盈方法
     StopPBy StopBy `json:"StopPBy,omitempty"`
     // 止盈价
@@ -1463,7 +1491,10 @@ type Position struct {
     // 止损价
     StopL float64 `json:"StopL,omitempty"`
     // //////////////////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////
     // 下面会因为结算操作而变更。每次结算的时候，当前的未实现盈亏，将变成累加到已实现盈亏后，未实现盈亏清0
+    //  开仓价格，将变更为结算价格 //TODO 确定上面的描述是否正确
+    // Unrealised PNL (ROE %) ?难道是 Rate Of Earn
     ROE float64 `json:"ROE,omitempty"`
     // ADLIdx, 这个是用来排序ADL的
     ADLIdx float64 `json:"ADLIdx,omitempty"`
@@ -1482,13 +1513,13 @@ type Wlt struct {
     // 钱包索引
     WId string `json:"WId,omitempty"`
     // 入金金额
-    Depo gaea_Num.Flt `json:"Depo"`
+    Depo MyFloat `json:"Depo,omitempty"`
     // 出金金额
-    WDrw gaea_Num.Flt `json:"WDrw"`
+    WDrw MyFloat `json:"WDrw,omitempty"`
     // 已实现盈亏
-    PNL gaea_Num.Flt `json:"PNL"`
+    PNL MyFloat `json:"PNL,omitempty"`
     // 冻结金额
-    Frz gaea_Num.Flt `json:"Frz"`
+    Frz MyFloat `json:"Frz,omitempty"`
     // ///////////////////////////////////////////////////////////////////////
     // 下面是统计值
     // 未实现盈亏：根据持仓情况、标记价格 刷新， 统计值
@@ -1503,11 +1534,11 @@ type Wlt struct {
     // 可取余额 . 定时刷新。
     Wdrawable float64 `json:"Wdrawable,omitempty"`
     // 现货交易出入金
-    Spot gaea_Num.Flt `json:"Spot,omitempty"`
+    Spot MyFloat `json:"Spot,omitempty"`
     // 赠送金额 不允许取出。
-    Gift gaea_Num.Flt `json:"Gift,omitempty"`
+    Gift MyFloat `json:"Gift,omitempty"`
     // Gift不为0的时候
-    PNLG gaea_Num.Flt `json:"PNLG,omitempty"`
+    PNLG MyFloat `json:"PNLG,omitempty"`
     // 账户状态
     Status WltStatus `json:"Status,omitempty"`
 }
@@ -1520,13 +1551,13 @@ type WltLog struct {
     // 货币类型
     Coin string `json:"Coin,omitempty"`
     // 投资者帐号
-    WId string       `json:"WId,omitempty"`
-    Qty gaea_Num.Flt `json:"Qty"`
-    Fee gaea_Num.Flt `json:"Fee"`
+    WId string `json:"WId,omitempty"`
+    Qty MyFloat `json:"Qty,omitempty"`
+    Fee MyFloat `json:"Fee,omitempty"`
     // 货币地址(假设是出金，则是地址)
     Peer string `json:"Peer,omitempty"`
     // 在进行完本次操作后，钱包的CalcWltBal函数的返回值。请注意，在合约交易中，当逐仓保证金变化的时候，本字段不会有对应的记录。
-    WalBal gaea_Num.Flt `json:"WalBal"`
+    WalBal MyFloat `json:"WalBal,omitempty"`
     // 时间
     At int64 `json:"At,omitempty"`
     // 类型
@@ -1550,9 +1581,9 @@ type TrdRec struct {
     WId             string   `json:"WId,omitempty"`      // 钱包ID
     MatchId         string   `json:"MatchId,omitempty"`  // 撮合ID
     OrdId           string   `json:"OrdId,omitempty"`    // 委托单ID
-    Sz              gaea_Num.Flt  `json:"Sz,omitempty"`       // 成交的张数
-    Prz             gaea_Num.Flt  `json:"Prz,omitempty"`      // 成交的价格
-    Fee             gaea_Num.Flt  `json:"Fee,omitempty"`      // 手续费
+    Sz              MyFloat  `json:"Sz,omitempty"`       // 成交的张数
+    Prz             MyFloat  `json:"Prz,omitempty"`      // 成交的价格
+    Fee             MyFloat  `json:"Fee,omitempty"`      // 手续费
     FeeCoin         string   `json:"FeeCoin,omitempty"`  // 手续费币种
     At              int64    `json:"At,omitempty"`       // 发生的时间，毫秒
     Via             OrderVia `json:"Via,omitempty"`      // 委托来源

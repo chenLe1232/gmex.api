@@ -121,7 +121,7 @@ const (
 
 type AssetEx struct {
     // 合约符合/交易对符号
-    Sym  string  `json:"Sym"`
+    Sym  string  `json:"Sym,omitempty"`
     // 手续费计费方法
     FM FeeMethod `json:"FM,omitempty"`
     // 尚未支持

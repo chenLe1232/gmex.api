@@ -1383,7 +1383,7 @@ type Ord struct {
     ErrTxt string `json:"ErrTxt,omitempty"`
     // 状态
     Status OrderStatus `json:"Status,omitempty"`
-    // 已成交	Qty Filled
+    // 已成交   Qty Filled
     QtyF MyFloat `json:"QtyF,omitempty"`
     // 已成交的平均价格 Prz Filled
     PrzF MyFloat `json:"PrzF,omitempty"`
@@ -1428,7 +1428,7 @@ type Ord struct {
     MM float64 `json:"MM,omitempty"`
     // 预估的手续费：按照手续费计算
     FeeEst float64 `json:"FeeEst,omitempty"`
-    // 预估的UPNL	.. Predicatee
+    // 预估的UPNL   .. Predicatee
     UPNLEst float64 `json:"UPNLEst,omitempty"`
     // 虚拟平台ID,相当于虚拟主机
     VP int64 `json:"VP,omitempty"`
@@ -1762,12 +1762,22 @@ const (
     OrderVia_Funding OrderVia = 11
     // 配售
     OrderVia_Offer OrderVia = 12
+    // 接管
+    OrderVia_TakeOver OrderVia = 13
+    // PNLISO 收入
+    OrderVia_PnlISO OrderVia = 14
+    // StopL StopP 盈亏
+    OrderVia_StopLP OrderVia = 15
     // 给予Gift
     OrderVia_Gift_Give OrderVia = 17
     // WltSettle 钱包结算
     OrderVia_Wlt_Settle OrderVia = 18
     // WltSettle 钱包结算
     OrderVia_Gift_Settle OrderVia = 19
+    // 计划中
+    OrderVia_Planing OrderVia = 20
+    // 已经执行
+    OrderVia_ByPlan OrderVia = 21
 )
 
 

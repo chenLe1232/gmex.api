@@ -148,6 +148,12 @@ const (
     AssetFlag_ENABLE_UnP_FOR_MARGIN AssetFlag = 16384
     // 在仓位强平后，是否重新计算保证金，检查风险
     AssetFlag_NO_STOP_LIQUIDATE AssetFlag = 32768
+    // NO_TWEAK_LEVERAGE
+    AssetFlag_NO_CHANGE_LEVERAGE AssetFlag = 65536
+    // 是否强制成交止盈止损
+    AssetFlag_STOPLP_BY_SYS AssetFlag = 131072
+    // FUNDING
+    AssetFlag_FUNDING_BOTH_SIDE AssetFlag = 262144
 )
 
 // **交易对/合约的结构定义**
@@ -178,6 +184,7 @@ type AssetD struct {
     Mult                float64 // 乘数
     FromC               string  // 从什么货币
     ToC                 string  // 兑换为什么货币
+    MIRMd               MIRMode // 全仓杠杆保证金模式
     TrdCls              int32   // 交易类型, 1-现货交易, 2-期货交易, 3-永续
     MkSt                int32   // 合约、交易对的状态: 1-正常运行, 2-自动减仓, 3-暂停, 4-交易对已经关闭
     Flag                AssetFlag   // 合约标志, 位操作
@@ -196,6 +203,19 @@ type AssetD struct {
     FeeDiscR            float64 // 如果允许使用第三种货币支付手续费，这里配置折扣率
     Grp                 int64   // 交易对所属的分组ID，仅仅是一个逻辑分组概念.
 }
+
+
+type MIRMode int32
+
+const (
+    // 全仓杠杆模式
+    // 默认设定
+    MIRMode_MIRM_DEFAULT MIRMode = 0
+    // 用户设定MIR,系统约束MMR
+    MIRMode_MIRM_MIR MIRMode = 1
+    // 用户设定MIR, MMR = MIR/2
+    MIRMode_MIRM_MIR1_MMRHalf MIRMode = 2
+)
 
 // **定义手续分的收取方式**
 type FeeMethod int32
@@ -1155,7 +1175,7 @@ args: {
 **/
 
 /*
-* 功能: 新建和删除仓位操作
+* 功能: 新建仓位，删除仓位
 * 参数说明:
 * expires:              // 消息的有效时间
 * rid: 10               // request-id
@@ -1167,6 +1187,24 @@ args: {
 *  "PId": "xxxxxxxx",   // 仓位的ID
 *  "Op": 1              // 操作定义, 0:New, 1:Del, 2:MIR
 * }
+*
+**/
+
+/*
+* 功能: 调整自律保证金率
+* 参数说明:
+* expires:              // 消息的有效时间
+* rid: 10               // request-id
+* req: 'PosOp'          // 请求的动作名称
+* signature: ""         // 签名,参考签名的生成规则
+* args: {
+*  "AId": "123456701",  // 账号的AId, 必须有
+*  "Sym": "BTC.USDT",   // 交易对名称, 必须有
+*  "PId": "xxxxxxxx",   // 仓位的ID
+*  "Op": 2              // 操作定义, Op=2, 用于调整自律保证金率，Param为保证金率
+*  "Param": 0.01        // float64 值, 参数值, 对应 MIRMy
+* }
+*
 **/
 
 ```
@@ -1407,7 +1445,7 @@ type Ord struct {
     StopP float64 `json:"StopP,omitempty"`
     // 只开仓模式: 止损止盈依据
     StopLPBy StopBy `json:"StopLPBy,omitempty"`
-    // 如果用户做全仓，就在这里设定值
+    // 如果用户做全仓，就在这里设定值。
     MIRMy float64 `json:"MIRMy,omitempty"`
     // 条件委托的判断依据
     StopBy StopBy `json:"StopBy,omitempty"`
@@ -1488,7 +1526,7 @@ type Position struct {
     PrzBr float64 `json:"PrzBr,omitempty"`
     // 预估的平仓费
     FeeEst float64 `json:"FeeEst,omitempty"`
-    // 用户自定义杠杆
+    // 用户设定的最低保证金率，用于自律。
     MIRMy float64 `json:"MIRMy,omitempty"`
     // 止盈方法
     StopPBy StopBy `json:"StopPBy,omitempty"`
@@ -1624,6 +1662,9 @@ type TrdRec struct {
     PnlCls float64 `json:"PnlCls,omitempty"` // 平仓收益
     PrzIO  float64 `json:"PrzIO,omitempty"`  // 仓位的最终开仓价格
     SzOpn  float64 `json:"SzOpn,omitempty"`  // 仓位的最终值
+    // 增加止损止盈字段
+    StopL float64 `json:"StopL,omitempty"` // 增加止损
+    StopP float64 `json:"StopP,omitempty"` // 止盈
 }
 
 

@@ -21,14 +21,6 @@ use std::thread;
 use std::thread::sleep;
 use std::time::Duration;
 
-// #[inline]
-// fn get_now_msec() -> i64 {
-//     std::time::SystemTime::now()
-//         .duration_since(std::time::UNIX_EPOCH)
-//         .expect("Time went backwards")
-//         .as_millis() as i64
-// }
-
 #[derive(Debug, Serialize, Deserialize)]
 struct WsResponseMessage {
     // 如果有 rid，则说明是request的返回结果消息
@@ -51,27 +43,21 @@ fn websocket_market_demo(market_base_url: &String) -> Result<(), Error> {
     impl Client {
         pub fn new(out: ws::Sender) -> Self {
             Client {
-                out: out,
+                out,
                 callbacks: HashMap::new(),
             }
         }
 
-        pub fn do_request<T: Serialize>(
-            &mut self,
-            req: &str,
-            args: T,
-            cb: WsMsgCallBack,
-        ) -> ws::Result<()> {
+        pub fn do_request<T: Serialize>(&mut self, req: &str, args: T, cb: WsMsgCallBack) -> ws::Result<()> {
             let rid = Uuid::new_v4().to_simple().to_string();
-            let expires = gmex_api::get_now_msec() + 5000; // 设置5秒过期, FIXME!!!
+            let expires = gmex_api::time_now_msec() + 5000; // 设置5秒过期, FIXME!!!
             let msg = json!({
                 "req": req,
                 "rid": rid,
                 "args": args,
                 "expires": expires,
             });
-            let buf = serde_json::to_vec(&msg)
-                .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
+            let buf = serde_json::to_vec(&msg).map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
 
             if cb.is_some() {
                 self.callbacks.insert(rid, cb);
@@ -98,15 +84,13 @@ fn websocket_market_demo(market_base_url: &String) -> Result<(), Error> {
             // self.out.close(ws::CloseCode::Normal)
 
             if msg.is_binary() {
-                log::warn!(
-                    "mkt_ws got binary response-msg, ignore now, 暂时不支持二进制消息, TODO!!!"
-                );
+                log::warn!("mkt_ws got binary response-msg, ignore now, 暂时不支持二进制消息, TODO!!!");
                 return Ok(());
             }
 
             let body = msg.as_text()?;
-            let mut resp: WsResponseMessage = serde_json::from_str(body)
-                .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
+            let mut resp: WsResponseMessage =
+                serde_json::from_str(body).map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
 
             if resp.rid.is_some() {
                 let rid = resp.rid.as_ref().unwrap();
@@ -119,44 +103,34 @@ fn websocket_market_demo(market_base_url: &String) -> Result<(), Error> {
                 match resp.subj.as_ref().map(|s| &s[..]) {
                     Some("tick") => {
                         let data: gmex_api::MktInstrumentTick =
-                            serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
-                                ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
-                            })?;
+                            serde_json::from_value(resp.data.unwrap_or_default())
+                                .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
                         log::info!("[mkt.tick]: {:?}", data);
                     }
                     Some("trade") => {
-                        let data: gmex_api::MktTradeItem =
-                            serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
-                                ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
-                            })?;
+                        let data: gmex_api::MktTradeItem = serde_json::from_value(resp.data.unwrap_or_default())
+                            .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
                         log::info!("[mkt.trade]: {:?}", data);
                     }
                     Some("order20") => {
-                        let data: gmex_api::MktOrder20Result =
-                            serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
-                                ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
-                            })?;
+                        let data: gmex_api::MktOrder20Result = serde_json::from_value(resp.data.unwrap_or_default())
+                            .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
                         log::info!("[mkt.order20]: {:?}", data);
                     }
                     Some("orderl2") => {
-                        let data: gmex_api::MktOrderItem =
-                            serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
-                                ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
-                            })?;
+                        let data: gmex_api::MktOrderItem = serde_json::from_value(resp.data.unwrap_or_default())
+                            .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
                         log::info!("[mkt.orderl2]: {:?}", data);
                     }
                     Some("kline") => {
-                        let data: gmex_api::MktKLineItem =
-                            serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
-                                ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
-                            })?;
+                        let data: gmex_api::MktKLineItem = serde_json::from_value(resp.data.unwrap_or_default())
+                            .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
                         log::info!("[mkt.kline]: {:?}", data);
                     }
                     Some("index") => {
                         let data: gmex_api::MktCompositeIndexTick =
-                            serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
-                                ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
-                            })?;
+                            serde_json::from_value(resp.data.unwrap_or_default())
+                                .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
                         log::info!("[mkt.index]: {:?}", data);
                     }
                     Some("notification") => {
@@ -201,14 +175,9 @@ fn websocket_trade_demo(
     }
 
     impl Client {
-        pub fn new(
-            out: ws::Sender,
-            user_name: &String,
-            api_key: &String,
-            api_secret: &String,
-        ) -> Self {
+        pub fn new(out: ws::Sender, user_name: &String, api_key: &String, api_secret: &String) -> Self {
             Client {
-                out: out,
+                out,
                 user_name: user_name.to_owned(),
                 api_key: api_key.to_owned(),
                 api_secret: api_secret.to_owned(),
@@ -225,9 +194,9 @@ fn websocket_trade_demo(
             // cb:  Box<dyn FnMut(WsResponseMessage) + 'a>
         ) -> ws::Result<()> {
             let rid = Uuid::new_v4().to_simple().to_string();
-            let expires = gmex_api::get_now_msec() + 5000; // 设置5秒过期, FIXME!!!
-            let s1 = serde_json::to_string(&args)
-                .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
+            let expires = gmex_api::time_now_msec() + 5000; // 设置5秒过期, FIXME!!!
+            let s1 =
+                serde_json::to_string(&args).map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
             // 生成签名的公式: md5(Req+rid+Args+Expires+API.SecretKey)
             let txt = format!("{}{}{}{}{}", req, rid, s1, expires, self.api_secret);
             let digest = md5::compute(txt);
@@ -240,8 +209,7 @@ fn websocket_trade_demo(
                 "apikey": self.api_key,
                 "signature": format!("{:x}", digest),
             });
-            let buf = serde_json::to_vec(&msg)
-                .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
+            let buf = serde_json::to_vec(&msg).map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
             if cb.is_some() {
                 self.callbacks.insert(rid, cb);
             }
@@ -280,15 +248,13 @@ fn websocket_trade_demo(
             // self.out.close(ws::CloseCode::Normal)
 
             if msg.is_binary() {
-                log::warn!(
-                    "trd_ws got binary response-msg, ignore now, 暂时不支持二进制消息, TODO!!!"
-                );
+                log::warn!("trd_ws got binary response-msg, ignore now, 暂时不支持二进制消息, TODO!!!");
                 return Ok(());
             }
 
             let body = msg.as_text()?;
-            let mut resp: WsResponseMessage = serde_json::from_str(body)
-                .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
+            let mut resp: WsResponseMessage =
+                serde_json::from_str(body).map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
             if resp.rid.is_some() {
                 let rid = resp.rid.as_ref().unwrap();
                 log::info!("trd_ws got rid={} response: {}", rid, body);
@@ -299,38 +265,28 @@ fn websocket_trade_demo(
             } else {
                 match resp.subj.as_ref().map(|s| &s[..]) {
                     Some("onWallet") => {
-                        let data: gmex_api::Wlt =
-                            serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
-                                ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
-                            })?;
+                        let data: gmex_api::Wlt = serde_json::from_value(resp.data.unwrap_or_default())
+                            .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
                         log::info!("[trd.onWallet]: {:?}", data);
                     }
                     Some("onTrade") => {
-                        let data: gmex_api::TrdRec =
-                            serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
-                                ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
-                            })?;
+                        let data: gmex_api::TrdRec = serde_json::from_value(resp.data.unwrap_or_default())
+                            .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
                         log::info!("[trd.onTrade]: {:?}", data);
                     }
                     Some("onOrder") => {
-                        let data: gmex_api::Ord =
-                            serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
-                                ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
-                            })?;
+                        let data: gmex_api::Order = serde_json::from_value(resp.data.unwrap_or_default())
+                            .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
                         log::info!("[trd.onOrder]: {:?}", data);
                     }
                     Some("onPosition") => {
-                        let data: gmex_api::Position =
-                            serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
-                                ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
-                            })?;
+                        let data: gmex_api::Position = serde_json::from_value(resp.data.unwrap_or_default())
+                            .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
                         log::info!("[trd.onPosition]: {:?}", data);
                     }
                     Some("onWltLog") => {
-                        let data: gmex_api::WltLog =
-                            serde_json::from_value(resp.data.unwrap_or_default()).map_err(|e| {
-                                ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), "")
-                            })?;
+                        let data: gmex_api::WltLog = serde_json::from_value(resp.data.unwrap_or_default())
+                            .map_err(|e| ws::Error::new(ws::ErrorKind::Custom(Box::new(e)), ""))?;
                         log::info!("[trd.onWltLog]: {:?}", data);
                     }
                     _ => {
@@ -367,10 +323,10 @@ fn main() -> Result<(), Error> {
     let gmex_api_key = std::env::var("GMEX_API_KEY").expect("GMEX_API_KEY must be set");
     let gmex_api_secret = std::env::var("GMEX_API_SECRET").expect("GMEX_API_SECRET must be set");
     //
-    let gmex_ws_url_market: String = std::env::var("GMEX_WS_URL_MARKET")
-        .unwrap_or_else(|_| gmex_api::GMEX_WS_URL_MARKET.to_string());
-    let gmex_ws_url_trade: String = std::env::var("GMEX_WS_URL_TRADE")
-        .unwrap_or_else(|_| gmex_api::GMEX_WS_URL_MARKET.to_string());
+    let gmex_ws_url_market: String =
+        std::env::var("GMEX_WS_URL_MARKET").unwrap_or_else(|_| gmex_api::GMEX_WS_URL_MARKET.to_string());
+    let gmex_ws_url_trade: String =
+        std::env::var("GMEX_WS_URL_TRADE").unwrap_or_else(|_| gmex_api::GMEX_WS_URL_MARKET.to_string());
 
     log::debug!("GMEX-WebSocket-API Test....");
     log::debug!("  GMEX_WS_URL_MARKET = {}", gmex_ws_url_market);
@@ -385,14 +341,7 @@ fn main() -> Result<(), Error> {
 
     let trd_cli = thread::Builder::new()
         .name("trd_cli".to_owned())
-        .spawn(move || {
-            websocket_trade_demo(
-                &gmex_ws_url_trade,
-                &gmex_user_name,
-                &gmex_api_key,
-                &gmex_api_secret,
-            )
-        })?;
+        .spawn(move || websocket_trade_demo(&gmex_ws_url_trade, &gmex_user_name, &gmex_api_key, &gmex_api_secret))?;
 
     // Wait for the worker threads to finish what they are doing
     let _ = mkt_cli.join();

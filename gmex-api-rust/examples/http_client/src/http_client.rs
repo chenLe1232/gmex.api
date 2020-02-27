@@ -11,15 +11,20 @@ use serde::{Deserialize, Serialize};
 // #[macro_use]
 // extern crate failure;
 // use failure::Error;
-use std::error::Error;
+// use std::error::Error;
 
 use gmex_api;
 
-fn http_market_demo(market_base_url: &String) -> Result<(), Box<dyn Error>> {
+async fn http_market_demo(market_base_url: &String) -> Result<(), Box<dyn std::error::Error>> {
     let client = reqwest::Client::new();
     let base_url = market_base_url.trim_end_matches(|c| c == '/');
     if true {
-        let rsp: serde_json::Value = client.get(&(base_url.to_owned() + "/ServerInfo")).send()?.json()?;
+        let rsp: serde_json::Value = client
+            .get(&(base_url.to_owned() + "/ServerInfo"))
+            .send()
+            .await?
+            .json()
+            .await?;
         log::info!("行情服务器信息 = {:?}", rsp);
     }
     if true {
@@ -30,13 +35,22 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Box<dyn Error>> {
             time: i64,
             data: String,
         }
-        let rsp: Response = client.get(&(base_url.to_owned() + "/Time?args=my-callback-data")).send()?.json()?;
+        let rsp: Response = client
+            .get(&(base_url.to_owned() + "/Time?args=my-callback-data"))
+            .send()
+            .await?
+            .json()
+            .await?;
         log::info!("行情服务器时间 = {:?}", rsp);
     }
     if true {
         // 获取可订阅的指数信息 GetCompositeIndex
-        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::MktCompositeIndexTick>> =
-            client.get(&(base_url.to_owned() + "/GetCompositeIndex")).send()?.json()?;
+        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::MktCompositeIndexTick>> = client
+            .get(&(base_url.to_owned() + "/GetCompositeIndex"))
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetCompositeIndex ret err: {:?}", rsp)));
         }
@@ -46,7 +60,12 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Box<dyn Error>> {
     if true {
         // 获取可订阅的交易对信息 GetAssetD
         // 参数VP是子交易所的编号，默认为0是GAEA交易所.
-        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::AssetD>> = client.get(&(base_url.to_owned() + "/GetAssetD?VP=0")).send()?.json()?;
+        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::AssetD>> = client
+            .get(&(base_url.to_owned() + "/GetAssetD?VP=0"))
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetAssetD failed: {:?}", rsp)));
         }
@@ -55,14 +74,14 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Box<dyn Error>> {
             if a.TrdCls == b.TrdCls {
                 a.Sym.cmp(&b.Sym)
             } else {
-                // a.TrdCls.cmp(b.TrdCls)
-                (a.TrdCls.unwrap_or_default() as i32).cmp(&(b.TrdCls.unwrap_or_default() as i32))
+                a.TrdCls.cmp(&b.TrdCls)
+                // (a.TrdCls. as i32).cmp(&(b.TrdCls as i32))
             }
         });
 
         log::info!("查询交易对信息返回 {} 个:", rows.len());
         for it in rows {
-            log::info!("  {} {:?}", it.Sym.unwrap_or_default(), it.TrdCls.unwrap_or_default());
+            log::info!("  {} {:?}", it.Sym, it.TrdCls);
         }
     }
 
@@ -70,34 +89,47 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Box<dyn Error>> {
         // 交易对信息扩展属性 GetAssetEx
         // 注意，如果交易对没有定义扩展属性，则这里返回的就没有这个交易对的数据.
         // 实际使用时，应该和 GetAssetD 配合一起使用，这里返回的结果和前面的进行结合.
-        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::V2AssetCfg>> = client.get(&(base_url.to_owned() + "/GetAssetEx?VP=0")).send()?.json()?;
+        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::V2AssetCfg>> = client
+            .get(&(base_url.to_owned() + "/GetAssetEx?VP=0"))
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetAssetEx failed: {:?}", rsp)));
         }
         let rows = rsp.take_rsp_data().unwrap_or_else(|| Default::default());
         log::info!("查询交易对扩展属性返回 {} 个:", rows.len());
         for it in rows {
-            // log::info!("  {:?}: {:?}", it.Sym.unwrap_or_default(), it);
-            log::info!("  {}", it.Sym.unwrap_or_default());
+            // log::info!("  {:?}: {:?}", it.Sym, it);
+            log::info!("  {}", it.Sym);
         }
     }
 
     if true {
         // 获取历史K线数据 GetHistKLine
         let args = gmex_api::MktQueryKLineHistoryRequestArgs {
-            Sym: Some(String::from("BTC.USDT")),
-            Typ: Some(gmex_api::MktKLineType::KL_1m),
-            Sec: Some(1541987816),
-            Offset: Some(0),
-            Count: Some(15),
+            Sym: String::from("BTC.USDT"),
+            Typ: gmex_api::MktKLineType::KL_1m,
+            Sec: gmex_api::time_now_sec() - 60 * 10, // 1541987816,
+            Offset: 0,
+            Count: 10,
         };
-        let mut rsp: gmex_api::HttpResponseMessage<gmex_api::MktQueryKLineHistoryResult> =
-            client.post(&(base_url.to_owned() + "/GetHistKLine")).json(&args).send()?.json()?;
+        // println!("XXX:args={}", serde_json::to_string(&args).unwrap());
+
+        let mut rsp: gmex_api::HttpResponseMessage<gmex_api::MktQueryKLineHistoryResult> = client
+            .post(&(base_url.to_owned() + "/GetHistKLine"))
+            .json(&args)
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetHistKLine failed: {:?}", rsp)));
         }
         let res = rsp.take_rsp_data().unwrap_or_else(|| Default::default());
         log::info!("获取历史K线数据: {:?}", res);
+        // return Ok(())
     }
 
     if true {
@@ -110,8 +142,10 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Box<dyn Error>> {
                 "Typ": "1h",
                 "Count": 24,
             }))
-            .send()?
-            .json()?;
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetLatestKLine failed: {:?}", rsp)));
         }
@@ -121,8 +155,12 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Box<dyn Error>> {
 
     if true {
         // 指数的聚合行情 GetIndexTick
-        let mut rsp: gmex_api::HttpResponseMessage<gmex_api::MktCompositeIndexTick> =
-            client.post(&(base_url.to_owned() + "/GetIndexTick?idx=GMEX_CI_ETH")).send()?.json()?;
+        let mut rsp: gmex_api::HttpResponseMessage<gmex_api::MktCompositeIndexTick> = client
+            .post(&(base_url.to_owned() + "/GetIndexTick?idx=GMEX_CI_ETH"))
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetIndexTick failed: {:?}", rsp)));
         }
@@ -134,8 +172,10 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Box<dyn Error>> {
         // 批量获取数据 GetIndexTickList, 一次获取多个，方便使用.
         let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::MktCompositeIndexTick>> = client
             .post(&(base_url.to_owned() + "/GetIndexTickList?idx_list=GMEX_CI_BTC,GMEX_CI_ETH"))
-            .send()?
-            .json()?;
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetIndexTickList failed: {:?}", rsp)));
         }
@@ -145,8 +185,12 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Box<dyn Error>> {
 
     if true {
         // 交易对的聚合行情 GetTick
-        let mut rsp: gmex_api::HttpResponseMessage<gmex_api::MktInstrumentTick> =
-            client.post(&(base_url.to_owned() + "/GetTick?sym=BTC.USDT")).send()?.json()?;
+        let mut rsp: gmex_api::HttpResponseMessage<gmex_api::MktInstrumentTick> = client
+            .post(&(base_url.to_owned() + "/GetTick?sym=BTC.USDT"))
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetTick failed: {:?}", rsp)));
         }
@@ -157,8 +201,10 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Box<dyn Error>> {
         // 批量获取数据 GetTickList
         let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::MktInstrumentTick>> = client
             .post(&(base_url.to_owned() + "/GetTickList?sym_list=BTC.BTC,BTC.USDT,ETH.ETH,ETH.USDT"))
-            .send()?
-            .json()?;
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetTickList failed: {:?}", rsp)));
         }
@@ -168,8 +214,12 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Box<dyn Error>> {
 
     if true {
         // 获取交易对最近的成交记录 GetTrades
-        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::MktTradeItem>> =
-            client.get(&(base_url.to_owned() + "/GetTrades?sym=BTC/USDT")).send()?.json()?;
+        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::MktTradeItem>> = client
+            .get(&(base_url.to_owned() + "/GetTrades?sym=BTC/USDT"))
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetTrades failed: {:?}", rsp)));
         }
@@ -179,8 +229,12 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Box<dyn Error>> {
 
     if true {
         // 获取交易对行情的20档盘口信息 GetOrd20
-        let mut rsp: gmex_api::HttpResponseMessage<gmex_api::MktOrder20Result> =
-            client.get(&(base_url.to_owned() + "/GetOrd20?sym=ETH/USDT")).send()?.json()?;
+        let mut rsp: gmex_api::HttpResponseMessage<gmex_api::MktOrder20Result> = client
+            .get(&(base_url.to_owned() + "/GetOrd20?sym=ETH/USDT"))
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetOrd20 failed: {:?}", rsp)));
         }
@@ -192,8 +246,10 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Box<dyn Error>> {
         // 批量获取数据 GetOrd20List, 一次获取多个方便使用.
         let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::MktOrder20Result>> = client
             .get(&(base_url.to_owned() + "/GetOrd20List?sym_list=BTC.BTC,BTC.USDT,ETH.ETH,ETH.USDT"))
-            .send()?
-            .json()?;
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetOrd20List failed: {:?}", rsp)));
         }
@@ -204,13 +260,23 @@ fn http_market_demo(market_base_url: &String) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn http_trade_demo(trade_base_url: &String, user_name: &String, api_key: &String, api_secret: &String) -> Result<(), Box<dyn Error>> {
+async fn http_trade_demo(
+    trade_base_url: &String,
+    user_name: &String,
+    api_key: &String,
+    api_secret: &String,
+) -> Result<(), Box<dyn std::error::Error>> {
     let client = reqwest::Client::new();
     let base_url = trade_base_url.trim_end_matches(|c| c == '/');
 
     if true {
         // 获取服务器信息
-        let res: serde_json::Value = client.get(&(base_url.to_owned() + "/ServerInfo")).send()?.json()?;
+        let res: serde_json::Value = client
+            .get(&(base_url.to_owned() + "/ServerInfo"))
+            .send()
+            .await?
+            .json()
+            .await?;
         log::info!("交易服务器信息 = {:?}", res);
     }
 
@@ -222,7 +288,12 @@ fn http_trade_demo(trade_base_url: &String, user_name: &String, api_key: &String
             time: i64,
             data: Option<String>,
         }
-        let rsp: Response = client.get(&(base_url.to_owned() + "/Time?args=my-callback-data")).send()?.json()?;
+        let rsp: Response = client
+            .get(&(base_url.to_owned() + "/Time?args=my-callback-data"))
+            .send()
+            .await?
+            .json()
+            .await?;
         log::info!("交易服务器时间 = {:?}", rsp);
     }
 
@@ -241,7 +312,13 @@ fn http_trade_demo(trade_base_url: &String, user_name: &String, api_key: &String
         }
 
         let req = gmex_api::HttpTradeRequestMessage::new("GetUserInfo", Args {}, user_name, api_key, api_secret);
-        let mut rsp: gmex_api::HttpResponseMessage<UserInfo> = client.post(&(base_url.to_owned() + "/Action")).json(&req).send()?.json()?;
+        let mut rsp: gmex_api::HttpResponseMessage<UserInfo> = client
+            .post(&(base_url.to_owned() + "/Action"))
+            .json(&req)
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetUserInfo failed: {:?}", rsp)));
         }
@@ -259,7 +336,13 @@ fn http_trade_demo(trade_base_url: &String, user_name: &String, api_key: &String
         #[derive(Debug, Serialize, Deserialize)]
         struct Args {}
         let req = gmex_api::HttpTradeRequestMessage::new("GetCcsWallets", Args {}, user_name, api_key, api_secret);
-        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::CcsMainWallet>> = client.post(&(base_url.to_owned() + "/Action")).json(&req).send()?.json()?;
+        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::CcsMainWallet>> = client
+            .post(&(base_url.to_owned() + "/Action"))
+            .json(&req)
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetCcsWallets failed: {:?}", rsp)));
         }
@@ -274,16 +357,44 @@ fn http_trade_demo(trade_base_url: &String, user_name: &String, api_key: &String
             #[serde(rename = "AId")]
             aid: String,
         }
-        let req = gmex_api::HttpTradeRequestMessage::new("GetWallets", Args { aid: format!("{}01", userid) }, user_name, api_key, api_secret);
-        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::Wlt>> = client.post(&(base_url.to_owned() + "/Action")).json(&req).send()?.json()?;
+        let req = gmex_api::HttpTradeRequestMessage::new(
+            "GetWallets",
+            Args {
+                aid: format!("{}01", userid),
+            },
+            user_name,
+            api_key,
+            api_secret,
+        );
+        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::Wlt>> = client
+            .post(&(base_url.to_owned() + "/Action"))
+            .json(&req)
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetWallets-01 failed: {:?}", rsp)));
         }
         let rows = rsp.take_rsp_data().unwrap_or_else(|| Default::default());
         log::info!("获取合约的钱包信息: {:?}", rows);
 
-        let req = gmex_api::HttpTradeRequestMessage::new("GetWallets", Args { aid: format!("{}02", userid) }, user_name, api_key, api_secret);
-        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::Wlt>> = client.post(&(base_url.to_owned() + "/Action")).json(&req).send()?.json()?;
+        let req = gmex_api::HttpTradeRequestMessage::new(
+            "GetWallets",
+            Args {
+                aid: format!("{}02", userid),
+            },
+            user_name,
+            api_key,
+            api_secret,
+        );
+        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::Wlt>> = client
+            .post(&(base_url.to_owned() + "/Action"))
+            .json(&req)
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetWallets-02 failed: {:?}", rsp)));
         }
@@ -309,8 +420,22 @@ fn http_trade_demo(trade_base_url: &String, user_name: &String, api_key: &String
             #[serde(rename = "AId")]
             aid: String,
         }
-        let req = gmex_api::HttpTradeRequestMessage::new("GetPositions", Args { aid: format!("{}01", userid) }, user_name, api_key, api_secret);
-        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::Position>> = client.post(&(base_url.to_owned() + "/Action")).json(&req).send()?.json()?;
+        let req = gmex_api::HttpTradeRequestMessage::new(
+            "GetPositions",
+            Args {
+                aid: format!("{}01", userid),
+            },
+            user_name,
+            api_key,
+            api_secret,
+        );
+        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::Position>> = client
+            .post(&(base_url.to_owned() + "/Action"))
+            .json(&req)
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetPositions failed: {:?}", rsp)));
         }
@@ -333,7 +458,13 @@ fn http_trade_demo(trade_base_url: &String, user_name: &String, api_key: &String
             api_key,
             api_secret,
         );
-        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::Ord>> = client.post(&(base_url.to_owned() + "/Action")).json(&req).send()?.json()?;
+        let mut rsp: gmex_api::HttpResponseMessage<Vec<gmex_api::Order>> = client
+            .post(&(base_url.to_owned() + "/Action"))
+            .json(&req)
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("GetOrders failed: {:?}", rsp)));
         }
@@ -342,14 +473,14 @@ fn http_trade_demo(trade_base_url: &String, user_name: &String, api_key: &String
     }
     if true {
         // 合约委托下单 OrderNew
-        let myord = gmex_api::Ord {
-            AId: Some(format!("{}01", userid)),
-            COrdId: Some(Uuid::new_v4().to_simple().to_string()),
-            Sym: Some("BTC.USDT".to_string()),
-            Dir: Some(gmex_api::OrderDir::BID),
-            OType: Some(gmex_api::OfferType::Limit),
-            Prz: Some(gmex_api::dec!(15_000)),
-            Qty: Some(gmex_api::dec!(1)),
+        let myord = gmex_api::Order {
+            AId: format!("{}01", userid),
+            COrdId: Uuid::new_v4().to_simple().to_string(),
+            Sym: "BTC.USDT".to_string(),
+            Dir: gmex_api::types::OrderDir_BID,
+            OType: gmex_api::types::OfferType_Limit,
+            Prz: gmex_api::dec!(15_000),
+            Qty: gmex_api::dec!(1),
             ..Default::default()
         };
 
@@ -360,7 +491,13 @@ fn http_trade_demo(trade_base_url: &String, user_name: &String, api_key: &String
         }
 
         let req = gmex_api::HttpTradeRequestMessage::new("OrderNew", myord, user_name, api_key, api_secret);
-        let mut rsp: gmex_api::HttpResponseMessage<gmex_api::Ord> = client.post(&(base_url.to_owned() + "/Action")).json(&req).send()?.json()?;
+        let mut rsp: gmex_api::HttpResponseMessage<gmex_api::Order> = client
+            .post(&(base_url.to_owned() + "/Action"))
+            .json(&req)
+            .send()
+            .await?
+            .json()
+            .await?;
         if rsp.has_error() {
             return Err(From::from(format!("OrderNew failed: {:?}", rsp)));
         }
@@ -395,7 +532,8 @@ fn http_trade_demo(trade_base_url: &String, user_name: &String, api_key: &String
     Ok(())
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv::dotenv().ok();
     std::env::set_var("RUST_LOG", "info,http_client=debug"); // error, info, warn, or trace
     env_logger::init();
@@ -404,8 +542,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let gmex_api_key = std::env::var("GMEX_API_KEY").expect("GMEX_API_KEY must be set");
     let gmex_api_secret = std::env::var("GMEX_API_SECRET").expect("GMEX_API_SECRET must be set");
     //
-    let gmex_http_url_market: String = std::env::var("GMEX_HTTP_URL_MARKET").unwrap_or_else(|_| gmex_api::GMEX_HTTP_URL_MARKET.to_string());
-    let gmex_http_url_trade: String = std::env::var("GMEX_HTTP_URL_TRADE").unwrap_or_else(|_| gmex_api::GMEX_WS_URL_TRADE.to_string());
+    let gmex_http_url_market: String =
+        std::env::var("GMEX_HTTP_URL_MARKET").unwrap_or_else(|_| gmex_api::GMEX_HTTP_URL_MARKET.to_string());
+    let gmex_http_url_trade: String =
+        std::env::var("GMEX_HTTP_URL_TRADE").unwrap_or_else(|_| gmex_api::GMEX_WS_URL_TRADE.to_string());
     log::debug!("GMEX-HTTP-API Test....");
     log::debug!("  GMEX_HTTP_URL_MARKET = {}", gmex_http_url_market);
     log::debug!("  GMEX_HTTP_URL_TRADE = {}", gmex_http_url_trade);
@@ -414,10 +554,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     log::debug!("  GMEX_API_SECRET = {}", gmex_api_secret);
 
     if true {
-        http_market_demo(&gmex_http_url_market)?;
+        http_market_demo(&gmex_http_url_market).await?;
     }
     if true {
-        http_trade_demo(&gmex_http_url_trade, &gmex_user_name, &gmex_api_key, &gmex_api_secret)?;
+        http_trade_demo(&gmex_http_url_trade, &gmex_user_name, &gmex_api_key, &gmex_api_secret).await?;
     }
     Ok(())
 }

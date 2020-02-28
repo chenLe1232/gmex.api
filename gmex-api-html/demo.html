@@ -536,7 +536,7 @@ http://192.168.2.48:20082/v1/rest/GetHistKLine \
                             </div>
                             <div style="line-height:30px">
                                 <label>查询：<input id="me4" type="text" value="" style="width:80px" /></label>
-                                <input id="mbLatestKline" type="button" name="latest" value="最近5个1分钟K">
+                                <input id="mbLatestKline" type="button" name="latest" value="最近200个1分钟K">
                                 <label>开始秒<input id="me5-0" type="text" value="1537077600" style="width:80px" /></label>
                                 <label>Offset<input id="me5-1" type="text" value="0" style="width:40px" /></label>
                                 <label>Count<input id="me5-2" type="text" value="1440" style="width:40px" /></label>
@@ -696,7 +696,7 @@ http://192.168.2.48:20082/v1/rest/GetHistKLine \
         $("input[id^='mbLatestKline']").click(function () {
             var sym = $("#me4").val();
             if (sym) {
-                request_market('GetLatestKLine', { Sym: sym, Typ: '1m', Count: 5 },  function (ret) {
+                request_market('GetLatestKLine', { Sym: sym, Typ: '1m', Count: 200 },  function (ret) {
                     G_LOG("debug", `GetLatestKLine: ${JSON.stringify(ret)}`);
                 })
             }

@@ -13,6 +13,9 @@
     <!-- <script src="http://novicelab.org/jsonabc/dist/jsonabc.js"></script> -->
     <script src="./jsonabc.js"></script>
 
+    <!-- // https://github.com/nodeca/pako -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/pako@1.0.11/dist/pako.min.js"></script> -->
+    <script src='./pako.min.js'></script>
     <script src="./md5.js"></script>
     <script src='./gaealib_api.js'></script>
 
@@ -264,11 +267,11 @@
         var contents = {
             "1": {
                 idx: -1,
-                list: [ 'wss://api-market.gmex.io/v1/market', 'wss://s0.gmex.io/v1/market' ]
+                list: [ 'wss://api-market.gmex.io/v1/market', 'wss://api-market.gmex.io/v1/market?z=1', 'wss://s0.gmex.io/v1/market' ]
             },
             "2": {
                 idx: -1,
-                list: [ 'wss://api-trade.gmex.io/v1/trade', 'wss://s0.gmex.io/v1/trade']
+                list: [ 'wss://api-trade.gmex.io/v1/trade', 'wss://api-trade.gmex.io/v1/trade?z=1', 'wss://s0.gmex.io/v1/trade']
             },
         };
         function changeContent(id, cid) {
@@ -565,9 +568,9 @@ http://192.168.2.48:20082/v1/rest/GetHistKLine \
                                 <select name="selected-aid" id="selected-aid"><option value="01">合约账户(01)</option><option value="02">币币账户(02)</option></select>
                                 &nbsp;&lt;&lt;|&gt;&gt;&nbsp;
                                 <input id="tbg1" type="button" route="GetAssetD" value="查询交易对" />
-                                <input id="tbg1" type="button" route="GetAssetEx" value="查交易对扩展属性" />
+                                <input id="tbg1b" type="button" route="GetAssetEx" value="查交易对扩展属性" />
                                 <input id="tbg2" type="button" route="GetWallets" value="查询钱包" />
-                                <input id="tbg21" type="button" route="GetCcsWallets" value="资金中心钱包" />
+                                <input id="tbg2b" type="button" route="GetCcsWallets" value="资金中心钱包" />
                                 <input id="tbg3" type="button" route="GetTrades" value="查询成交记录" />
                                 <input id="tbg4" type="button" route="GetOrders" value="查询报单记录" />
                                 <label><input id="tc1" type="checkbox" />全撤单</label>
@@ -575,7 +578,7 @@ http://192.168.2.48:20082/v1/rest/GetHistKLine \
                                 <input id="tbg6" type="button" route="GetHistOrders" value="查询报单历史" />
                                 <input id="tbg7" type="button" route="GetWalletsLog" value="查询钱包记录" />
                                 <input id="tbg8" type="button" route="GetRiskLimit" value="GetRiskLimit" />
-                                <input id="tbg8" type="button" route="GetRiskLimits" value="GetRiskLimits" />
+                                <input id="tbg9" type="button" route="GetRiskLimits" value="GetRiskLimits" />
                             </div>
                             <div style="line-height:30px" id="div_order1">
                                 <input id="tbordercast" type="button" value="下单" />

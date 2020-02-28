@@ -29,8 +29,8 @@ gaea.prototype.init = function (options, cb) {
             if (m.tm + self.timeout < tm) {
                 if (typeof (m.cb) == 'function') {
                     console.log(`[timeout]<< ${JSONStringify(m)}`)
-                    console.log(m)
-                    m.cb({ code: -9999, data: 'timeout' })
+                    // console.log(m)
+                    m.cb({ code: -9999, rid: rid, data: 'timeout' })
                 }
                 delete self.msgMap[rid];
             }
@@ -45,6 +45,7 @@ gaea.prototype.init = function (options, cb) {
 
     self.close();
     var ws = new WebSocket(options.ws_url);
+    ws.binaryType = "arraybuffer"; // 默认的"blob"在解压时不方便用这里直接改掉
     ws.onopen = function (evt) {
         self.connected = true;
         self.activetm = Date.now();
@@ -65,10 +66,15 @@ gaea.prototype.init = function (options, cb) {
     }
     ws.onmessage = function (evt) {
         self.activetm = Date.now();
+        var msg = {}
         try {
-            var msg = JSON.parse(evt.data);
+            if (typeof(evt.data) == 'string') {
+                msg = JSON.parse(evt.data);
+            } else {
+                msg = JSON.parse(pako.inflateRaw(evt.data, { to: 'string' }));
+            }
         } catch (e) {
-            //console.log(data,e)
+            console.log(`[onmessage.decode.err]<< `, e, evt)
             return;
         }
 

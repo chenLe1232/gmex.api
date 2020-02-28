@@ -1866,6 +1866,21 @@ const (
 
 ```
 
+## 关于 websocket.BinaryMessage 和消息压缩
+尽管http层上的ws可以自己协商进行压缩减少传输带宽，还是有很多人觉得压缩后通过二进制方式传输更好。于是我们也进行一下支持。
+
+当前服务端仅支持对长度大于512的消息进行压缩通过二进制来传输，其它消息依旧使用 TextMessage 传输。开启方式为，在进行ws连接时，在url上增加参数'z=1'即可。
+
+```txt
+启用二进制消息压缩的地址
+行情服务： wss://api-market.gmex.io/v1/market?z=1
+交易服务： wss://api-trade.gmex.io/v1/trade?z=1
+```
+
+具体示例请参考 gmex-api-html 里的代码实现。
+
+
+
 
 ## 相关术语
 | 名称 | 描述 |

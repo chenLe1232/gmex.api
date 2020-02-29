@@ -260,6 +260,7 @@ type AssetEx struct {
      * Sym:交易对名称
      * Count: K线的数量
      * Type: K线的周期类型
+     * 注意: 这个指令服务器端对于Count为100倍数的请求有加速(Count最大3000)，推荐大家使用。
      * */
     http POST https://api-market.gmex.io/v1/rest/GetLatestKLine  Sym='BTC.USDT' Count:=2 Typ='1m'
 

@@ -942,6 +942,9 @@ type V2AssetCfg struct {
 // 发送下单请求
 // COrdId 是 Client Order ID 的意思，不能为空，由用户生成管理并维护其唯一性(长度不超过40的字符串).
 // 当委托单成功后，会对应一个OrdId，为系统能够识别的委托单编号;
+// PId可填写现有的PId来下单，没有PId或者PId为空服务端会选择默认的仓位来下单；如果PId为"new"则会新建仓位;
+// lvr自定义杠杆开仓，建议PId为"new"时使用
+// MIRMy自定义委托保证金率（又叫自定义全仓杠杆）,lvr为0时使用，lvr不为0时无效
 // 注意，用户发起下单后，要通过 onOrder 消息来监控管理委托单的状态变化;
 {
     "req":"OrderNew",
@@ -950,6 +953,7 @@ type V2AssetCfg struct {
     "args":{
         "AId":"123456701",
         "COrdId":"c4681144dc5b4051925f00e8339ee97f",
+        "PId": "",                                       //可选
         "Sym":"BTC1809",
         "Dir":1,
         "OType":1,
@@ -958,7 +962,12 @@ type V2AssetCfg struct {
         "QtyDsp":0,
         "Tif":0,
         "OrdFlag":0,
-        "PrzChg":0
+        "PrzChg":0,
+        "lvr":0,                                         //可选，建议PId为"new"时使用
+        "MIRMy":0.01,                                    //可选，自定义委托保证金率，lvr为0时使用，lvr不为0时无效
+        "StopP": 8000,                                   //止盈价，可选，只开仓时设置仓位止盈价格
+        "StopL": 6000,                                   //止损价，可选，只开仓时设置仓位止损价格
+        "StopLPBy": 0                                    //止盈止损参考价格，默认为0; 0:标记价，1:最新价，2:指数价
     },
     "signature": "1234567890abcdef1234567890abcdef"
 }
@@ -985,7 +994,12 @@ type V2AssetCfg struct {
         "QtyF":0,
         "PrzF":0,
         "Val":0,
-        "StopPrz":0
+        "StopPrz":0,
+        "lvr":0,
+        "MIRMy":0.01,
+        "StopP": 8000,
+        "StopL": 6000,
+        "StopLPBy": 0
     }
 }
 
@@ -1013,7 +1027,12 @@ type V2AssetCfg struct {
         "Sym":"BTC1809",
         "OrdId":"01CQES0XMVV3SMWJ7N683FWJR8",
         "OType":1,
-        "At":1537712923017
+        "At":1537712923017,
+        "lvr":0,
+        "MIRMy":0.01,
+        "StopP": 8000,
+        "StopL": 6000,
+        "StopLPBy": 0
     }
 }
 ```
@@ -1032,7 +1051,12 @@ args: {
     "Tif": 0,           // 生效时间设定, 0:GoodTillCancel, 1:ImmediateOrCancel/FillAndKill, 2:FillOrKill
     "OrdFlag": 0,       // 标志位, 0: OF_INVALID, 1: POSTONLY, 2: REDUCEONLY, 4: CLOSEONTRIGGER;
     "PrzChg" 0,         // 市价成交档位
-    // ... 跟多参数，请参考下面的Ord数据结构定义.
+    "lvr":0,            //可选，建议PId为"new"时使用
+    "MIRMy":0.01,       //可选，自定义委托保证金率，lvr为0时使用，lvr不为0时无效
+    "StopP": 8000,      //止盈价，可选，只开仓时设置仓位止盈价格
+    "StopL": 6000,      //止损价，可选，只开仓时设置仓位止损价格
+    "StopLPBy": 0       //止盈止损参考价格，默认为0; 0:标记价，1:最新价，2:指数价
+    // ... 更多参数，请参考下面的Ord数据结构定义.
 }
 ```
 更多关于委托单数据结构的的参数定义和说明，请参考下面的推送消息章节里的结构定义。
@@ -1732,8 +1756,8 @@ const (
     OrdFlag_POSTONLY OrdFlag = 1
     // 如果委托会导致增加仓位，则不发送此委托
     OrdFlag_REDUCEONLY OrdFlag = 2
-    // 触发后平仓 TODO 目前未实现
-    //     CLOSEONTRIGGER     = 4;
+    // 只开仓
+    OrdFlag_OPENONLY OrdFlag = 4
     // 条件指定为 如果价格大于StopBy
     OrdFlag_IF_GREATERTHAN OrdFlag = 8
     // 条件指定为 如果价格低于StopBy
@@ -1748,6 +1772,8 @@ const (
     OrdFlag_FEE_IN_TPCOIN OrdFlag = 256
     // 超过强平价
     OrdFlag_PRZ_OVER_LIQUIDATE OrdFlag = 512
+    // 合并到特定的仓位
+    OrdFlag_PRZ_OVER_LIQUIDATE OrdFlag = 1024
 )
 
 

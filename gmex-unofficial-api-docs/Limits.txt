@@ -1,0 +1,44 @@
+#访问限速
+
+接入服务器WS对于API的访问有权重限制，具体计算如下:
+
+TRADE_MAX_API_WEIGHT_PER_SECOND 200
+	Time 5
+	ServerInfo 5
+	Login  1
+	OrderNew 1
+	OrderDel 1
+	CancelAllAfter 1
+	PosLeverage 1
+	PosTransMgn 1
+	PosStopLP 1
+	PosOp 1
+	GetAssetD 1
+	GetAssetEx 1
+	GetWallets 1
+	GetTrades 1
+	GetOrders 1
+	GetPositions 1
+	GetHistOrders 5
+	GetWalletsLog 5
+	GetCcsWallets 1
+	GetRiskLimit 1
+	GetExchangeRate 1
+	GetMktSum 1
+	GetTrdSum 1
+
+MARKET_MAX_API_WEIGHT_PER_SECOND 200
+	Time 5
+	ServerInfo 5
+	Sub 1
+	UnSub 1
+	GetAssetD 1
+	GetAssetEx 1
+	GetHistKLine 5
+	GetLatestKLine 1
+	GetCompositeIndex 1
+
+
+NOTE: 
+当前服务器端放的比较开，后继会逐步收紧，请使用者注意限速问题.
+

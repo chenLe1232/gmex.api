@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -95,5 +97,21 @@ namespace Gmex.API
                 _json_default_setting
                 );
         }
+
+        public static string Decompress(byte[] baseBytes, int index, int count)
+        {
+            using (var decompressedStream = new MemoryStream())
+            using (var compressedStream = new MemoryStream(baseBytes,index,count))
+            using (var deflateStream = new DeflateStream(compressedStream, CompressionMode.Decompress))
+            {
+                deflateStream.CopyTo(decompressedStream);
+                decompressedStream.Position = 0;
+                using (var streamReader = new StreamReader(decompressedStream))
+                {
+                    return streamReader.ReadToEnd();
+                }
+            }
+        }
+
     }
 }

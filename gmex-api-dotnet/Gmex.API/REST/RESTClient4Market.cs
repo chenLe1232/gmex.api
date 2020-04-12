@@ -12,10 +12,12 @@ namespace Gmex.API.REST
     public class RESTClient4Market
     {
         private string m_url;
+        private int m_vpid;
 
-        public RESTClient4Market(string serverurl)
+        public RESTClient4Market(string serverurl, int vpid)
         {
             m_url = serverurl;
+            m_vpid = vpid;
         }
 
         public async Task<long> GetTimeAsync()
@@ -54,7 +56,7 @@ namespace Gmex.API.REST
         public async Task<List<Models.AssetD>> GetAssetDAsync()
         {
             var results = new List<Models.AssetD>();
-            var url = $"{m_url}/GetAssetD";
+            var url = $"{m_url}/GetAssetD?VP={m_vpid}";
             using (var httpClient = new HttpClient())
             {
                 var res = await httpClient.GetAsync(url);
@@ -85,7 +87,7 @@ namespace Gmex.API.REST
         public async Task<List<Models.AssetEx>> GetAssetExAsync()
         {
             var results = new List<Models.AssetEx>();
-            var url = $"{m_url}/GetAssetEx";
+            var url = $"{m_url}/GetAssetEx?VP={m_vpid}";
             using (var httpClient = new HttpClient())
             {
                 var res = await httpClient.GetAsync(url);
@@ -236,6 +238,29 @@ namespace Gmex.API.REST
                 args.Typ = typ;
                 args.Sec = beginSec;
                 args.Offset = offset;
+                args.Count = count;
+
+                var content = new StringContent(Helper.MyJsonMarshal(args), Encoding.UTF8, "application/json");
+
+                var res = await httpClient.PostAsync(url, content);
+                var contentStr = await res.Content.ReadAsStringAsync();
+                var resp = Helper.MyJsonUnmarshal<RestResponse>(contentStr);
+                if (resp != null && resp.Code == 0)
+                {
+                    return Helper.MyJsonSafeToObj<Models.MktQueryKLineHistoryResult>(resp.Data);
+                }
+                throw new InvalidOperationException($"invalid response: code={resp?.Code}");
+            }
+        }
+
+        public async Task<Models.MktQueryKLineHistoryResult> GetLatestKLineAsync(string sym, Models.MktKLineType typ, int count)
+        {
+            var url = $"{m_url}/GetLatestKLine";
+            using (var httpClient = new HttpClient())
+            {
+                var args = new Models.MktQueryKLineHistoryRequestArgs();
+                args.Sym = sym;
+                args.Typ = typ;
                 args.Count = count;
 
                 var content = new StringContent(Helper.MyJsonMarshal(args), Encoding.UTF8, "application/json");

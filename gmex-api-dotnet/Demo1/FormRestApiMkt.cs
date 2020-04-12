@@ -48,7 +48,7 @@ namespace Demo1
             if (comboBoxMktServer.Text.Length < 4) return;
             try
             {
-                var client = new RESTClient4Market(comboBoxMktServer.Text);
+                var client = new RESTClient4Market(comboBoxMktServer.Text, Convert.ToInt32(textBoxVPID.Text));
                 var delta = await client.GetTimeAsync();
                 LOG($"[Time]<< time delta(ms): {delta}\r\n");
             }
@@ -63,7 +63,7 @@ namespace Demo1
             if (comboBoxMktServer.Text.Length < 4) return;
             try
             {
-                var client = new RESTClient4Market(comboBoxMktServer.Text);
+                var client = new RESTClient4Market(comboBoxMktServer.Text,Convert.ToInt32(textBoxVPID.Text));
                 var ret = await client.GetServerInfoAsync();
                 LOG($"[ServerInfo] << {Helper.MyJsonMarshal(ret)} \r\n");
             }
@@ -81,7 +81,7 @@ namespace Demo1
             {
                 comboBoxMktSym.Items.Clear();
 
-                var client = new RESTClient4Market(comboBoxMktServer.Text);
+                var client = new RESTClient4Market(comboBoxMktServer.Text, Convert.ToInt32(textBoxVPID.Text));
                 var ret = await client.GetAssetDAsync();
 
                 LOG($"[GetAssetD] <<");
@@ -112,7 +112,7 @@ namespace Demo1
             {
                 comboBoxMktIndex.Items.Clear();
 
-                var client = new RESTClient4Market(comboBoxMktServer.Text);
+                var client = new RESTClient4Market(comboBoxMktServer.Text, Convert.ToInt32(textBoxVPID.Text));
                 var ret = await client.GetCompositeIndexAsync();
 
                 LOG($"[GetCompositeIndex] <<");
@@ -141,7 +141,7 @@ namespace Demo1
 
             try
             {
-                var client = new RESTClient4Market(comboBoxMktServer.Text);
+                var client = new RESTClient4Market(comboBoxMktServer.Text, Convert.ToInt32(textBoxVPID.Text));
                 var ret = await client.GetTickAsync(comboBoxMktSym.Text);
                 LOG($"[GetTick] << {Helper.MyJsonMarshal(ret)} \r\n");
             }
@@ -158,7 +158,7 @@ namespace Demo1
 
             try
             {
-                var client = new RESTClient4Market(comboBoxMktServer.Text);
+                var client = new RESTClient4Market(comboBoxMktServer.Text, Convert.ToInt32(textBoxVPID.Text));
                 var ret = await client.GetIndexTickAsync(comboBoxMktIndex.Text);
                 LOG($"[GetIndexTick] << {Helper.MyJsonMarshal(ret)} \r\n");
             }
@@ -175,7 +175,7 @@ namespace Demo1
 
             try
             {
-                var client = new RESTClient4Market(comboBoxMktServer.Text);
+                var client = new RESTClient4Market(comboBoxMktServer.Text, Convert.ToInt32(textBoxVPID.Text));
                 var ret = await client.GetTradesAsync(comboBoxMktSym.Text);
                 LOG($"[GetTrades] << {Helper.MyJsonMarshal(ret)} \r\n");
             }
@@ -192,7 +192,7 @@ namespace Demo1
 
             try
             {
-                var client = new RESTClient4Market(comboBoxMktServer.Text);
+                var client = new RESTClient4Market(comboBoxMktServer.Text, Convert.ToInt32(textBoxVPID.Text));
                 var ret = await client.GetOrd20Async(comboBoxMktSym.Text);
                 LOG($"[GetOrd20] << {Helper.MyJsonMarshal(ret)} \r\n");
             }
@@ -222,7 +222,7 @@ namespace Demo1
             }
             try
             {
-                var client = new RESTClient4Market(comboBoxMktServer.Text);
+                var client = new RESTClient4Market(comboBoxMktServer.Text, Convert.ToInt32(textBoxVPID.Text));
                 var ret = await client.GetHistKLineAsync(comboBoxMktSym.Text, typ, beginSec, offset, count);
                 LOG($"[GetHistKLine] << {Helper.MyJsonMarshal(ret)} \r\n");
             }
@@ -253,7 +253,7 @@ namespace Demo1
 
             try
             {
-                var client = new RESTClient4Market(comboBoxMktServer.Text);
+                var client = new RESTClient4Market(comboBoxMktServer.Text, Convert.ToInt32(textBoxVPID.Text));
                 var ret = await client.GetHistKLineAsync(comboBoxMktIndex.Text, typ, beginSec, offset, count);
                 LOG($"[GetHistKLine] << {Helper.MyJsonMarshal(ret)} \r\n");
             }
@@ -269,7 +269,7 @@ namespace Demo1
 
             try
             {
-                var client = new RESTClient4Market(comboBoxMktServer.Text);
+                var client = new RESTClient4Market(comboBoxMktServer.Text, Convert.ToInt32(textBoxVPID.Text));
                 var ret = await client.GetAssetExAsync();
 
                 LOG($"[GetAssetEx] <<");
@@ -284,6 +284,67 @@ namespace Demo1
                 LOG("[ERROR] Exception: " + ex.Message + "\r\n");
             }
 
+        }
+
+        async private void buttonGetLatestKLine_Click(object sender, EventArgs e)
+        {
+            if (comboBoxMktServer.Text.Length < 4) return;
+            if (comboBoxMktSym.Text.Length < 1) return;
+
+            Gmex.API.Models.MktKLineType typ;
+            int count;
+            try
+            {
+                //beginSec = Convert.ToInt32(textBoxBeginSecSym.Text.Trim());
+                //offset = Convert.ToInt32(textBoxOffsetSym.Text.Trim());
+                count = Convert.ToInt32(textBoxCount2.Text.Trim());
+                typ = (Gmex.API.Models.MktKLineType)(comboBoxMktKLineTypSym.SelectedIndex + 1);
+            }
+            catch (Exception)
+            {
+                return;
+            }
+            try
+            {
+                var client = new RESTClient4Market(comboBoxMktServer.Text, Convert.ToInt32(textBoxVPID.Text));
+                var ret = await client.GetLatestKLineAsync(comboBoxMktSym.Text, typ, count);
+                LOG($"[GetLatestKLine] << {Helper.MyJsonMarshal(ret)} \r\n");
+            }
+            catch (Exception ex)
+            {
+                LOG("[ERROR] Exception: " + ex.Message + "\r\n");
+            }
+        }
+
+        async private void buttonGetLatestKLineIdx_Click(object sender, EventArgs e)
+        {
+            if (comboBoxMktServer.Text.Length < 4) return;
+            if (comboBoxMktIndex.Text.Length < 1) return;
+
+            Gmex.API.Models.MktKLineType typ;
+            int  count;
+            try
+            {
+                //beginSec = Convert.ToInt32(textBoxBeginSecIdx.Text.Trim());
+                //offset = Convert.ToInt32(textBoxOffsetIdx.Text.Trim());
+                count = Convert.ToInt32(textBoxCount2Idx.Text.Trim());
+                typ = (Gmex.API.Models.MktKLineType)(comboBoxMktKLineTypIdx.SelectedIndex + 1);
+            }
+            catch (Exception)
+            {
+                return;
+            }
+
+            try
+            {
+                var client = new RESTClient4Market(comboBoxMktServer.Text, Convert.ToInt32(textBoxVPID.Text));
+                var ret = await client.GetLatestKLineAsync(comboBoxMktIndex.Text, typ, count);
+                LOG($"[GetLatestKLine] << {Helper.MyJsonMarshal(ret)} \r\n");
+            }
+            catch (Exception ex)
+            {
+                LOG("[ERROR] Exception: " + ex.Message + "\r\n");
+            }
         }
     }
 }

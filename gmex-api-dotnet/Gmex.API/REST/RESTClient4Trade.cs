@@ -12,6 +12,7 @@ namespace Gmex.API.REST
     {
         private string m_url;
         private string m_uname;
+        private int m_vpid;
         private string m_apikey;
         private string m_apisecret;
 
@@ -34,10 +35,11 @@ namespace Gmex.API.REST
         /// <param name="uname"></param>
         /// <param name="apiKey"></param>
         /// <param name="apiSecret"></param>
-        public RESTClient4Trade(string serverurl, string uname, string apiKey, string apiSecret)
+        public RESTClient4Trade(string serverurl, string uname, int vpid, string apiKey, string apiSecret)
         {
             m_url = serverurl;
             m_uname = uname;
+            m_vpid = vpid;
             m_apikey = apiKey;
             m_apisecret = apiSecret;
         }
@@ -98,7 +100,7 @@ namespace Gmex.API.REST
             using (var httpClient = new HttpClient())
             {
                 var args = new RestTradeMessageRequest("GetUserInfo", null);
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
@@ -133,7 +135,7 @@ namespace Gmex.API.REST
                 var args = new RestTradeMessageRequest("GetAssetD",
                     new Dictionary<string, object>() { { "AId", m_uid + accType.ToString("D2") } }
                     );
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
@@ -159,7 +161,7 @@ namespace Gmex.API.REST
                 var args = new RestTradeMessageRequest("GetWallets",
                     new Dictionary<string, object>() { { "AId", m_uid + accType.ToString("D2") } }
                     );
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
@@ -183,7 +185,7 @@ namespace Gmex.API.REST
             {
                 //var args = new RestTradeMessageRequest("GetWallets", new Dictionary<string, object>() { { "AId", m_uid + "00" } });
                 var args = new RestTradeMessageRequest("GetCcsWallets", null);
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
@@ -209,7 +211,7 @@ namespace Gmex.API.REST
             {
                 var args = new RestTradeMessageRequest("GetTrades",
                     new Dictionary<string, object>() { { "AId", m_uid + accType.ToString("D2") }, { "Sym", sym }/*, { "Start", 0 }, { "Stop", 100 }*/ });
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
@@ -235,7 +237,7 @@ namespace Gmex.API.REST
             {
                 var args = new RestTradeMessageRequest("GetOrders",
                    new Dictionary<string, object>() { { "AId", m_uid + accType.ToString("D2") }, { "Sym", sym }/*, { "Start", 0 }, { "Stop", 100 }*/ });
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
@@ -261,7 +263,7 @@ namespace Gmex.API.REST
             {
                 var args = new RestTradeMessageRequest("GetPositions",
                     new Dictionary<string, object>() { { "AId", m_uid + accType.ToString("D2") }, { "Sym", sym }/*, { "Start", 0 }, { "Stop", 100 }*/ });
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
@@ -287,7 +289,7 @@ namespace Gmex.API.REST
             {
                 var args = new RestTradeMessageRequest("GetHistOrders",
                     new Dictionary<string, object>() { { "AId", m_uid + accType.ToString("D2") }, { "Sym", sym }/*, { "Start", 0 }, { "Stop", 100 }*/ });
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
@@ -313,7 +315,7 @@ namespace Gmex.API.REST
             {
                 var args = new RestTradeMessageRequest("GetOrderByID", 
                     new Dictionary<string, object>() {{ "AId", m_uid + accType.ToString("D2") }, {"OrdId", ordid}});
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
@@ -339,7 +341,7 @@ namespace Gmex.API.REST
             {
                 var args = new RestTradeMessageRequest("GetWalletsLog",
                     new Dictionary<string, object>() { { "AId", m_uid + accType.ToString("D2") }, { "Sym", sym } });
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
@@ -365,7 +367,7 @@ namespace Gmex.API.REST
             {
                 var args = new RestTradeMessageRequest("GetRiskLimit",
                     new Dictionary<string, object>() { { "AId", m_uid + accType.ToString("D2") }, {"Sym", sym } });
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
@@ -390,7 +392,7 @@ namespace Gmex.API.REST
             {
                 //ord.AId = m_uid + accType.ToString("D2");
                 var args = new RestTradeMessageRequest("OrderNew", ord);
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
@@ -415,7 +417,7 @@ namespace Gmex.API.REST
             {
                 //ord.AId = m_uid + accType.ToString("D2");
                 var args = new RestTradeMessageRequest("OrderDel", ord);
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
@@ -441,7 +443,7 @@ namespace Gmex.API.REST
             {
                 var args = new RestTradeMessageRequest("CancelAllAfter",
                     new Dictionary<string, object>() { { "AId", m_uid + accType.ToString("D2") }, { "Sec", sec } });
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
@@ -476,7 +478,7 @@ namespace Gmex.API.REST
                         { "PId", postionId },
                         { "Param", param },
                     });
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();
@@ -509,7 +511,7 @@ namespace Gmex.API.REST
                         { "PId", postionId },
                         { "Param", param },
                     });
-                var content = new StringContent(args.GetSignedTxt(m_uname, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
+                var content = new StringContent(args.GetSignedTxt(m_uname, m_vpid, m_apikey, m_apisecret), Encoding.UTF8, "application/json");
 
                 var res = await httpClient.PostAsync(url, content);
                 var contentStr = await res.Content.ReadAsStringAsync();

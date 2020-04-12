@@ -10,16 +10,17 @@ namespace Gmex.API.WS
 {
     public class Client4Market
     {
-        
+
 
         //private ConcurrentDictionary<string, Action<int, object>> _request_callback = new ConcurrentDictionary<string, Action<int, object>>();
         private Dictionary<string, Action<int, object>> _request_callback = new Dictionary<string, Action<int, object>>();
 
         private ClientWebSocket _ws;
+        private int _vpid;
 
-        public Client4Market()
+        public Client4Market(int VP)
         {
-            // TODO
+            _vpid = VP;
         }
 
         public void SafeClose()
@@ -76,13 +77,128 @@ namespace Gmex.API.WS
                 _ws?.Dispose();
                 _ws = new ClientWebSocket();
                 await _ws.ConnectAsync(new Uri(url), cancellationToken);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw ex;
             }
 
             await Task.Factory.StartNew(async () =>
             {
+                Action<WsMarketMessageResponse> onWsMarketMessageResponse = (resp) =>
+                {
+                    if (resp == null)
+                        return;
+
+                    if (resp?.ReqID?.Length > 0)
+                    {
+                        if (_request_callback.ContainsKey(resp.ReqID))
+                        {
+                            var action = _request_callback[resp.ReqID];
+                            _request_callback.Remove(resp.ReqID);
+                            action?.Invoke(resp.Code, resp.Data);
+                        }
+                        else
+                        {
+                            Debug.WriteLine("[WARN] ignore non-exists-reqid resp << " + resp);
+                        }
+                    }
+                    else if (resp?.Subj?.Length > 0)
+                    {
+                        if (resp.Subj == K_SUBJ_TRADE)
+                        {
+                            var msg = Helper.MyJsonSafeToObj<Models.MktTradeItem>(resp.Data);
+                            if (msg != null)
+                            {
+                                onMktTradeItem?.Invoke(msg);
+                            }
+                            else
+                            {
+                                Debug.WriteLine("[WARN] invalid resp << " + resp);
+                            }
+                        }
+                        else if (resp.Subj == K_SUBJ_ORDERL2)
+                        {
+                            var msg = Helper.MyJsonSafeToObj<Models.MktOrderItem>(resp.Data);
+                            if (msg != null)
+                            {
+                                //if (msg.At == 0)
+                                //    Debug.WriteLine($"[NOTE] {msg.Sym} orderl2 begin...");
+                                //else if(msg.At==1)
+                                //    Debug.WriteLine($"[NOTE] {msg.Sym} orderl2 end.");
+
+                                onMktOrderItem?.Invoke(msg);
+                            }
+                            else
+                            {
+                                Debug.WriteLine("[WARN] invalid resp << " + resp);
+                            }
+                        }
+                        else if (resp.Subj == K_SUBJ_ORDER20)
+                        {
+                            var msg = Helper.MyJsonSafeToObj<Models.MktOrder20Result>(resp.Data);
+                            if (msg != null)
+                            {
+                                onMktOrder20Result?.Invoke(msg);
+                            }
+                            else
+                            {
+                                Debug.WriteLine("[WARN] invalid resp << " + resp);
+                            }
+                        }
+                        else if (resp.Subj == K_SUBJ_TICK)
+                        {
+                            var msg = Helper.MyJsonSafeToObj<Models.MktInstrumentTick>(resp.Data);
+                            if (msg != null)
+                            {
+                                onMktInstrumentTick?.Invoke(msg);
+                            }
+                            else
+                            {
+                                Debug.WriteLine("[WARN] invalid resp << " + resp);
+                            }
+                        }
+                        else if (resp.Subj == K_SUBJ_INDEX)
+                        {
+                            var msg = Helper.MyJsonSafeToObj<Models.MktCompositeIndexTick>(resp.Data);
+                            if (msg != null)
+                            {
+                                onMktCompositeIndexTick?.Invoke(msg);
+                            }
+                            else
+                            {
+                                Debug.WriteLine("[WARN] invalid resp << " + resp);
+                            }
+                        }
+                        else if (resp.Subj == K_SUBJ_KLINE)
+                        {
+                            var msg = Helper.MyJsonSafeToObj<Models.MktKLineItem>(resp.Data);
+                            if (msg != null)
+                            {
+                                onMktKLineItem?.Invoke(msg);
+                            }
+                            else
+                            {
+                                Debug.WriteLine("[WARN] invalid resp << " + resp);
+                            }
+                        }
+                        else if (resp.Subj == K_SUBJ_NOTIF)
+                        {
+                            // 系统广播消息
+                            // TODO
+                            Debug.WriteLine("[NOTE] ignore notify msg << " + resp);
+                        }
+                        else
+                        {
+                            Debug.WriteLine("[WANR]: unknown subj: " + resp);
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("[ERROR] invalid msg from market-ws-server: " + resp);
+                    }
+                };
+
                 var buffer = new byte[GlobalDefine.K_MAX_MSG_SIZE]; // 有时消息会很大，比如查询1天的分钟K结果.
                 while (true)
                 {
@@ -157,129 +273,39 @@ namespace Gmex.API.WS
                         count += result.Count;
                     }
 
-                    var rspTxt = Encoding.UTF8.GetString(buffer, 0, count);
-                    WsMarketMessageResponse resp = null;
-                    try
-                    {
-                        resp = Helper.MyJsonUnmarshal<WsMarketMessageResponse>(rspTxt);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine("[ERROR] Deserialize Resp err: " + ex.Message);
-                    }
 
-                    if (resp == null)
-                        continue;
-
-                    if (resp?.ReqID?.Length > 0)
+                    var rspTxt = "";
+                    if (result.MessageType == WebSocketMessageType.Binary) // 二进制压缩消息,先解压缩到txt格式
                     {
-                        if (_request_callback.ContainsKey(resp.ReqID))
-                        {
-                            var action = _request_callback[resp.ReqID];
-                            _request_callback.Remove(resp.ReqID);
-                            action?.Invoke(resp.Code, resp.Data);
-                        }
-                        else
-                        {
-                            Debug.WriteLine("[WARN] ignore non-exists-reqid resp << " + rspTxt);
-                        }
-                    }
-                    else if (resp?.Subj?.Length > 0)
-                    {
-                        if (resp.Subj == K_SUBJ_TRADE)
-                        {
-                            var msg = Helper.MyJsonSafeToObj<Models.MktTradeItem>(resp.Data);
-                            if (msg != null)
-                            {
-                                onMktTradeItem?.Invoke(msg);
-                            }
-                            else
-                            {
-                                Debug.WriteLine("[WARN] invalid resp << " + rspTxt);
-                            }
-                        }
-                        else if (resp.Subj == K_SUBJ_ORDERL2)
-                        {
-                            var msg = Helper.MyJsonSafeToObj<Models.MktOrderItem>(resp.Data);
-                            if (msg != null)
-                            {
-                                //if (msg.At == 0)
-                                //    Debug.WriteLine($"[NOTE] {msg.Sym} orderl2 begin...");
-                                //else if(msg.At==1)
-                                //    Debug.WriteLine($"[NOTE] {msg.Sym} orderl2 end.");
-
-                                onMktOrderItem?.Invoke(msg);
-                            }
-                            else
-                            {
-                                Debug.WriteLine("[WARN] invalid resp << " + rspTxt);
-                            }
-                        }
-                        else if (resp.Subj == K_SUBJ_ORDER20)
-                        {
-                            var msg = Helper.MyJsonSafeToObj<Models.MktOrder20Result>(resp.Data);
-                            if (msg != null)
-                            {
-                                onMktOrder20Result?.Invoke(msg);
-                            }
-                            else
-                            {
-                                Debug.WriteLine("[WARN] invalid resp << " + rspTxt);
-                            }
-                        }
-                        else if (resp.Subj == K_SUBJ_TICK)
-                        {
-                            var msg = Helper.MyJsonSafeToObj<Models.MktInstrumentTick>(resp.Data);
-                            if (msg != null)
-                            {
-                                onMktInstrumentTick?.Invoke(msg);
-                            }
-                            else
-                            {
-                                Debug.WriteLine("[WARN] invalid resp << " + rspTxt);
-                            }
-                        }
-                        else if (resp.Subj == K_SUBJ_INDEX)
-                        {
-                            var msg = Helper.MyJsonSafeToObj<Models.MktCompositeIndexTick>(resp.Data);
-                            if (msg != null)
-                            {
-                                onMktCompositeIndexTick?.Invoke(msg);
-                            }
-                            else
-                            {
-                                Debug.WriteLine("[WARN] invalid resp << " + rspTxt);
-                            }
-                        }
-                        else if (resp.Subj == K_SUBJ_KLINE)
-                        {
-                            var msg = Helper.MyJsonSafeToObj<Models.MktKLineItem>(resp.Data);
-                            if (msg != null)
-                            {
-                                onMktKLineItem?.Invoke(msg);
-                            }
-                            else
-                            {
-                                Debug.WriteLine("[WARN] invalid resp << " + rspTxt);
-                            }
-                        }
-                        else if (resp.Subj == K_SUBJ_NOTIF)
-                        {
-                            // 系统广播消息
-                            // TODO
-                            Debug.WriteLine("[NOTE] ignore notify msg << " + rspTxt);
-                        }
-                        else
-                        {
-                            Debug.WriteLine("[WANR]: unknown subj: " + rspTxt);
-                        }
+                        rspTxt = Helper.Decompress(buffer, 0, count);
                     }
                     else
                     {
-                        Debug.WriteLine("[ERROR] invalid msg from market-ws-server: " + rspTxt);
+                        rspTxt = Encoding.UTF8.GetString(buffer, 0, count);
+                    }
+
+                    try
+                    {
+                        if (rspTxt[0] == '[') // 多个消息一起数组过来的
+                        {
+                            var respList = Helper.MyJsonUnmarshal<List<WsMarketMessageResponse>>(rspTxt);
+                            foreach (var resp in respList)
+                            {
+                                onWsMarketMessageResponse(resp);
+                            }
+                        }
+                        else
+                        {
+                            var resp = Helper.MyJsonUnmarshal<WsMarketMessageResponse>(rspTxt);
+                            onWsMarketMessageResponse(resp);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("[ERROR] process ws-mkt-rsp-msg err:" + ex.Message + "; respTxt=" + rspTxt);
                     }
                 }
-            }, 
+            },
             cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
@@ -333,7 +359,7 @@ namespace Gmex.API.WS
         public async Task REQ_GetAssetDAsync(Action<int, List<Models.AssetD>> cb, CancellationToken cancellationToken)
         {
             // {"rid":"40","code":0,"data":[{Sym...},... ]}
-            var req = new Gmex.API.WS.WsMarketMessageRequest("GetAssetD", null);
+            var req = new Gmex.API.WS.WsMarketMessageRequest("GetAssetD", new Dictionary<string, int> { { "VP", this._vpid } });
             await this.SendRequestAsync(req, (code, data) =>
             {
                 var instruments = new List<Models.AssetD>();
@@ -354,7 +380,7 @@ namespace Gmex.API.WS
         public async Task REQ_GetAssetExAsync(Action<int, List<Models.AssetEx>> cb, CancellationToken cancellationToken)
         {
             // {"rid":"40","code":0,"data":[{Sym...},... ]}
-            var req = new Gmex.API.WS.WsMarketMessageRequest("GetAssetEx", null);
+            var req = new Gmex.API.WS.WsMarketMessageRequest("GetAssetEx", new Dictionary<string, int> { { "VP", this._vpid } });
             await this.SendRequestAsync(req, (code, data) =>
             {
                 var instruments = new List<Models.AssetEx>();
@@ -395,6 +421,32 @@ namespace Gmex.API.WS
                 else
                 {
                     Debug.WriteLine("[-] GetHistKLine failed: " + data.ToString());
+                    cb(code, null);
+                }
+            },
+            cancellationToken);
+        }
+        public async Task REQ_GetLatestKLine(string sym, Models.MktKLineType typ, int count, Action<int, Models.MktQueryKLineHistoryResult> cb, CancellationToken cancellationToken)
+        {
+            var args = new Models.MktQueryKLineHistoryRequestArgs
+            {
+                Sym = sym,
+                Typ = typ,
+                Count = count
+            };
+            var req = new WsMarketMessageRequest("GetLatestKLine", args);
+
+            await this.SendRequestAsync(req, (code, data) =>
+            {
+                //Models.MxQueryKLineHistoryResult result = new Models.MxQueryKLineHistoryResult();
+                if (code == 0)
+                {
+                    var res = Helper.MyJsonSafeToObj<Models.MktQueryKLineHistoryResult>(data);
+                    cb(code, res);
+                }
+                else
+                {
+                    Debug.WriteLine("[-] GetLatestKLine failed: " + data.ToString());
                     cb(code, null);
                 }
             },
@@ -453,7 +505,7 @@ namespace Gmex.API.WS
         }
         public async Task REQ_Sub_kline_xxx(string sym, Models.MktKLineType typ, Action<int, string> cb, CancellationToken cancellationToken, bool unSub)
         {
-            
+
             await REQ_Sub(new List<string> { K_SUBJ_KLINE + "_" + Gmex.API.Helper.GetEnumMemberValue(typ) + "_" + sym }, cb, cancellationToken, unSub);
         }
         public async Task REQ_Sub_index_xxx(string ci, Action<int, string> cb, CancellationToken cancellationToken, bool unSub)
@@ -462,6 +514,6 @@ namespace Gmex.API.WS
         }
 
 
-        
+
     }
 }

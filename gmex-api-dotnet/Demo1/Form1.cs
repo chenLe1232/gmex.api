@@ -186,7 +186,7 @@ namespace Demo1
             {
                 LOG(">> " + url + " ...\r\n");
 
-                cli4mkt = new Gmex.API.WS.Client4Market();
+                cli4mkt = new Gmex.API.WS.Client4Market(Convert.ToInt32(textBoxMktVPID.Text));
                 await cli4mkt.ReceiveLoop(url, true,
                     (obj) => { UI_ACTION(() => { OnMarketPushMessage(obj); }); },
                     (obj) => { UI_ACTION(() => { OnMarketPushMessage(obj); }); },
@@ -474,7 +474,7 @@ namespace Demo1
             try
             {
                 LOG(">> " + url + " ...\r\n");
-                cli4trd = new Gmex.API.WS.Client4Trade(textBoxUname.Text.Trim(), textBoxApiKey.Text.Trim(), textBoxApiSecret.Text.Trim());
+                cli4trd = new Gmex.API.WS.Client4Trade(textBoxUname.Text.Trim(), Convert.ToInt32(textBoxVPID.Text), textBoxApiKey.Text.Trim(), textBoxApiSecret.Text.Trim());
 
                 await cli4trd.ReceiveLoop(url, true,
                     (obj) => { UI_ACTION(() => { OnTradePushMessage(obj); }); },
@@ -850,6 +850,7 @@ namespace Demo1
                         textBoxUname.Text = config[url].UserName;
                         textBoxApiKey.Text = config[url].ApiKey;
                         textBoxApiSecret.Text = config[url].ApiSecret;
+                        textBoxVPID.Text = config[url].VP.ToString();
                     }
                 }
             }
@@ -876,6 +877,33 @@ namespace Demo1
 
 
             }, cts4mkt.Token);
+        }
+
+        async private void button21_Click(object sender, EventArgs e)
+        {
+            var sym = textBox5.Text.Trim();
+            if (sym.Length < 1) return;
+
+            Gmex.API.Models.MktKLineType typ;
+            int count;
+            try
+            {
+                count = Convert.ToInt32(textBoxCount2.Text.Trim());
+                typ = (Gmex.API.Models.MktKLineType)(comboBoxMktKLineTyp.SelectedIndex + 1);
+            }
+            catch (Exception)
+            {
+                return;
+            }
+
+            await cli4mkt?.REQ_GetLatestKLine(sym, typ, count, (code, msg) =>
+            {
+                UI_ACTION(() =>
+                {
+                    LOG($"<< GetLatestKLine({sym},{typ}) ret code={code}: \r\n {Gmex.API.Helper.MyJsonMarshal(msg)}\r\n");
+                });
+            },
+            cts4mkt.Token);
         }
     }
 }

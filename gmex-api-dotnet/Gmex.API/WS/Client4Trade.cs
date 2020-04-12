@@ -16,14 +16,16 @@ namespace Gmex.API.WS
         private ClientWebSocket _ws;
 
         private string _uname;
+        private int _vpid;
         private string _apikey;
         private string _apisecret;
 
         private string _uid; // Login成功后得到
 
-        public Client4Trade(string uname, string apiKey, string apiSecret)
+        public Client4Trade(string uname, int vpid, string apiKey, string apiSecret)
         {
             _uname = uname;
+            _vpid = vpid;
             _apikey = apiKey;
             _apisecret = apiSecret;
         }
@@ -86,6 +88,95 @@ namespace Gmex.API.WS
 
             await Task.Factory.StartNew(async () =>
             {
+                Action<WsTradeMessageResponse> onWsTradeMessageResponse = (resp) =>
+                {
+                    if (resp?.ReqID?.Length > 0)
+                    {
+                        if (_request_callback.ContainsKey(resp.ReqID))
+                        {
+                            var action = _request_callback[resp.ReqID];
+                            _request_callback.Remove(resp.ReqID);
+                            action?.Invoke(resp.Code, resp.Data);
+                        }
+                        else
+                        {
+                            Debug.WriteLine("[WARN] ignore non-exists-reqid resp << " + resp);
+                        }
+                    }
+                    else if (resp?.Subj?.Length > 0)
+                    {
+                        if (resp.Subj == "onWallet")
+                        {
+                            var msg = Helper.MyJsonSafeToObj<Models.Wlt>(resp.Data);
+                            if (msg != null)
+                            {
+                                onWallet?.Invoke(msg);
+                            }
+                            else
+                            {
+                                Debug.WriteLine("[WARN] invalid resp << " + resp);
+                            }
+                        }
+                        else if (resp.Subj == "onTrade")
+                        {
+                            var msg = Helper.MyJsonSafeToObj<Models.TrdRec>(resp.Data);
+                            if (msg != null)
+                            {
+                                onTrade?.Invoke(msg);
+                            }
+                            else
+                            {
+                                Debug.WriteLine("[WARN] invalid resp << " + resp);
+                            }
+                        }
+                        else if (resp.Subj == "onOrder")
+                        {
+                            var msg = Helper.MyJsonSafeToObj<Models.Ord>(resp.Data);
+                            if (msg != null)
+                            {
+                                onOrder?.Invoke(msg);
+                            }
+                            else
+                            {
+                                Debug.WriteLine("[WARN] invalid resp << " + resp);
+                            }
+                        }
+                        else if (resp.Subj == "onPosition")
+                        {
+                            // {"subj":"onPosition","data":{"ADLIdx":-0.1733476102,"AId":"112508701","FeeEst":0.000000201,"Lever":0,"MI":0,"MMnF":0.0000013399,"MgnISO":0,"PId":"01CZ54KHZ9VAGCNPDWHS2XQREC","PrzBr":5.3328399195,"PrzIni":3732.57,"PrzLiq":5.3594841359,"ROE":-0.0002480831,"RPNL":-0.0000002009,"Sym":"BTC.BTC","Sz":1,"UId":"1125087","UPNL":-0.0000000665,"Val":-0.0002679119,"WId":"112508701BTC"}}
+                            var msg = Helper.MyJsonSafeToObj<Models.Position>(resp.Data);
+                            if (msg != null)
+                            {
+                                onPosition?.Invoke(msg);
+                            }
+                            else
+                            {
+                                Debug.WriteLine("[WARN] invalid resp << " + resp);
+                            }
+                        }
+                        else if (resp.Subj == "onWltLog")
+                        {
+                            var msg = Helper.MyJsonSafeToObj<Models.WltLog>(resp.Data);
+                            if (msg != null)
+                            {
+                                onWltLog?.Invoke(msg);
+                            }
+                            else
+                            {
+                                Debug.WriteLine("[WARN] invalid resp << " + resp);
+                            }
+                        }
+                        else
+                        {
+                            Debug.WriteLine("[WANR]: unknown subj: " + resp);
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("[ERROR] invalid msg from trade-ws-server: " + resp);
+                    }
+                };
+
                 var buffer = new byte[GlobalDefine.K_MAX_MSG_SIZE]; // 有时消息会很大，比如查询1天的分钟K结果.
                 while (true)
                 {
@@ -161,104 +252,35 @@ namespace Gmex.API.WS
                         count += result.Count;
                     }
 
-                    var rspTxt = Encoding.UTF8.GetString(buffer, 0, count);
-                    WsMarketMessageResponse resp = null;
-                    try
+                    var rspTxt = "";
+                    if (result.MessageType == WebSocketMessageType.Binary) // 二进制压缩消息,先解压缩到txt格式
                     {
-                        resp = Helper.MyJsonUnmarshal<WsMarketMessageResponse>(rspTxt);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine("[ERROR] Deserialize Resp err: " + ex.Message);
-                    }
-
-                    if (resp == null)
-                        continue;
-
-                    if (resp?.ReqID?.Length > 0)
-                    {
-                        if (_request_callback.ContainsKey(resp.ReqID))
-                        {
-                            var action = _request_callback[resp.ReqID];
-                            _request_callback.Remove(resp.ReqID);
-                            action?.Invoke(resp.Code, resp.Data);
-                        }
-                        else
-                        {
-                            Debug.WriteLine("[WARN] ignore non-exists-reqid resp << " + rspTxt);
-                        }
-                    }
-                    else if (resp?.Subj?.Length > 0)
-                    {
-                        if (resp.Subj == "onWallet")
-                        {
-                            var msg = Helper.MyJsonSafeToObj<Models.Wlt>(resp.Data);
-                            if (msg != null)
-                            {
-                                onWallet?.Invoke(msg);
-                            }
-                            else
-                            {
-                                Debug.WriteLine("[WARN] invalid resp << " + rspTxt);
-                            }
-                        }
-                        else if (resp.Subj == "onTrade")
-                        {
-                            var msg = Helper.MyJsonSafeToObj<Models.TrdRec>(resp.Data);
-                            if (msg != null)
-                            {
-                                onTrade?.Invoke(msg);
-                            }
-                            else
-                            {
-                                Debug.WriteLine("[WARN] invalid resp << " + rspTxt);
-                            }
-                        }
-                        else if (resp.Subj == "onOrder")
-                        {
-                            var msg = Helper.MyJsonSafeToObj<Models.Ord>(resp.Data);
-                            if (msg != null)
-                            {
-                                onOrder?.Invoke(msg);
-                            }
-                            else
-                            {
-                                Debug.WriteLine("[WARN] invalid resp << " + rspTxt);
-                            }
-                        }
-                        else if (resp.Subj == "onPosition")
-                        {
-                            // {"subj":"onPosition","data":{"ADLIdx":-0.1733476102,"AId":"112508701","FeeEst":0.000000201,"Lever":0,"MI":0,"MMnF":0.0000013399,"MgnISO":0,"PId":"01CZ54KHZ9VAGCNPDWHS2XQREC","PrzBr":5.3328399195,"PrzIni":3732.57,"PrzLiq":5.3594841359,"ROE":-0.0002480831,"RPNL":-0.0000002009,"Sym":"BTC.BTC","Sz":1,"UId":"1125087","UPNL":-0.0000000665,"Val":-0.0002679119,"WId":"112508701BTC"}}
-                            var msg = Helper.MyJsonSafeToObj<Models.Position>(resp.Data);
-                            if (msg != null)
-                            {
-                                onPosition?.Invoke(msg);
-                            }
-                            else
-                            {
-                                Debug.WriteLine("[WARN] invalid resp << " + rspTxt);
-                            }
-                        }
-                        else if (resp.Subj == "onWltLog")
-                        {
-                            var msg = Helper.MyJsonSafeToObj<Models.WltLog>(resp.Data);
-                            if (msg != null)
-                            {
-                                onWltLog?.Invoke(msg);
-                            }
-                            else
-                            {
-                                Debug.WriteLine("[WARN] invalid resp << " + rspTxt);
-                            }
-                        }
-                        else
-                        {
-                            Debug.WriteLine("[WANR]: unknown subj: " + rspTxt);
-                        }
+                        rspTxt = Helper.Decompress(buffer, 0, count);
                     }
                     else
                     {
-                        Debug.WriteLine("[ERROR] invalid msg from trade-ws-server: " + rspTxt);
+                        rspTxt = Encoding.UTF8.GetString(buffer, 0, count);
+                    }
+
+                    try
+                    {
+                        if (rspTxt[0] == '[') // 多个消息一起数组过来的
+                        {
+                            var respList = Helper.MyJsonUnmarshal<List<WsTradeMessageResponse>>(rspTxt);
+                            foreach (var resp in respList)
+                            {
+                                onWsTradeMessageResponse(resp);
+                            }
+                        }
+                        else
+                        {
+                            var resp = Helper.MyJsonUnmarshal<WsTradeMessageResponse>(rspTxt);
+                            onWsTradeMessageResponse(resp);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("[ERROR] process ws-trd-rsp-msg err:" + ex.Message + "; respTxt=" + rspTxt);
                     }
                 }
             },
@@ -305,6 +327,7 @@ namespace Gmex.API.WS
                 new Models.TradeRequestLoginArgs
                 {
                     UserName = this._uname,
+                    VP = this._vpid,
                     UserCred = this._apikey,
                     DeviceInfo = "gmex-api-dotnet sample"
                 });
@@ -362,13 +385,13 @@ namespace Gmex.API.WS
         public async Task REQ_GetAssetExAsync(int AccTyp, string Sym, Action<int, Models.AssetEx> cb, CancellationToken cancellationToken)
         {
             var req = new Gmex.API.WS.WsTradeMessageRequest("GetAssetEx",
-                new Dictionary<string, string>() { { "AId", this._uid + AccTyp.ToString("D2") }, { "Sym", Sym} }
+                new Dictionary<string, string>() { { "AId", this._uid + AccTyp.ToString("D2") }, { "Sym", Sym } }
                 );
             await this.SendRequestAsync(req, (code, data) =>
             {
                 Models.AssetEx ex = null;
                 var obj = data as Newtonsoft.Json.Linq.JObject;
-                if (obj!=null)
+                if (obj != null)
                     ex = obj.ToObject<Models.AssetEx>();
                 cb(code, ex);
             },
@@ -527,7 +550,7 @@ namespace Gmex.API.WS
         /// <returns></returns>
         public async Task REQ_GetCcsWalletsAsync(Action<int, List<Models.CcsWallet>> cb, CancellationToken cancellationToken)
         {
-            var req = new Gmex.API.WS.WsTradeMessageRequest("GetCcsWallets",null);
+            var req = new Gmex.API.WS.WsTradeMessageRequest("GetCcsWallets", null);
             await this.SendRequestAsync(req, (code, data) =>
             {
                 var msgs = new List<Models.CcsWallet>();
@@ -584,7 +607,7 @@ namespace Gmex.API.WS
         public async Task REQ_GetRiskLimitAsync(int AccTyp, string sym, Action<int, Models.RiskLimit> cb, CancellationToken cancellationToken)
         {
             var req = new Gmex.API.WS.WsTradeMessageRequest("GetRiskLimit",
-                new Dictionary<string, string>() { { "AId", this._uid + AccTyp.ToString("D2") }, { "Sym", sym} }
+                new Dictionary<string, string>() { { "AId", this._uid + AccTyp.ToString("D2") }, { "Sym", sym } }
                 );
             await this.SendRequestAsync(req, (code, data) =>
             {
@@ -628,7 +651,7 @@ namespace Gmex.API.WS
         public async Task REQ_PosLeverageAsync(int AccTyp, string sym, string postionId, decimal param, Action<int, object> cb, CancellationToken cancellationToken)
         {
             var req = new Gmex.API.WS.WsTradeMessageRequest("PosLeverage",
-                new Dictionary<string, object>() { { "AId", this._uid + AccTyp.ToString("D2") }, { "Sym", sym }, { "PId", postionId }, {"Param", param} }
+                new Dictionary<string, object>() { { "AId", this._uid + AccTyp.ToString("D2") }, { "Sym", sym }, { "PId", postionId }, { "Param", param } }
                 );
             await this.SendRequestAsync(req, (code, data) =>
             {

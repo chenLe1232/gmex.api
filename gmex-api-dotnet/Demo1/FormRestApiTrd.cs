@@ -51,7 +51,7 @@ namespace Demo1
                 }
                 try
                 {
-                    var client = new RESTClient4Trade(comboBoxTrdServer.Text, textBoxUname.Text, textBoxApiKey.Text, textBoxApiSecret.Text);
+                    var client = new RESTClient4Trade(comboBoxTrdServer.Text, textBoxUname.Text, Convert.ToInt32(textBoxVPID.Text), textBoxApiKey.Text, textBoxApiSecret.Text);
                     var info = await client.GetUserInfoAsync();
                     LOG($"[DEBUG] connect trade-server, get user info: {info}\r\n");
                     cli4trd = client;
@@ -80,7 +80,7 @@ namespace Demo1
 
             try
             {
-                var client = new RESTClient4Trade(comboBoxTrdServer.Text, textBoxUname.Text, textBoxApiKey.Text, textBoxApiSecret.Text);
+                var client = new RESTClient4Trade(comboBoxTrdServer.Text.Trim(), textBoxUname.Text.Trim(), Convert.ToInt32(textBoxVPID.Text), textBoxApiKey.Text.Trim(), textBoxApiSecret.Text.Trim());
                 var info = await client.GetUserInfoAsync();
                 LOG($"[DEBUG] connect trade-server, GetUserInfo: {info}\r\n");
 
@@ -397,10 +397,12 @@ namespace Demo1
                         textBoxUname.Text = config[url].UserName;
                         textBoxApiKey.Text = config[url].ApiKey;
                         textBoxApiSecret.Text = config[url].ApiSecret;
+                        textBoxVPID.Text= config[url].VP.ToString();
                     }
                 }
             }
             catch (Exception) { }
         }
+
     }
 }

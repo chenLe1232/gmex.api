@@ -11,6 +11,7 @@ namespace Gmex.API.Models
         public string UserName { get; set; }
         public string ApiKey { get; set; }
         public string ApiSecret { get; set; }
+        public int VP { get; set; }
     }
 
 }

@@ -34,15 +34,21 @@ namespace Gmex.API.REST
         public string Username { get; set; }
 
         /// <summary>
+        /// VP 渠道号,没有或不知道就默认0即可.
+        /// </summary>
+        [JsonProperty(Order = 5, PropertyName = "VP")]
+        public int VP { get; set; }
+
+        /// <summary>
         /// Apikey
         /// </summary>
-        [JsonProperty(Order = 5, PropertyName = "apikey")]
+        [JsonProperty(Order = 6, PropertyName = "apikey")]
         public string Apikey { get; set; }
 
         /// <summary>
         /// request mesage signature
         /// </summary>
-        [JsonProperty(Order = 6, PropertyName = "signature")]
+        [JsonProperty(Order = 7, PropertyName = "signature")]
         public string Signature { get; set; }
 
 
@@ -57,12 +63,13 @@ namespace Gmex.API.REST
         /// </summary>
         /// <param name="ApiKey"></param>
         /// <param name="ApiSecret"></param>
-        public void Sign(string UserName, string ApiKey, string ApiSecret)
+        public void Sign(string UserName, int vpid, string ApiKey, string ApiSecret)
         {
             if (UserName == null || ApiSecret == null || ApiSecret.Length <= 0)
                 return;
 
             this.Username = UserName;
+            this.VP = vpid;
             this.Apikey = ApiKey;
             this.Expires = DateTimeOffset.Now.ToUnixTimeMilliseconds() + GlobalDefine.MSG_REQ_EXPIRES_DEFAULT_TIMEOUT;
 
@@ -89,9 +96,9 @@ namespace Gmex.API.REST
         /// <param name="ApiKey"></param>
         /// <param name="ApiSecret"></param>
         /// <returns></returns>
-        public string GetSignedTxt(string UserName, string ApiKey, string ApiSecret)
+        public string GetSignedTxt(string UserName, int VP, string ApiKey, string ApiSecret)
         {
-            this.Sign(UserName, ApiKey, ApiSecret);
+            this.Sign(UserName, VP, ApiKey, ApiSecret);
             var txt = Helper.MyJsonMarshal(this);
             //return Encoding.UTF8.GetBytes(txt);
             return txt;
